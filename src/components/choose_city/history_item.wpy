@@ -1,0 +1,40 @@
+<style lang="less">
+  .history-item {
+    width: 33.33%;
+    border: 1px solid #000;
+    text-align: center;
+    font-size: 14px;
+  }
+  .history-item-content {
+    margin: 4px;
+    padding: 6px;
+    background-color: #dddddd;
+    color: #333;
+    font-size: 14px;
+  }
+  .history-item-content:active {
+    background-color: #0872b0;
+    color: white;
+  }
+</style>
+<template>
+  <view class="history-item" @tap="tapHistoryItem">
+    <view class="history-item-content">
+      {{ city.display_city }}
+    </view>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  export default class HistoryCityItem extends wepy.component {
+    props = {
+      city: {},
+    }
+    methods = {
+      tapHistoryItem (ev) {
+        this.$emit('click-history', this.city)
+      },
+    }
+
+  }
+</script>

@@ -1,0 +1,526 @@
+<style lang="less">
+
+  #bottom-loader-wrapper {
+    align-self: center;
+    padding: 10px;
+  }
+
+  #operation_wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-self: stretch;
+    margin: 8px 12px 0px 12px;
+  }
+
+  #clear_button {
+    display: flex;
+    background-color: #f2f2f2;
+    color: #333;
+    height: 36px;
+    text-align: center;
+    align-items: center;
+    margin-right: 8px;
+    padding-left: 16px;
+    padding-right: 16px;
+    border-radius: 2px;
+    justify-content: center;
+  }
+
+  #clear_button:active {
+    opacity: 0.7;
+  }
+
+  #confirm_button {
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    border-radius: 2px;
+    height: 36px;
+    flex: 1;
+    background-color: #0872b0;
+  }
+
+  #confirm_button:active {
+    opacity: 0.7;
+  }
+
+  #contact_service_button {
+    color: #333;
+    text-decoration: underline;
+  }
+
+</style>
+<template>
+  <block wx:if="{{ !visible }}">
+    <view class="container"
+          style="min-height: 100vh;">
+      <view
+        style="display: flex; flex-direction: column; flex: 1; padding-bottom: {{ isMine ? '95px' : '0px' }}; padding-top: {{ isMine ? '44px' : '0px' }}">
+
+        <block wx:if="{{ isMine }}">
+          <view style="display: flex; align-items: center; position: fixed; top: 0; left: 0; width: 100vw; height: 44px; background-color: white;">
+            <text style=" padding: 8px 16px; flex: 1;">通告可以5分钟重发刷新一次</text>
+            <text style="font-size: 14px; color: #0872b0; text-decoration: underline; padding: 8px 16px; width: 50px; text-align: center;" @tap="selectAll">{{ selectAllFlag ? '全选' : '全不选' }}</text>
+          </view>
+        </block>
+
+        <repeat for="{{ announce_data }}" item="item" index="index" key="index">
+          <view @tap="clickItem" data-announce-id="{{item.announceID}}" data-announce-index="{{index}}">
+            <express_item :item_data="item"/>
+          </view>
+        </repeat>
+        <view id="bottom-loader-wrapper">
+          <block wx:if="{{ !hasMore }}">
+            <text style="font-size: 12px; color: #9f9f9f;">没有更多内容了</text>
+          </block>
+          <block wx:elif="{{ isLoadingMore }}">
+            <bounce_loading/>
+          </block>
+        </view>
+      </view>
+
+      <block wx:if="{{ isMine }}">
+        <view style="display: flex; position: fixed; bottom: 0; left: 0; width: 100vw; height: 95px; background-color: white">
+          <view style="display: flex; align-self: flex-end; flex: 1; flex-direction: column; align-items: center; padding-bottom: 12px;">
+            <view style="display: flex; justify-content: center; padding-top: 12px; align-items: center;">
+              <text style="margin-right: 10px">在线客服</text>
+              <contact-button type="default-dark" size="27" session-from="kol_report"></contact-button>
+              <text id="contact_service_button" @tap="clickContactService" style="font-size: 14px; margin-left: 10px">客服电话:400-6090-168</text>
+            </view>
+
+            <view id="operation_wrapper">
+              <text id="clear_button"
+                    style="background-color: {{ submitReady ? '#f2f2f2' : '#9f9f9f' }}; color: {{ submitReady ? '#333' : 'white' }}"
+                    disabled="{{ !submitReady  }}"
+                    @tap="onClickCancel">删除</text>
+              <text id="confirm_button"
+                    style="background-color: {{ submitReady ? '#0872b0' : '#9f9f9f' }}"
+                    disabled="{{ !submitReady  }}"
+                    @tap="onClickSubmit">重发刷新</text>
+            </view>
+
+          </view>
+        </view>
+      </block>
+
+      <block wx:if="{{ isRefreshing }}">
+        <view
+          style="width: 100vw; height: 100vh; position: fixed; z-index: 100; display: flex; justify-content: center; align-items: center">
+          <bounce_loading/>
+        </view>
+      </block>
+    </view>
+  </block>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import ExpressAreaItem from '../components/express_area/express_item'
+  import BounceLoadingView from '../components/bounce_loading_view'
+  import * as LoginApi from '../api/login'
+  import * as PackageApi from '../api/packages'
+  // import * as AnnounceReleaseApi from '../api/announce_release'
+  // import {isLogged, goLoginPage} from '../utils/login_util'
+  import mta from '../utils/mta_analysis'
+
+  class Util {
+    // 根据本页面的过滤条件构建搜索的条件对象
+    static buildQueryOption(data, pageIndex) {
+      let { userIDs } = data
+      return {
+        pageIndex,
+        userIDs
+      }
+    }
+  }
+
+  export default class PersonAnnouncePage extends wepy.page {
+    config = {
+      navigationBarTitleText: '用户通告列表',
+      enablePullDownRefresh: true,
+    }
+    components = {
+      express_item: ExpressAreaItem,
+      bounce_loading: BounceLoadingView,
+    }
+
+    data = {
+      userIDs: "",
+      // 进入时不允许看，因为可能还未登录
+      visible: false,
+      // 用于不同手机，设置 scrollview 高度
+      scrollViewHeight: 1, // 没用到
+      isLoadingMore: false,
+      hasMore: true,
+      isRefreshing: false, // 可以是筛选完毕之后自动触发的一次 Loading. 和Loading more 有区别
+      current_page_index: 0,
+      announce_data: [],
+      selectAllFlag: true,
+      isMine: false
+    }
+
+    computed = {
+      submitReady() {
+        let checkedItems = ''
+        this.announce_data.forEach(function (item) {
+          if (item.checked) {
+            checkedItems = checkedItems + ',' + item.announceID
+          }
+        })
+        return checkedItems
+      }
+    }
+
+    methods = {
+
+      // 去详情页面
+      clickItem(ev) {
+        const { announceIndex } = ev.currentTarget.dataset
+        let item = this.announce_data[announceIndex]
+        if (item) {
+          if (!this.isMine) {
+            wepy.navigateTo({
+              url: '../pages/express_detail?data=' + JSON.stringify(item)
+            })
+          } else {
+            if (item.checked) {
+              item.checked = 0
+            } else {
+              item.checked = 1
+            }
+          }
+        }
+      },
+
+      selectAll(ev) {
+        let that = this
+        this.announce_data.forEach(function (item) {
+          if (that.selectAllFlag) {
+            item.checked = 1
+          } else {
+            item.checked = 0
+          }
+        })
+        if (this.selectAllFlag) {
+          this.selectAllFlag = false
+        } else {
+          this.selectAllFlag = true
+        }
+        this.$apply()
+      },
+
+      // onClickSubmit(ev) {
+      //   console.log('form发生了submit事件，携带数据为：', ev.detail.value)
+      //   // let that = this
+      //   wepy.showLoading({
+      //     title: '正在提交...',
+      //     mask: true,
+      //   })
+
+      //   let checkedItems = ''
+      //   this.announce_data.forEach(function (item) {
+      //     if (item.checked) {
+      //       checkedItems = checkedItems + ',' + item.announceID
+      //     }
+      //   })
+
+      //   let that = this
+      //   AnnounceReleaseApi.batchRefreshAnnounce(checkedItems)
+      //     .then((res) => {
+      //       wepy.hideLoading()
+      //       let callback = that['requestRefresh']
+      //       if (typeof callback === 'function') {
+      //         callback.call(that, null)
+      //       }
+      //       wepy.showToast({
+      //         title: '成功',
+      //         icon: 'success',
+      //         duration: 2000
+      //       })
+      //     })
+      //     .catch((err) => {
+      //       wepy.hideLoading()
+      //       wepy.showToast({
+      //         title: err.message || '发布失败',
+      //         icon: 'success',
+      //         duration: 2000
+      //       })
+      //     })
+      // },
+
+      // onClickCancel(ev) {
+      //   console.log('form发生了submit事件，携带数据为：', ev.detail.value)
+      //   // let that = this
+      //   wepy.showLoading({
+      //     title: '正在提交...',
+      //     mask: true,
+      //   })
+
+      //   let checkedItems = ''
+      //   this.announce_data.forEach(function (item) {
+      //     if (item.checked) {
+      //       checkedItems = checkedItems + ',' + item.announceID
+      //     }
+      //   })
+
+      //   let that = this
+      //   AnnounceReleaseApi.batchDisableAnnounce(checkedItems)
+      //     .then((res) => {
+      //       wepy.hideLoading()
+      //       let callback = that['requestRefresh']
+      //       if (typeof callback === 'function') {
+      //         callback.call(that, null)
+      //       }
+      //       wepy.showToast({
+      //         title: '成功',
+      //         icon: 'success',
+      //         duration: 2000
+      //       })
+      //     })
+      //     .catch((err) => {
+      //       wepy.hideLoading()
+      //       wepy.showToast({
+      //         title: err.message || '发布失败',
+      //         icon: 'success',
+      //         duration: 2000
+      //       })
+      //     })
+      // },
+
+      clickContactService(ev) {
+        wepy.showModal({
+          title: '是否拨打客服电话',
+          content: '4006090168',
+        }).then(function (res) {
+          if (res.confirm) {
+            wepy.makePhoneCall({
+              phoneNumber: '4006090168'
+            })
+          } else if (res.cancel) {
+            console.log('用户点击取消')
+          }
+        })
+      }
+
+    }
+
+    events = {
+      'click-call-phone': function (data) {
+        wepy.showModal({
+          title: '是否拨打电话',
+          content: data.user,
+        }).then((res) => {
+          if (res.confirm) {
+            wepy.makePhoneCall({
+              phoneNumber: data.phone
+            })
+            LoginApi.saveDialHistory(data.dialUserId, data.announceId)
+          } else if (res.cancel) {
+            console.log('用户点击取消')
+          }
+        })
+      }
+    }
+
+    // 主动触发刷新
+    requestRefresh() {
+      let that = this
+      this.isRefreshing = true
+      PackageApi.searchAnnounce(Util.buildQueryOption(this.data, 0)).then((data) => {
+        data.forEach(function (item) {
+          item.owner.isMySelf = that.isMine
+        })
+        that.announce_data = data
+        that.hasMore = true
+        that.current_page_index = 0
+        that.isRefreshing = false
+        that.$apply()
+      }).catch((err) => {
+        that.isRefreshing = false
+        that.$apply()
+        wepy.showToast({
+          title: err.message || '加载失败',
+          image: '/images/icon_warning.png',
+          duration: 2000
+        })
+      })
+    }
+
+    onPullDownRefresh(e) {
+      console.log('onPullDownRefresh')
+      let that = this
+      PackageApi.searchAnnounce(Util.buildQueryOption(this.data, 0)).then((data) => {
+        data.forEach(function (item) {
+          item.owner.isMySelf = that.isMine
+        })
+        that.announce_data = data
+        that.current_page_index = 0
+        that.hasMore = true
+        that.$apply()
+        wepy.stopPullDownRefresh()
+      }).catch((err) => {
+        wepy.showToast({
+          title: err.message || '加载失败',
+          image: '/images/icon_warning.png',
+          duration: 2000
+        })
+        wepy.stopPullDownRefresh()
+      })
+    }
+
+    // onReachBottom(e) {
+    //   if (!this.hasMore || this.isLoadingMore || this.isRefreshing) {
+    //     return
+    //   }
+    //   this.isLoadingMore = true
+    //   let nextPageIndex = this.current_page_index + 1
+    //   let that = this
+    //   PackageApi.searchAnnounce(Util.buildQueryOption(this.data, nextPageIndex)).then((data) => {
+    //     data.forEach(function (item) {
+    //       item.owner.isMySelf = that.isMine
+    //     })
+    //     that.announce_data = that.announce_data.concat(data)
+    //     that.hasMore = data.length >= 15 // greater than page size
+    //     that.isLoadingMore = false
+    //     that.current_page_index = nextPageIndex
+    //     that.$apply()
+    //   }).catch((err) => {
+    //     wepy.showToast({
+    //       title: err.message || '加载失败',
+    //       image: '/images/icon_warning.png',
+    //       duration: 2000
+    //     })
+    //     that.isLoadingMore = false
+    //     that.$apply()
+    //   })
+    // }
+
+    onShareAppMessage(res) {
+      if (res.from === 'button') {
+        // 来自页面内转发按钮
+        console.log(res.target)
+      }
+      let loggedUser = wepy.getStorageSync('loggedUser')
+      let loggedUserAccountNo = loggedUser ? loggedUser.accountNo : ''
+
+      return {
+        title: `用户通告列表`,
+        desc: `用户通告列表`,
+        path: '/pages/person_announces?userIDs=' + this.userIDs + '&referUser=' + loggedUserAccountNo,
+
+        success: function (res) {
+          let shareTicket = res.shareTickets[0]
+
+          console.log(shareTicket) // 奇怪为什么 shareTickets 是个数组？这个数组永远只有一个值。
+
+          wx.getShareInfo({
+            shareTicket: shareTicket,
+            complete(res) {
+              console.log(res)
+            }
+          })
+
+          // 转发成功
+          mta.Event.stat('share_announce', {})
+          console.log(res)
+        },
+        fail: function (res) {
+          // 转发失败
+          console.log(res)
+        }
+      }
+    }
+
+    onShow(option) {
+
+      /*
+      let { userIDs } = option
+      this.userIDs = userIDs
+
+      this.isMine = false
+      let loggedUser = wepy.getStorageSync('loggedUser')
+      if (loggedUser && loggedUser.userID && (loggedUser.userID + "") === this.userIDs) {
+        this.isMine = true
+      }
+      */
+      this.selectAllFlag = true
+      this.requestRefresh()
+    }
+
+    onLoad(option) {
+      wepy.showShareMenu({
+        withShareTicket: true // 要求小程序返回分享目标信息
+      })
+      // mta.Page.init()
+
+      let { userIDs } = option
+      this.userIDs = userIDs
+
+      this.isMine = false
+      this.selectAllFlag = true
+      let loggedUser = wepy.getStorageSync('loggedUser')
+      loggedUser = { userID: 1 }
+      if (loggedUser && loggedUser.userID && (loggedUser.userID + "") === this.userIDs) {
+        this.isMine = true
+      }
+
+      // let logged = isLogged()
+    //   if (logged) {
+
+    //     wepy.showLoading({
+    //       title: '正在检查登录状态...',
+    //       mask: true,
+    //     })
+    //     this.visible = logged
+
+    //     LoginApi.checkServerSideLogin()
+    //       .then((res) => {
+    //         wepy.setStorageSync('logged', true)
+    //         // LoginApi.getUserRefer()
+    //         // LoginApi.getLengYun56Data()
+    //         // LoginApi.getUserInfo()
+    //         wepy.hideLoading()
+    //       })
+    //       .catch((err) => {
+    //         wepy.setStorageSync('logged', false)
+    //         wepy.hideLoading()
+
+    //         let logged = isLogged()
+    //         if (!logged) {
+    //           // 先去登录
+    //           goLoginPage('', 'main')
+    //         }
+
+    //         if (err.is_internal && err.code === 1004) {
+    //           // 不是签约司机
+    //           wepy.showModal({
+    //             title: '提示',
+    //             content: err.message,
+    //           })
+    //         } else {
+    //           wepy.showToast({
+    //             title: err.message || '登录失败',
+    //             icon: 'success',
+    //             duration: 2000
+    //           })
+    //         }
+    //       })
+    //   } else {
+
+    //     this.visible = logged
+    //     if (!logged) {
+    //       // 先去登录
+    //       goLoginPage('', 'main')
+    //     }
+      // }
+    }
+
+    onReady() {
+      this.requestRefresh()
+    }
+
+  }
+</script>

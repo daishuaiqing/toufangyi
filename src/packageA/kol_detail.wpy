@@ -1,0 +1,275 @@
+<style lang="less">
+.container{
+  background: #dedede;
+  min-height: 100vh;
+}
+.container_koldetail{
+  display: flex;
+  flex-direction:column; 
+  flex: 1; 
+  width: 100vw; 
+  min-height: 100vh;
+  background-color: #f2f2f2; 
+}
+// 内容显示
+.content_show{
+  display: flex; 
+  flex-direction: column; 
+  margin-bottom: 8px;
+  box-shadow: 0 1px 1px #dedede;
+}
+  .operation-item {
+    display: flex;
+    border: 1px solid #000;
+    align-items: center;
+    border:1px solid white;
+    background-color: #5dd5c8;
+    flex: 1;
+    justify-content: center;
+  }
+  .operation-item text {
+    color: white;
+  }
+  #detail_share_button {
+    border-radius: 0;
+    background-color: transparent;
+    font-size: 14px;
+    color: white;
+    flex: 1;
+  }
+  #detail_share_button::after {
+    border: 0;
+  }
+  // 微信弹窗
+   .wechatlayer{
+    background:rgba(198, 202, 198,0.4);
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+  }
+  .layercontent{
+    width:250px;
+    height:150px;
+    border-radius:10px;
+    background:white;
+    margin:200px auto;
+    display:flex;
+    text-align: center;
+   flex-direction:column;
+  }
+  .wechat{
+    height:40px;
+    line-height:40px;
+    text-align:center;
+    font-size:16px;
+    width:100%;
+    border-top:1px solid #999;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+  }
+  // 摩卡区域
+  .pictures{
+    height: 160px;
+    margin-bottom: 8px;
+    margin-top:5px;
+    box-shadow: 0 1px 1px #dedede;
+  }
+  .img_user{
+    display:flex;
+    justify-content: center;
+    width: 100%;
+    height: 150px;
+  }
+  // 底部添加名片
+  .addIDcard{
+    position: fixed;
+    width: 100vw;
+    line-height: 45px;
+    bottom: 0;
+    height: 45px;
+    text-align: center;
+    background: white;
+    font-size: 14px;
+  }
+</style>
+<template>
+  <view class="container">
+    <view class="container_koldetail">
+      <view class="content_show">
+        <view style="display:flex;justify-content:space-between;height:28px;align-items:center;">
+          <text style="font-size: 13px;margin-left:10px;">摩卡展示</text>
+          <view wx:if="{{isFromMine}}" style="font-size: 13px;margin-right:10px;" @tap="editmyPhoto">编辑</view>
+        </view>
+        <view class="pictures">
+          <!-- 当前没有照片 -->
+          <view  wx:if="{{false}}" class="img_user" >
+            <jump url='/packageB/addpicture'>点击上传照片</jump>
+          </view>
+          <!-- 用户上传了照片 -->
+          <view wx:else class="img_user">
+           <swiper style="width:100%;height:100%;" indicator-dots = "true" autoplay="{{true}}" interval="{{3000}}" duration="{{5000}} " circular indicator-color='white'>
+             <swiper-item>
+                <image style="width: 100vw; height: 150px;" src="https://up.enterdesk.com/edpic_source/ad/d7/2d/add72da3d716f887c941c8b880b405fb.jpg"/>
+             </swiper-item>
+             <swiper-item>
+                <image style="width: 100vw; height: 150px;" src="https://up.enterdesk.com/edpic_source/ad/d7/2d/add72da3d716f887c941c8b880b405fb.jpg"/>
+             </swiper-item>
+           </swiper>
+        </view>
+        </view>
+        <!-- 平台 -->
+        <view wx:if="{{isFromMine}}" style="display: flex; flex-direction: column; justify-content: space-between">
+          <repeat for="{{platform_data}}" item ="item" index = "index" key="index">
+            <view @tap="clickItem" id="{{item.id}}">
+              <platform_item :item_data="item"/>
+            </view>
+          </repeat>
+        </view>
+        <view wx:else style="display: flex; flex-direction: column; justify-content: space-between">
+          <repeat for="{{platform_data}}" item ="item" index = "index" key="index">
+              <platform_item :item_data="item"/>
+          </repeat>
+        </view>
+        <jump url="/packageB/edit_myplatform?addplatform=true" class="addIDcard">+ 添加名片</jump>
+        <!-- 是否展示微信号 -->
+        <view wx:if="{{isShow}}" class="wechatlayer">
+          <view class="layercontent">
+            <text style="font-size:15px;font-weight:500;flex:1;margin-top:30px;">金主的微信号为</text>
+            <text style="font-size:12px;color:#999;margin:5px 0;">点击复制微信号</text>
+            <view class="wechat" @tap='copy' data-copy='{{value}}'>{{value}}</view>
+          </view>
+        </view>
+        <!-- 底部导航 -->
+        <view style="display: flex;height: 50px;position: fixed; bottom: 0; left: 0; width: 100vw;" wx:if="{{!isFromMine}}">
+           <view class="operation-item" @tap="callPhone" style="background-color: #5dd5c8">
+             <text>电话联系</text>
+           </view>
+           <view class="operation-item">
+             <button id="detail_share_button" open-type="share">分享</button>
+           </view>
+            <view class="{{applied?'apply-active':'operation-item'}}">
+             <text @tap="applyJob">微信联系</text>
+           </view>
+        </view>
+      </view>
+    </view> 
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  import jump from "../components/common/jump"
+  import { getRequest } from "../utils/request"
+  import PlatformItem from '../components/kol/platform'
+  export default class KOLDetailPage extends wepy.page {
+    config = {
+      navigationBarTitleText: '个人资料',
+      enablePullDownRefresh: false
+    }
+    components = {
+      jump,
+      platform_item: PlatformItem,
+    }
+    data = {
+      tempFilePaths: [],
+      editStatus: false,
+      isFromMine: null, // 判断是不是从我的资料页面进入此页面
+      isShow: false, // 是否隐藏微信号提示框
+      value: 'b222889564', // 微信号
+      platform_data: []
+    }
+    methods = {
+      editmyPhoto() {
+        wepy.navigateTo({url: '/packageB/addpicture'})
+      },
+      clickItem(e) {
+        var id = e.currentTarget.id
+        wepy.navigateTo({url: '/packageB/edit_myplatform?platformID=' + id})
+      },
+         // 编辑照片的状态
+      edit_myphoto() {
+        this.editStatus = true
+      },
+      delImage(e) {
+        console.log('删除了图片')
+        var index = e.currentTarget.index
+        this.tempFilePaths.splice(index, 1)
+      },
+      previewImage(e) {
+        console.log(e)
+        var that = this
+        wepy.previewImage({
+          current: e.currentTarget.dataset.image,
+          urls: that.tempFilePaths
+        })
+      },
+      callPhone(ev) {
+        var userPhone = wx.getStorageSync('referUserPhoneNo')
+        // const { announceID } = this.item_data
+        // const { userName, mobileNo, userID } = this.item_data.owner
+        wepy.showModal({
+          title: '是否拨打电话',
+          content: userPhone,
+        }).then(function (res) {
+          if (res.confirm) {
+            wepy.makePhoneCall({
+              phoneNumber: value
+            })
+            LoginApi.saveDialHistory(userID, announceID)
+          } else if (res.cancel) {
+            console.log('用户点击取消')
+          }
+        })
+      },
+      copy(e) {
+        var that = this
+        var copy = e.currentTarget.dataset.copy
+        wepy.setClipboardData({
+          data: copy,
+          success: res => {
+            wepy.showToast({
+              title: '复制成功'
+            })
+          }
+        })
+        that.isShow = false
+      },
+      applyJob() {
+        this.applied = true
+        this.isShow = true
+      }
+    }
+    onShow() {
+      // 获取所有平台信息
+      let celebrity_id = 10000
+      getRequest({url: '/ums_celebrity_card/find/all/' + celebrity_id}).then(res => {
+        console.log(res)
+        if (res.data.code === 200) {
+          var platform_data = res.data.data
+          this.platform_data = platform_data
+          console.log(this.platform_data)
+        }
+      })
+    }
+    onLoad(options) {
+      console.log(options)
+      // 判断从哪个页面跳转过来
+      let pages = getCurrentPages()
+      let prevpage = pages[pages.length - 2]
+      console.log(prevpage.route)
+      // 从个人资料页面跳转过来 隐藏底部导航
+      if (prevpage.route === 'pages/kol_mine') {
+        this.isFromMine = true
+      }
+      wepy.showShareMenu({
+        withShareTicket: true // 要求小程序返回分享目标信息
+      })
+      let data = options.data
+      if (data) {
+        data = JSON.parse(data)
+        this.item_data = data
+      }
+    }
+  }
+</script>

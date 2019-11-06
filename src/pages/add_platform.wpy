@@ -1,0 +1,340 @@
+<style lang="less">
+.form_container{
+  width:90vw;
+  margin:10px auto;
+  min-height: 100vh;
+  font-size: 14px;
+}
+.form_input_label{
+  display: flex;
+  height: 50px;
+  justify-content: space-between;
+  width: 100%;
+  border-bottom: 1px solid #dedede;
+  align-items: center;
+}
+.labelname{
+  margin-left: 5px;
+}
+.filter_button{
+ font-size: 14px;
+  flex: 1;
+  padding-right: 20px;
+  color:#837f7f;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-size: 13px;
+}
+.input_edit{
+  height: 100%;
+  flex: 1;
+  text-align: right;
+  color:black;
+  font-size: 13px;
+  padding-right: 20px;
+}
+.button_all{
+  margin-top: 30px;
+  display: flex;
+  justify-content: space-around;
+}
+.edit_button{
+  font-size: 14px;
+  width: 30%;
+  margin-top: 25px;
+  border:none;
+  color:white;
+  border-radius: 10px;
+  background: rgb(187, 180, 180);
+  box-shadow: 2px 2px 2px #dedede;
+}
+</style>
+<template>
+<view>
+  <!-- boss发布公告页面 -->
+  <view class="form_container" wx:if="{{!verify}}">
+     <form bindsubmit="formSubmit" bindreset="formReset">
+      <view class="form_input_label">
+        <text class="labelname">商品名称</text>
+        <input  type="text" class="input_edit" name="announceName" @input="inputgoodsName" placeholder="请输入商品名称" value="{{goodsName}}" />
+      </view>
+    <!-- <view class="input_wrapper">
+      <view class="form_input_label">
+        <text class="labelname">文章篇数</text>
+         <picker name="articleNum" bindchange="bindPickerChange" value="{{index}}" range="{{array}}">
+          <view class="picker right_content">
+            {{array[index]}}篇 ▾
+          </view>
+      </picker>
+      </view>
+    </view> -->
+      <view class="form_input_label">
+        <text class="labelname">平台类型</text>
+         <picker name="appName" class="filter_button {{ filter_condition.platform ?  'filtered' : '' }}" @change="clickFilterByPlatform" value="{{filter_condition.platformIndex}}" range="{{platform_name_data}}">
+        <text>{{filter_platform_text}} ▾</text>
+        </picker>
+      </view>
+       <view class="form_input_label">
+        <text class="labelname">类别</text>
+         <picker name="announceCategory" class="filter_button right_content {{ filter_condition.contentType ?  'filtered' : '' }}" @change="clickFilterByContentType" value="{{filter_condition.contentTypeIndex}}" range="{{contentType_text_data}}">
+        <text>{{filter_contentType_text}} ▾</text>
+      </picker>
+      </view> 
+
+      <view class="form_input_label">
+        <text class="labelname">粉丝数</text>
+         <picker  name="fansNumb" class="filter_button {{ filter_condition.fans_num ?  'filtered' : '' }}" @change="clickFilterByFansNum" value="{{filter_condition.fansNumIndex}}" range="{{fans_num_name_data}}">
+        <text>{{filter_fans_num_text}} ▾</text>
+      </picker>
+      </view>
+      <view class="form_input_label">
+        <text class="labelname">需求人数</text>
+         <input class="input_edit" name="needNumb" type="number" @input="needNumb" placeholder="请输入需求人数" value="{{needNumb}}"/>
+      </view>
+       <view class="form_input_label">
+        <text class="labelname">报酬</text>
+         <input class="input_edit" name="salary" @input="salaryinput" type="number" placeholder="请输入报酬" value="{{salary}}"/>
+      </view>
+      <view class="form_input_label">
+        <text class="labelname">通告详情</text>
+      </view>
+      <view class="txt_input_container">
+        <block>
+          <view  hidden="{{!hasContent}}" @tap="inputCase" style="color:#837f7f;border:1px solid #999;min-height:100px;font-size:12px;">
+            <view>1、推广时间在9月或者10月初</view>
+            <view>2、颜值高的小姐姐优先，笔记需要收录</view>
+            <view>3、粉丝要求1w以上，固定报价100元</view>
+            <view style="padding-bottom: 16px;">4、拖稿的小姐姐就不要来了</view>
+            <view>至少输入8个字才可提交</view>
+          </view>
+           <textarea name="detail" id="" hidden="{{hasContent}}"  style="padding:10px;height:100px;width:92%;margin:0 auto;border:1px solid #888;line-height:20px;"></textarea>
+        </block>
+      </view>
+    <view class="form_input_label">
+      <text class="labelname">报名截止时间:{{data}}</text>
+       <picker  mode="date" value="{{endTime}}"  start="2019-10-01" end="2030-12-31" bindchange="bindDateChange" name="endTime">
+          <view class="filter_button" >
+           {{date? date: '年 - 月 - 日'}}
+          </view>
+        </picker>
+    </view>
+    <view class="button_all">
+        <button class="edit_button" formType="submit">保存</button>
+        <button class="edit_button" wx:if="{{fromPersonPage}}" @tap="delplatinfo">删除</button> 
+        <button class="edit_button" wx:else @tap="delplatinfo">重置</button>    
+    </view>
+  </form>
+   </view>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  import { FILTER_CONDITION } from '../data/filter'
+  import AreaPicker from "../components/common/wepy-area-picker"
+  import jump from "../components/common/jump"
+  import { postRequest } from "../utils/request"
+  export default class AddPlatformPage extends wepy.page {
+    config = {
+      enablePullDownRefresh: false,
+    }
+    components = {
+      AreaPicker,
+      jump
+    }
+    data = {
+      province: '',
+      city: '',
+      area: '',
+      salary: '',
+      needNUmb: '',
+      endTime: '',
+      index: 0,
+      array: ['1', '2', '3', '4', '5', '6'],
+      verify: false,
+      hasContent: true,
+      platformUserId: '',
+      goodsName: '',
+      announceDetail: '',
+      tempFilePaths: [],
+      filter_condition: {
+        platform: '',
+        platformIndex: 0,
+        fans_num: '',
+        fansNumIndex: 0,
+        contentType: '',
+        contentTypeIndex: 0,
+      },
+      contentType_data: FILTER_CONDITION.contentType_data, // 类别
+      platform_data: FILTER_CONDITION.platform_data, // 平台
+      fans_num_data: FILTER_CONDITION.fans_num_data // 粉丝数量
+    }
+    computed = {
+      submitReady() {
+      },
+      filter_platform_text() {
+        return this.filter_condition.platform ? this.filter_condition.platform.displayText : '请选择'
+      },
+      filter_fans_num_text() {
+        return this.filter_condition.fans_num ? this.filter_condition.fans_num.displayText : '请选择'
+      },
+      filter_contentType_text() {
+        return this.filter_condition.contentType ? this.filter_condition.contentType.displayText : '请选择'
+      },
+      platform_name_data() {
+        return this.platform_data.map((item) => {
+          return item.displayText
+        })
+      },
+      fans_num_name_data() {
+        return this.fans_num_data.map((item) => {
+          return item.displayText
+        })
+      },
+      contentType_text_data() {
+        return this.contentType_data.map((item) => {
+          return item.displayText
+        })
+      }
+    }
+    events = {
+      'areaArray': (...args) => {
+        console.log(args)
+        this.province = args[0]
+        this.city = args[1]
+        this.area = args[2]
+      }
+    }
+    // 需求人数
+    needNumb(e) {
+      this.needNUmb = e.detail.value
+    }
+    // 报酬
+    salaryinput(e) {
+      this.salary = e.detail.value
+    }
+     // 日期选择
+    bindDateChange(e) {
+      this.endTime = e.detail.value
+    }
+    methods = {
+      formSubmit(e) {
+        var announcevalue = e.detail.value
+        var data = {
+          "address": 'fdgf gfdg gdf',
+          "announceCategory": announcevalue.announceCategory,
+          "announceName": announcevalue.announceName,
+          "appName": announcevalue.appName,
+          "detail": announcevalue.detail,
+          "endTime": "2019-11-04T07:22:08.905Z",
+          "financierId": 22,
+          "id": 1
+        }
+        data.fansNumb = parseInt(announcevalue.fansNumb)
+        data.needNumb = parseInt(announcevalue.needNumb)
+        data.salary = parseInt(announcevalue.salary)
+        console.log(data)
+        // var data = {
+        //   "address": "dfsdfsdf",
+        //   "announceCategory": "其他",
+        //   "announceName": "点赞",
+        //   "appName": "绿洲",
+        //   "detail": "20",
+        //   "endTime": "2019-11-04T07:22:08.905Z",
+        //   "fansNumb": 1000,
+        //   "financierId": 221,
+        //   "id": 11,
+        //   "needNumb": 300,
+        //   "salary": 30
+        // }
+        postRequest({ url: '/bms_announce/add' }, data).then(res => {
+          if (res.data.code === 200) {
+            console.log(res.data)
+            wepy.showToast({
+              title: '上传成功',
+              icon: 'success',
+              duration: 2000,
+              mask: true,
+              success: res => {}
+            })
+          } else {
+            wepy.showToast({
+              title: '系统出现异常',
+              icon: 'none',
+              duration: 2000,
+              mask: true,
+              success: res => {}
+            })
+          }
+        })
+      },
+      formReset() {
+        console.log('form发生了reset事件')
+      },
+      // 输入通告详情
+      inputCase(e) {
+        this.hasContent = false
+        this.announceDetail = e.detail.value
+      },
+      // 输入商品名称
+      inputgoodsName(e) {
+        this.goodsName = e.detail.value
+      },
+      // 平台类型
+      clickFilterByPlatform(ev) {
+        let value = ev.detail.value
+        this.filter_condition.platformIndex = value
+
+        let plt = this.platform_data[value]
+        this.filter_condition.platform = plt && plt.platformId ? plt : ''
+      },
+      // 粉丝数量
+      clickFilterByFansNum(ev) {
+        let value = ev.detail.value
+        this.filter_condition.fansNumIndex = value
+        let fnd = this.fans_num_data[value]
+        this.filter_condition.fans_num = fnd && fnd.beginNum ? fnd : ''
+      },
+      // 类型
+      clickFilterByContentType(ev) {
+        let value = ev.detail.value
+        this.filter_condition.contentTypeIndex = value
+
+        let plt = this.contentType_data[value]
+        this.filter_condition.contentType = plt && plt.contentTypeId ? plt : ''
+      }
+    }
+    onShareAppMessage() {
+      return {
+        desc: '发布通告',
+        path: '/pages/add_announce',
+        success: function (res) {
+          // 转发成功
+//          mta.Event.stat('share_transportation_hire', {})
+          console.log(res)
+        },
+        fail: function (res) {
+          // 转发失败
+          console.log(res)
+        }
+      }
+    }
+    onLoad(options) {
+      console.log(this.$parent.globalData.wxinfo, '用户的信息')
+    }
+    onShow() {
+      var verify = this.$parent.globalData.verify
+      if (verify === 1) {
+        console.log('这是红人界面')
+        this.verify = true
+      } else {
+        console.log('这是金主界面')
+        this.verify = false
+        wepy.setNavigationBarTitle({
+          title: "发布通告"
+        })
+      }
+    }
+  }
+</script>

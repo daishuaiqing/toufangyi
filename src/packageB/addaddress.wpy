@@ -1,0 +1,114 @@
+<style lang="less">
+.address{
+    display:flex;
+    border-bottom:1px solid #dedede;
+    padding:10px;
+}
+input{
+    font-size: 14px;
+}
+.addItem{
+    width: 80px;
+    font-size: 12x;
+}
+</style>
+<template>
+  <view class="container" style="min-height: 100vh; background-color: white">
+      <form bindsubmit="formSubmit" bindreset="formReset">
+      <view style="padding:10px;background:white;">
+          <view class="address">
+              <view class="addItem">联系人</view>
+              <view style="flex:1;">
+                  <input placeholder="名字" name="contacter" @input="inputname" value="{{name}}"/>
+              </view>
+          </view>
+          <view class="address">
+              <view class="addItem">电话号</view>
+              <view style="flex:1;">
+                  <input placeholder="电话号" @input="inputmobileNO" value="{{mobileNO}}" name="mobileNo" type="number"/>
+              </view>
+          </view>
+          <view class="address" >
+              <view class="addItem">选择地区</view>
+              <view style="flex:1;">
+                  <view @tap="openAddressPicker">{{province ? province: '省'}} - {{city ? city: '市' }} - {{area ? area : '区' }}</view>
+                 <AreaPicker name="areapicker"></AreaPicker>
+              </view>
+          </view>
+          <view class="address">
+              <view class="addItem">详细地址</view>
+              <view style="flex:1;">
+                  <input placeholder="街道门牌信息" value="{{}}" name="detailaddress" @input="detailaddress"/>
+              </view>
+          </view>
+      </view>
+      <button formType="submit" style="width:80px;height:40px;font-size:16px;line-height:40px;">保存</button>
+      </form>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  import { postRequest } from "../utils/request"
+  import AreaPicker from "../components/common/wepy-area-picker"
+  export default class addaddress extends wepy.page {
+    config = {
+      navigationBarTitleText: '新增地址',
+      enablePullDownRefresh: false,
+    }
+    components = {
+      AreaPicker
+    }
+    events = {
+      'areaArray': (...args) => {
+        console.log(args, '1111111111111')
+        var areaInfo = args
+        this.areaInfo = areaInfo
+        this.province = args[0]
+        this.city = args[1]
+        this.area = args[2]
+
+      }
+    }
+    data = {
+      province: '',
+      city: '',
+      area: '',
+      name: ''
+    }
+    methods = {
+      inputname(e) {
+        this.name = e.detail.value
+      },
+      inputmobileNO(e) {
+        this.mobileNO = e.detail.value
+      },
+      detailaddress(e) {
+        this.detailaddress = e.detail.value
+      },
+      formSubmit(e) {
+        var data = {
+          "address": this.detailaddress,
+          "area": this.area,
+          "city": this.city,
+          "id": 11,
+          "isDefault": 0,
+          "mobile": this.mobileNO,
+          "name": this.name,
+          "province": this.province,
+          "userId": 1
+        }
+        postRequest({ url: '/ums_address/add' }, data).then(res => {
+          console.log(res)
+          if (res.data.code === 200) {
+            wepy.showToast({
+              title: '保存成功',
+              icon: 'success',
+            })
+          }
+        })
+      }
+    }
+    onLoad(options) {
+    }
+  }
+</script>

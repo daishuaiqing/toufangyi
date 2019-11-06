@@ -1,0 +1,113 @@
+<style lang="less">
+</style>
+<template>
+  <view class="container" style="min-height: 100vh; background-color: #dedede">
+    <view style=" display: flex; flex-direction: column; margin-bottom: 8px;">
+          <view style="padding:6px;">
+            <!-- 上传照片用户照片 -->
+          <text style="color: #9f9f9f; font-size: 12px;">上传摩卡</text>
+           <view style="position:relative;display: flex; padding: 6px;height:100px; margin-top: 6px; background-color: white">
+            <view style="position:absolute; top:5px; right:15px;">
+              <text style="font-size: 15px" class="iconfont" @tap='edit_myphoto'>&#xe601;</text>
+            </view>
+            <repeat for="{{tempFilePaths}}" item="item" index="index" key="index">
+              <view style="position:relative">
+                <image mode="aspectFill" @tap="previewImage" data-image="{{item}}" style="width:100px;height:100px;border:1px solid black;margin:0 5px;border:1px solid #ccc;" src="{{item}}"/>
+                <view class="iconfont" wx:if="{{editStatus}}" data-index ="{{index}}" catchtap="delImage" style="font-size:15px;position:absolute;right:10px;top:5px;">&#xe628;</view>
+              </view>
+            </repeat>
+            <view wx:if="{{tempFilePaths.length < 3}}"  @tap='uploadImg' style="width:100px;height:100px;background:#dedede;font-size:50px;color:#999;font-weight:200;display:flex;justify-content:center;align-items:center;">+</view>
+          </view>
+          </view>
+          <!-- 添加平台 -->
+        <view style="display:flex;justify-content:space-between;margin:10px 0;border-bottom:1px solid #dedede;background:white;padding:15px;font-size:15px;padding-left: 20px;"  @tap="addplatform">
+            <view class="iconfont" style="font-size:20px;margin-right:10px;">&#xe67b;</view>
+            <text style="flex:1">添加平台</text>
+            <view class="iconfont" style="color:#999;">&#xe683;</view>
+        </view>
+        <!-- 添加收货地址 -->
+        <view style="display:flex;justify-content:space-between;border-bottom:1px solid #dedede;background:white;padding:15px;font-size:15px;padding-left: 20px;" @tap="tomyaddress">
+            <view class="iconfont" style="font-size:20px;margin-right:10px;" >&#xe64b;</view>
+            <text style="flex:1">我的收货地址</text>
+            <view class="iconfont" style="color:#999;">&#xe683;</view>
+        </view>
+     </view>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  export default class RulePage extends wepy.page {
+    config = {
+      navigationBarTitleText: '完善我的信息',
+      enablePullDownRefresh: false,
+    }
+    data = {
+      tempFilePaths: [],
+      editStatus: false
+    }
+    methods = {
+         // 点击上传图片
+      uploadImg() {
+        var that = this
+        wx.chooseImage({
+          count: 3,
+          success(res) {
+            let tempFilePaths = res.tempFilePaths
+            if (that.tempFilePaths.length === 2) {
+              that.tempFilePaths = [...that.tempFilePaths, tempFilePaths[0]]
+            } else {
+              that.tempFilePaths = [...that.tempFilePaths, ...tempFilePaths]
+            }
+            console.log(that.tempFilePaths)
+            wepy.startPullDownRefresh({success: res => {}})
+            // // 上传完后把文件上传到服务器
+            // for (var i = 0; i < that.tempFilePaths.length; i++) {
+            //   wx.uploadFile({
+            //     url: 'https://a1.easemob.com',
+            //     filePath: that.tempFilePaths[i],
+            //     name: 'name',
+            //     success: res => {
+            //       wx.hideLoading()
+            //       console.log(res)
+            //       console.log('上传到服务器成功')
+            //     },
+            //     fail: () => {
+            //       console.log('上传图片失败')
+            //     }
+            //   })
+            // }
+          }
+        })
+      },
+         // 编辑照片的状态
+      edit_myphoto() {
+        this.editStatus = true
+      },
+      delImage(e) {
+        console.log('删除了图片')
+        var index = e.currentTarget.index
+        this.tempFilePaths.splice(index, 1)
+      },
+      previewImage(e) {
+        console.log(e)
+        var that = this
+        wepy.previewImage({
+          current: e.currentTarget.dataset.image,
+          urls: that.tempFilePaths
+        })
+      },
+        // 添加平台
+      addplatform() {
+        wepy.navigateTo({ url: '/packageB/edit_myplatform' })
+      },
+        // 添加地址
+      tomyaddress() {
+        wepy.navigateTo({ url: '/packageB/myaddress' })
+      },
+    }
+    components = {
+    }
+    onLoad(options) {
+    }
+  }
+</script>

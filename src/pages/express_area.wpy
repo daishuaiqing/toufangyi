@@ -1,0 +1,253 @@
+<style lang="less">
+// 顶部筛选
+#top-filter-bar{
+  display: flex;
+  font-size: 14px;
+  padding:10px 15px;
+  justify-content: space-around;
+  border-bottom: 1px solid rgba(216, 209, 209, 0.596);
+}
+.announce_list{
+  padding-bottom:30px;
+}
+</style>
+<template>
+<view>
+  <view wx:if="{{visible}}" style="text-align:center;padding-top:200px;">
+    <view >您当前还未登录，请先去登录...</view>
+  </view>
+  <!-- boss页面 -->
+  <view class="container" wx:if="{{!verify&!visible}}">
+      <!-- 顶部筛选区域-->
+      <view id="top-filter-bar">
+        <picker class="filter_button" @change="clickFilterByPlatform" value="{{filter_condition.platformIndex}}" range="{{platform_name_data}}">
+          <text>{{filter_platform_text}} ▾</text>
+        </picker>
+        <picker class="filter_button" @change="clickFilterByFansNum" value="{{filter_condition.fansNumIndex}}" range="{{fans_num_name_data}}">
+          <text>{{filter_fans_num_text}} ▾</text>
+        </picker>
+      </view>
+      <!-- 通告列表 -->
+      <repeat for="{{announce_data}}" item="item" index="index" key="index">
+          <view @tap="clickItem" data-announce-id="{{item.announceID}}" data-announce-index="{{index}}">
+            <ApplyItem :item_data="item"/>
+          </view>
+      </repeat>
+    </view>
+  <!-- 应聘者通告 -->
+  <block wx:if="{{verify&!visible}}">
+    <view class="container">
+        <!-- 顶部筛选区域-->
+      <view id="top-filter-bar">
+        <picker class="filter_button {{ filter_condition.platform ?  'filtered' : '' }}" @change="clickFilterByPlatform" value="{{filter_condition.platformIndex}}" range="{{platform_name_data}}">
+          <text>{{filter_platform_text}} ▾</text>
+        </picker>
+        <picker class="filter_button {{ filter_condition.fans_num ?  'filtered' : '' }}" @change="clickFilterByFansNum" value="{{filter_condition.fansNumIndex}}" range="{{fans_num_name_data}}">
+          <text>{{filter_fans_num_text}} ▾</text>
+        </picker>
+      </view>
+      <!-- 内容列表 -->
+      <view class="container announce_list">
+        <repeat for="{{announce_data}}" item="item" index="index" key="index">
+          <view @tap="clickItem" id="{{item.id}}">
+            <ExpressAreaItem :item_data="item"/>
+          </view>
+        </repeat>
+        <view id="bottom-loader-wrapper" style="padding:10px 0;font-size:12px;text-align:center;">
+          <block wx:if="{{ !hasMore }}">
+            <text class="bottom_loader_wrapper_text">没有更多内容了</text>
+          </block>
+        </view>
+      </view>
+      <block wx:if="{{ isRefreshing }}">
+        <view class="page_mask">
+          <bounce_loading/>
+        </view>
+      </block>
+      <!-- 底部tabbar -->
+      <mp-tabbar current="{{current}}" style="position:fixed;bottom:0;width:100%;left:0;right:0;" list="{{list}}" bindchange="tabChange"></mp-tabbar>
+    </view>
+  </block>
+</view>
+</template>
+<script>
+  import wepy from 'wepy'
+  // import jump from "../components/common/jump"
+  import { FILTER_CONDITION } from '../data/filter'
+  import ExpressAreaItem from '../components/express_area/express_item'
+  import ApplyItem from '../components/express_area/apply_item'
+  import BounceLoadingView from '../components/bounce_loading_view'
+  import * as LoginApi from '../api/login'
+  import {checkphonewechat} from '../utils/login_util'
+  import { getRequest } from "../utils/request"
+  export default class ExpressAreaPage extends wepy.page {
+    config = {
+      navigationBarTitleText: '通告列表',
+      enablePullDownRefresh: true,
+      "usingComponents": {
+        "mp-tabbar": '../../custom-tab-bar/tabbar/tabbar'
+      }
+    }
+    components = {
+      ExpressAreaItem,
+      bounce_loading: BounceLoadingView,
+      ApplyItem
+    }
+    data = {
+      current: 0,
+      list: [{
+        text: "通告",
+        iconPath: "/images/hezi.png",
+        selectedIconPath: "/images/tonggao_pre.png",
+      },
+      {
+        text: "消息",
+        iconPath: "/images/time.png",
+        selectedIconPath: "/images/message.png"
+      },
+      {
+        text: "我的",
+        iconPath: "/images/weibiaoti-.png",
+        selectedIconPath: "/images/wpde.png",
+      }],
+      // 进入时不允许看，因为可能还未登录
+      verify: false,
+      current_page_index: 0,
+      filter_condition: {
+        platform: '',
+        platformIndex: 0,
+        fans_num: '',
+        fansNumIndex: 0,
+      },
+      announce_data: [],
+      platform_data: FILTER_CONDITION.platform_data,
+      fans_num_data: FILTER_CONDITION.fans_num_data
+    }
+    computed = {
+      // 平台
+      filter_platform_text() {
+        return this.filter_condition.platform ? this.filter_condition.platform.displayText : '平台'
+      },
+      // 粉丝数量
+      filter_fans_num_text() {
+        return this.filter_condition.fans_num ? this.filter_condition.fans_num.displayText : '粉丝'
+      },
+      platform_name_data() {
+        return this.platform_data.map((item) => {
+          return item.displayText
+        })
+      },
+      fans_num_name_data() {
+        return this.fans_num_data.map((item) => {
+          return item.displayText
+        })
+      }
+    }
+    methods = {
+      // 底部tabbar切换
+      tabChange(e) {
+        if (e.detail.index === 0) {
+          wepy.switchTab({ url: '/pages/express_area' })
+        }
+        if (e.detail.index === 1) {
+          wepy.switchTab({ url: '/pages/message' })
+        }
+        if (e.detail.index === 2) {
+          wepy.switchTab({ url: '/pages/kol_mine' })
+        }
+      },
+      // 去详情页面
+      clickItem(e) {
+        var announceid = e.currentTarget.id
+        // 应聘者界面
+        if (this.verify === true) {
+          wepy.navigateTo({
+            url: '../packageA/express_detail?announceId=' + announceid
+          })
+        } else {
+          // 金主界面
+          wepy.navigateTo({
+            url: '../packageA/kol_detail'
+          })
+        }
+      }
+    }
+     // 通过平台过滤
+    clickFilterByPlatform(ev) {
+      let value = ev.detail.value
+      this.filter_condition.platformIndex = value
+      let plt = this.platform_data[value]
+      this.filter_condition.platform = plt && plt.platformId ? plt : ''
+    }
+      // 通过粉丝数量过滤
+    clickFilterByFansNum(ev) {
+      let value = ev.detail.value
+      this.filter_condition.fansNumIndex = value
+      let fnd = this.fans_num_data[value]
+      this.filter_condition.fans_num = fnd && fnd.beginNum ? fnd : ''
+    }
+    events = {
+      'click-call-phone': function (data) {
+        wepy.showModal({
+          title: '是否拨打电话',
+          content: data.user,
+        }).then((res) => {
+          if (res.confirm) {
+            wepy.makePhoneCall({
+              phoneNumber: data.phone
+            })
+            LoginApi.saveDialHistory(data.dialUserId, data.announceId)
+          } else if (res.cancel) {
+            console.log('用户点击取消')
+          }
+        })
+      }
+    }
+    // 下拉刷新
+    onPullDownRefresh(e) {
+      this.getannounceList()
+    }
+    // 触底加载
+    onReachBottom(e) {
+    }
+    // 获取通告列表
+    getannounceList() {
+      getRequest({ url: '/bms_announce/find/all/0' }).then(res => {
+        var code = res.data.code
+        if (code === 200) {
+          this.announce_data = res.data.data
+          console.log(this.announce_data, '通告列表')
+        }
+      })
+    }
+    // 获取红人列表
+    getKolList() {
+    }
+    onLoad(option) {
+      this.getannounceList()
+      // 检查是否注册过手机号
+      checkphonewechat()
+      let logged = wepy.getStorageSync('logged')
+      if (logged === true) {
+        this.visible = true
+      } else {
+        this.visible = false
+      }
+    }
+    onShow() {
+      var verify = this.$parent.globalData.verify
+      if (verify === 1) {
+        console.log(verify, '这是红人身份')
+        this.verify = true
+        wepy.hideTabBar({
+          animation: false
+        })
+      } else {
+        console.log(verify, '这是金主身份')
+        this.verify = false
+      }
+    }
+    onReady() {
+    }
+  }
+</script>

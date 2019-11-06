@@ -1,0 +1,37 @@
+<style lang="less">
+</style>
+<template>
+  <view style="display: flex; flex-direction: column; padding: 15px;margin-top:5px; background-color: white">
+    <view style="display: flex; align-items: center">
+      <text style="font-size: 16px;font-weight:600">{{item_data.appNickname}}</text>
+      <view  style="display: flex; flex: 1; justify-content: flex-end; align-items: center;font-size:13px;">{{item_data.fansNumb}} 粉丝</view>
+      <!-- <block wx:if="{{ item_data.isMine }}"> -->
+        <!-- <block>
+        <view style="display: flex; flex: 1; justify-content: flex-end; align-items: center" wx:if="{{isFromMine}}">
+          <text style="font-size: 15px" class="iconfont" @tap='edit_myplatform'>&#xe601;</text>
+        </view>
+      </block> -->
+    </view>
+    <view style="display: flex; margin-top: 10px;font-size:14px;">
+      <text>{{item_data.appName}}</text>
+      <text style="margin-left: 6px">({{item_data.category}})</text>
+    </view>
+    <view style="display: flex; margin-top: 10px;font-size:14px;">
+      <text style=" font-size: 12px;">链接:</text>
+      <text style="margin-left: 8px">{{item_data.appLink}}</text>
+    </view>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  export default class PlatformItem extends wepy.component {
+    props = {
+      isFromMine: '',
+      item_data: {}
+    }
+    data = {
+    }
+    methods = {
+    }
+  }
+</script>

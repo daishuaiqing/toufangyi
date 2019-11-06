@@ -1,0 +1,41 @@
+<style lang="less">
+ .jump{
+   box-sizing:border-box;
+ }
+</style>
+<template>
+  <view>
+    <view @tap="tap" class="jump">
+        <slot></slot>
+    </view>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  export default class Jump extends wepy.component {
+    props = {
+      url: String
+    }
+    methods = {
+      tap() {
+      // 获取页面栈集合
+        var pages = getCurrentPages()
+        for (var i = 0; i < pages.length - 1; i++) {
+          if ("/" + pages[i].route === this.url) {
+            var index = i
+            break
+          }
+        }
+        if (index) {
+          wx.navigateBack({
+            delta: pages.length - 1 - index
+          })
+        } else {
+          wx.navigateTo({
+            url: this.url
+          })
+        }
+      }
+    }
+  }
+</script>

@@ -1,0 +1,327 @@
+{
+	"description": "A WePY project",
+	"setting": {
+		"urlCheck": false,
+		"es6": false,
+		"postcss": false,
+		"minified": false,
+		"newFeature": true,
+		"coverView": true,
+		"autoAudits": false,
+		"checkInvalidKey": true,
+		"checkSiteMap": true,
+		"uploadWithSourceMap": true,
+		"babelSetting": {
+			"ignore": [],
+			"disablePlugins": [],
+			"outputPath": ""
+		}
+	},
+	"compileType": "miniprogram",
+	"appid": "wx1eb2742e18074c4e",
+	"projectname": "my-project",
+	"miniprogramRoot": "dist/",
+	"simulatorType": "wechat",
+	"simulatorPluginLibVersion": {},
+	"condition": {
+		"search": {
+			"current": -1,
+			"list": []
+		},
+		"conversation": {
+			"current": -1,
+			"list": []
+		},
+		"plugin": {
+			"current": -1,
+			"list": []
+		},
+		"game": {
+			"list": []
+		},
+		"miniprogram": {
+			"current": 39,
+			"list": [
+				{
+					"id": -1,
+					"name": "通告页面",
+					"pathName": "pages/express_area",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/message",
+					"pathName": "pages/message",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/empty_kol_report",
+					"pathName": "pages/empty_kol_report",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "个人资料",
+					"pathName": "pages/kol_mine",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/add_platform",
+					"pathName": "pages/add_platform",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/choose_city",
+					"pathName": "packageB/choose_city",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/edit_myplatform",
+					"pathName": "packageB/edit_myplatform",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/setting",
+					"pathName": "packageB/setting",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageA/express_detail",
+					"pathName": "packageA/express_detail",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/kol_mine",
+					"pathName": "pages/kol_mine",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageA/kol_detail",
+					"pathName": "packageA/kol_detail",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/express_area",
+					"pathName": "pages/express_area",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/payment",
+					"pathName": "packageB/payment",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/payment",
+					"pathName": "packageB/payment",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/empty_kol_report",
+					"pathName": "packageB/empty_kol_report",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/filter_condition",
+					"pathName": "packageB/filter_condition",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/rule",
+					"pathName": "packageB/rule",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/org/index",
+					"pathName": "pages/org/index",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/org/event",
+					"pathName": "pages/org/event",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/mywallet",
+					"pathName": "packageB/mywallet",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageA/express_detail",
+					"pathName": "packageA/express_detail",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/choose_identify",
+					"pathName": "packageB/choose_identify",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/bind_phone",
+					"pathName": "packageB/bind_phone",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/bind_phone",
+					"pathName": "packageB/bind_phone",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/myaddress",
+					"pathName": "packageB/myaddress",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/myaddress",
+					"pathName": "packageB/myaddress",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/addaddress",
+					"pathName": "packageB/addaddress",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/add_platform",
+					"pathName": "pages/add_platform",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageA/kol_detail",
+					"pathName": "packageA/kol_detail",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageA/addmyInfo",
+					"pathName": "packageA/addmyInfo",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/edit_myplatform",
+					"pathName": "packageB/edit_myplatform",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/edit_myplatform",
+					"pathName": "packageB/edit_myplatform",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageA/kol_detail",
+					"pathName": "packageA/kol_detail",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/addpicture",
+					"pathName": "packageB/addpicture",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/express_area",
+					"pathName": "pages/express_area",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageA/authorize",
+					"pathName": "packageA/authorize",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/addpicture",
+					"pathName": "packageB/addpicture",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/edit_myplatform",
+					"pathName": "packageB/edit_myplatform",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/myaddress",
+					"pathName": "packageB/myaddress",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/jinzhupage",
+					"pathName": "packageB/jinzhupage",
+					"scene": null
+				}
+			]
+		}
+	}
+}

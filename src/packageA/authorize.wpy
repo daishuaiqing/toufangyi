@@ -1,0 +1,91 @@
+<style lang="less">
+.container{
+  height:100vw;
+  overflow: hidden;
+  overflow-y: hidden;
+}
+.box_author{
+  margin-top:120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+ .box_author .bottom_promise{
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    height:50px;
+    width: 90vw;
+    background:#dedede;
+    color:#000000;
+}
+</style>
+<template>
+  <view class="container" style="min-height: 100vh; background-color: white">
+<view class="box_author" wx:if="{{canIUse}}">
+    <button class='bottom_promise' open-type="getUserInfo" lang="zh_CN" bindgetuserinfo="bindGetUserInfo">
+        允许授权
+    </button>
+</view>
+<view class="box" wx:else>请升级微信版本</view>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  export default class RulePage extends wepy.page {
+    config = {
+      navigationBarTitleText: '授权',
+      enablePullDownRefresh: false
+    }
+    components = {
+    }
+    data = {
+      canIUse: wx.canIUse('button.open-type.getUserInfo')
+    }
+    bindGetUserInfo(e) {
+      // 用户点击了授权登录按钮
+      if (e.detail.userInfo) {
+        let that = this
+        wx.login({
+          success(res) {
+            // const code = res.code
+            wx.getSetting({
+              success(res) {
+                if (res.authSetting['scope.userInfo']) {
+                  // 已经授权，可以直接调用getUserInfo获取头像昵称
+                  wx.getUserInfo({
+                    success(res) {
+                      var userInfo = res.userInfo
+                      that.userInfo = userInfo
+                      console.log(that.userInfo, 'userinfo授权')
+                      that.$parent.globalData.wxinfo = userInfo
+                      that.$parent.globalData.scopeu = true
+                      wx.switchTab({ url: '/pages/express_area' })
+                      var nickName = res.userInfo.nickName
+                      that.nickName = nickName
+                      // var avatarUrl = res.userInfo.avatarUrl
+                      // wx.setStorageSync('nickName', nickName)
+                      // wx.setStorageSync('avatarUrl', avatarUrl)
+                      // var iv = res.iv
+                      // var encryptedData = res.encryptedData
+                      // var postData = {}
+                      // postData.code = code
+                      // postData.iv = res.iv
+                      // postData.encryptedData = res.encryptedData
+                      // app.globalData.userInfo = res.rawData
+                    }
+                  })
+                }
+              }
+            })
+          }
+        })
+      }
+    }
+    methods = {
+    }
+    onLoad(options) {}
+  }
+</script>

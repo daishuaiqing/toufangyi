@@ -1,0 +1,370 @@
+<style lang="less">
+  .input_layout {
+    display: flex;
+    align-items: center;
+    margin: 8px 8px;
+  }
+  .input_layout input {
+    border: 0;
+    outline: 0;
+    border-bottom: 1px solid black;
+    font-size: 14px;
+    padding: 4px;
+    flex: 1;
+  }
+  .input_icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+  }
+  #verify_code_button {
+    font-size: 14px;
+    outline: 0;
+    background-color: transparent;
+    border: 1px solid black;
+    border-radius: 4px;
+    text-align: center;
+    padding: 6px;
+    vertical-align: middle;
+    color: #333;
+    display: flex;
+    margin-left: 8px;
+    min-width: 70px;
+    justify-content: center;
+  }
+  #verify_code_button:active {
+    background-color: #dedede;
+    opacity: 0.5;
+    color: white;
+  }
+
+  #contact_service_button {
+    color: #333;
+    text-decoration: underline;
+  }
+  #submit_button {
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    border-radius: 5px;
+    height: 36px;
+    flex: 1;
+    font-size: 14px;
+    margin: 8px;
+  }
+
+  button.button-enable {
+    background-color: #dedede;
+  }
+
+  button.button-disable {
+    background-color: #9f9f9f;
+  }
+
+  #submit_button:active {
+    opacity: 0.6;
+  }
+
+  .title {
+    font-size: 16px;
+    color: #333;
+  }
+</style>
+<template>
+  <view style="padding:0 24px; flex: 1;">
+    <view style="display: flex; justify-content: center; padding: 64px;">
+      <text class="title">绑定手机号码</text>
+    </view>
+    <form bindsubmit="formSubmit" bindreset="formReset">
+      <view class="input_layout">
+        <view class="iconfont" style="font-size:20px;">&#xe611;</view>
+        <input name="phone" value="{{ phone }}" type="number" placeholder="输入手机号" @input="phoneInputChanged" maxlength="11"/>
+        <text style="font-size:12px;">{{phoneTip}}</text>
+      </view>
+       <view class="input_layout" style="margin-top:20px;">
+        <view class="iconfont" style="font-size:20px;">&#xe645;</view>
+        <input name="wechat" value="{{ wechat}}"  placeholder="输入微信号" @input="wechatInputChanged" />
+      </view>
+      <view class="input_layout" style="margin-top: 20px">
+        <view class="iconfont" style="font-size:20px;">&#xe620;</view>
+        <input name="code" placeholder="验证码" type="number" maxlength="4" @input="codeInputChanged"/>
+        <text id="verify_code_button" @tap="clickVerifyCodeButton">{{ codeButtonText }}</text>
+      </view>
+      <view style="display: flex; justify-content: center; margin-top: 64px">
+        <button id="submit_button" style="background-color: {{ submitReady ? '#0872b0' : '#9f9f9f' }}"
+          disabled="{{ !submitReady  }}" formType="submit">提交</button>
+      </view>
+      <view style="display: flex; justify-content: center; padding: 32px 0px 0px 0px; align-items: center;">
+        <text style="color: #333; margin-right: 10px">在线客服</text>
+        <contact-button type="default-dark" size="27" session-from="bind_phone"></contact-button>
+      </view>
+      <view style="display: flex; flex: 1; justify-content: center; align-items: flex-end; margin-top: 32px">
+        <text id="contact_service_button" @tap="clickContactService">客服电话:400-6090-168</text>
+      </view>
+    </form>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import * as LoginApi from '../api/login'
+  export default class BindPhonePage extends wepy.page {
+    config = {
+      navigationBarTitleText: '绑定手机号'
+    }
+    data = {
+      wechat: null,
+      phone: null,
+      phoneTip: '',
+      code: null,
+      login_key: '',
+      login_type: 'login',
+      codePreventTime: 0,
+//      // 倒计时任务的 ID
+//      codePreventCountdownTaskId: -1,
+      origin: 'main', // 来源
+      backUrl: '', // 登录成功之后返回的页面
+      verify: ''
+    }
+    computed = {
+      submitReady() {
+        return this.phone && this.phone.length === 11 && this.code && this.code.length === 4
+      },
+      // 获取验证码区域的文字
+      codeButtonText() {
+        if (this.codePreventTime <= 0) {
+          return '获取验证码'
+        } else {
+          return this.codePreventTime + '秒'
+        }
+      }
+    }
+    methods = {
+      wechatInputChanged(e) {
+        this.wechat = e.detail.value
+      },
+      // 输入手机号时执行的函数
+      phoneInputChanged(ev) {
+        let value = ev.detail.value
+        let myreg = /^13[\d]{9}$|^14[5,7]{1}\d{8}$|^15[^4]{1}\d{8}$|^17[0,3,6,7,8]{1}\d{8}$|^18[\d]{9}$/
+        if (value.length === 0) {
+          this.phoneTip = '手机号不能为空'
+        } else if (!myreg.test(value)) {
+          this.phoneTip = '请检查您的手机号是否有误'
+        } else {
+          this.phoneTip = ''
+          this.phone = value
+        }
+      },
+    // 输入验证码时执行的函数
+      codeInputChanged(ev) {
+        this.code = ev.detail.value
+      },
+      //  点击获取验证码
+      clickVerifyCodeButton(ev) {
+        if (this.codePreventTime > 0) {
+          console.warn('正在倒计时')
+          return
+        }
+        if (!this.phone || this.phone.length !== 11) {
+          console.warn('手机长度不对')
+          return
+        }
+        wepy.showLoading({
+          title: '正在发送验证码',
+          mask: true,
+        })
+        let that = this
+        // 执行获取验证码方法
+        LoginApi.sendVerifyCodeSJB(this.phone)
+          .then(function (res) {
+            console.log(res, '发送验证码')
+            wepy.hideLoading()
+            that.startCountdownCodePrevent()
+            if (res.type === 'auto_login') {
+              wepy.setStorageSync('logged', true)
+              if (that.origin === 'main') {
+                wepy.navigateTo({
+                  url: '/pages/express_area'
+                })
+              } else if (that.origin === 'share') {
+                wepy.redirectTo({
+                  url: '/pages/express_detail_from_share'
+                })
+              } else if (that.origin === 'report') {
+                wepy.navigateTo({
+                  url: '/pages/empty_kol_report'
+                })
+              } else {
+                wepy.navigateTo({
+                  url: '/pages/express_area'
+                })
+              }
+              wepy.showToast({
+                title: '自动登录成功',
+                icon: 'success',
+                duration: 2000
+              })
+            } else if (res.type === 'login') {
+              that.login_key = res.key
+              that.login_type = 'login'
+              that.$apply()
+              wepy.showToast({
+                title: '发送成功',
+                icon: 'success',
+                duration: 2000
+              })
+            } else if (res.type === 'register') {
+              that.login_key = res.key
+              that.login_type = 'register'
+              that.$apply()
+              wepy.showToast({
+                title: '发送成功',
+                icon: 'success',
+                duration: 2000
+              })
+            }
+          })
+          .catch((err) => {
+            wepy.hideLoading()
+            if (err.is_internal && err.code === 1004) {
+              wepy.showModal({
+                title: '提示',
+                content: err.message,
+              })
+            } else {
+              wepy.showToast({
+                title: err.message ? err.message : String(err),
+                image: '/images/icon_warning.png',
+                duration: 2000
+              })
+            }
+          })
+      },
+      // 点击客户电话
+      clickContactService(ev) {
+        wepy.showModal({
+          title: '是否拨打客服电话',
+          content: '4006090168',
+        }).then(function (res) {
+          if (res.confirm) {
+            wepy.makePhoneCall({
+              phoneNumber: '4006090168'
+            })
+          } else if (res.cancel) {
+            console.log('用户点击取消')
+          }
+        })
+      }
+    }
+    // 点击提交
+    formSubmit(e) {
+      console.log('form发生了submit事件，携带数据为：', e.detail.value)
+      let that = this
+      wepy.showLoading({
+        title: '正在登录...',
+        mask: true,
+      })
+      if (this.login_type === 'register') {
+        LoginApi.registerWithConfirmCode(this.login_key, this.code)
+          .then((res) => {
+            console.log(res)
+            wepy.setStorageSync('logged', true)
+            wepy.hideLoading()
+            if (that.origin === 'main') {
+              wepy.switchTab({
+                url: '/pages/express_area'
+              })
+            } else if (that.origin === 'share') {
+              wepy.redirectTo({
+                url: '/pages/express_detail_from_share'
+              })
+            } else if (that.origin === 'report') {
+              wepy.switchTab({
+                url: '/pages/empty_kol_report'
+              })
+            } else {
+              wepy.switchTab({
+                url: '/pages/express_area'
+              })
+            }
+            wepy.showToast({
+              title: '成功',
+              icon: 'success',
+              duration: 2000
+            })
+          })
+          .catch((err) => {
+            wepy.hideLoading()
+            if (err.is_internal && err.code === 1004) {
+              wepy.showModal({
+                title: '提示',
+                content: err.message,
+              })
+            } else {
+              wepy.showToast({
+                title: err.message || '登录失败',
+                icon: 'success',
+                duration: 2000
+              })
+            }
+          })
+
+      } else {
+        // 用验证码登录
+        LoginApi.loginWithConfirmCode(this.login_key, this.code)
+          .then((res) => {
+            console.log(res, '用验证码登录')
+            wepy.setStorageSync('logged', true)
+            wepy.setStorageSync('referUserPhoneNo', this.phone)
+            wepy.hideLoading()
+            if (that.origin === 'main') {
+              // 跳转到首页
+              var mymsg = {
+                verify: this.verify,
+                phone: e.detail.value.phone
+              }
+              console.log(mymsg)
+              wepy.switchTab({
+                url: '/pages/express_area?mymsg=' + mymsg
+              })
+            } else if (that.origin === 'share') {
+              wepy.redirectTo({
+                url: '/pages/express_detail_from_share'
+              })
+            } else if (that.origin === 'report') {
+              wepy.switchTab({
+                url: '/pages/empty_kol_report'
+              })
+            } else {
+              wepy.switchTab({
+                url: '/pages/express_area'
+              })
+            }
+            wepy.showToast({
+              title: '成功',
+              icon: 'success',
+              duration: 2000
+            })
+          })
+          .catch((err) => {
+            wepy.hideLoading()
+            if (err.is_internal && err.code === 1004) {
+              wepy.showModal({
+                title: '提示',
+                content: err.message,
+              })
+            } else {
+              wepy.showToast({
+                title: err.message || '登录失败',
+                icon: 'success',
+                duration: 2000
+              })
+            }
+          })
+      }
+    }
+  }
+</script>

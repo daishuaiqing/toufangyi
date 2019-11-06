@@ -1,0 +1,101 @@
+<style lang="less">
+.chooseidentify{
+  height: 100%;
+  box-sizing: border-box;
+  flex: 1;
+  text-align: right;
+}
+.picker{
+  height: 100%;
+}
+</style>
+<template>
+  <view class="container" style="min-height: 100vh; background-color: white">
+       <view>
+            <view style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #dedede;background:white;padding:15px;font-size:15px;padding-left: 20px;">
+             <view class="iconfont" style="font-size:18px;margin-right:10px;" >&#xe629;</view>
+              <text style="flex:1">当前身份</text>
+              <!-- <view  style="font-size:16px; ">{{verify === true ? '金主':'红人'}}</view> -->
+              <picker bindchange="bindPickerChange" class="chooseidentify" value="{{index}}" range="{{array}}">
+                <view class="picker">{{array[index]}}  ▾</view>
+              </picker>
+            </view>
+             <view style="display:flex;justify-content:space-between;background:white;border-bottom:1px solid #dedede;padding:15px;font-size:15px;padding-left: 20px;">
+            <view class="iconfont" style="font-size:18px;margin-right:10px;">&#xe633;</view>
+             <text style="flex:1">手机号</text>
+             <view  style="font-size:15px;">{{userPhone}}</view>
+             </view>
+             <view style="display:flex;justify-content:space-between;background:white;border-bottom:1px solid #dedede;padding:15px;font-size:15px;padding-left: 20px;">
+            <view class="iconfont" style="font-size:20px;margin-right:10px;">&#xe645;</view>
+             <text style="flex:1">微信</text>
+             <view  style="font-size:15px;">{{wechat}}</view>
+             </view>
+            <!-- <view style="display:flex;align-items:center;justify-content:space-between;background:white;border-bottom:1px solid #dedede;padding:15px;font-size:15px;padding-left: 20px;">
+            <view class="iconfont" style="font-size:18px;margin-right:10px;">&#xe602;</view>
+             <text style="flex:1">推送通知</text>
+              <switch checked="{{switch1Checked}}" bindchange="switch1Change"/>
+            </view> -->
+      </view>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  // import * as LoginApi from '../api/login'
+  export default class RulePage extends wepy.page {
+    config = {
+      navigationBarTitleText: '设置',
+      enablePullDownRefresh: false
+    }
+    watch = {
+      verify(newvalue, oldValue) {
+        if (newvalue === false) {
+          console.log('转换身份为红人')
+          this.$parent.globalData.verify = 1
+        } else {
+          console.log('转换身份为金主')
+          this.$parent.globalData.verify = 2
+        }
+        wepy.setStorageSync('verify', this.$parent.globalData.verify)
+      }
+    }
+    components = {
+    }
+    data = {
+      index: -1,
+      array: ['红人', '金主'],
+      verify: null,
+      userPhone: '',
+      wechat: 'b1628162035'
+    }
+    methods = {
+      //   // 点击切换身份
+      // changeidentify() {
+      //   // 如果当前是应聘者身份，切换到boss身份
+      //   if (this.$parent.globalData.verify === 1) {
+      //     this.verify = true
+      //   } else {
+      //     this.verify = false
+      //   }
+      // }
+    }
+    // 切换身份
+    bindPickerChange(e) {
+      this.index = e.detail.value
+      if (this.$parent.globalData.verify === 1) {
+        this.verify = true
+      } else {
+        this.verify = false
+      }
+    }
+    onLoad(options) {
+      if (this.$parent.globalData.verify === 1) {
+        this.index = 0
+      } else {
+        this.index = 1
+      }
+      // 获取用户的手机号微信号
+      var userPhone = wx.getStorageSync('referUserPhoneNo')
+      this.userPhone = userPhone
+    }
+  }
+</script>

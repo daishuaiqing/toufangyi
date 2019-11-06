@@ -1,0 +1,42 @@
+<style lang="less">
+.content-item{
+    width:100vw;
+}
+.interest{
+    margin:5px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 80px;
+}
+</style>
+<template>
+  <view >
+      <view class="content-item">
+        <repeat for="{{5}}" key="{{index}}">
+            <view class="interest" @tap="topersonInfo">
+                <image style="width:50px;height:50px;border-radius:50%;margin-right:10px;" src="https://up.enterdesk.com/edpic_source/ad/d7/2d/add72da3d716f887c941c8b880b405fb.jpg"/>
+                <view style="flex:1;border-bottom:1px solid #cccccc;height:100%;">     
+                    <view style="font-size:14px;margin-top:8px;">姓名  .  CEO</view>
+                     <view style="display:flex;font-size:13px;align-items:center;">
+                        <view style="flex:1;">公司：XXX公司</view>
+                        <view style="border:1px solid orange;color:orange;padding:5px;border-radius:5px;">去看看</view>
+                    </view>
+                    <view style="font-size:12px;">查看了您</view>
+                </view>
+            </view>
+        </repeat>
+    </view>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  export default class SimpleItem extends wepy.component {
+    props = {
+    }
+    methods = {
+      topersonInfo() {
+      }
+    }
+  }
+</script>

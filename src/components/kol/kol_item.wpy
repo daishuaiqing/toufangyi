@@ -1,0 +1,54 @@
+<style lang="less">
+  .avatar-image {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+  }
+</style>
+<template>
+    <view style="display: flex; align-items: center; padding: 12px 12px; background-color: white; margin-bottom: 6px">
+      <view style="display: flex; flex-direction: column; flex: 1">
+        <text style="font-size: 16px; font-weight: bold">{{item_data.userName}}</text>
+
+        <view style="display: flex; align-items: center; padding-top: 12px; font-size: 14px">
+          <text>{{item_data.fans_num.displayText}}粉</text>
+          <text style="padding: 0 6px">|</text>
+          <text>{{item_data.payment.value}}/篇</text>
+        </view>
+      </view>
+      <image class="avatar-image" src="{{item_data.faceImgUrl}}" @tap="clickLogout"/>
+    
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+
+  /**
+   * 档期上报时，车型Item
+   *
+   */
+  export default class KolItem extends wepy.component {
+
+    props = {
+      item_data: {
+        userName: '鹿小英',
+        faceImgUrl: 'https://up.enterdesk.com/edpic_source/ad/d7/2d/add72da3d716f887c941c8b880b405fb.jpg',
+        fans_num: {displayText: '5W+', beginNum: 50000},
+        payment: {
+          "key": 4,
+          "value": "500-1000元",
+          "beginVal": "500",
+          "endVal": "1000"
+        },
+      },
+//      identifier: {} // id 用于标识item 区别数据和事件
+    }
+
+    data = {
+    }
+
+    methods = {
+    }
+
+  }
+</script>

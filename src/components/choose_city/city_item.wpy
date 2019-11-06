@@ -1,0 +1,41 @@
+<style lang="less">
+  .city-item {
+    width: 33.33%;
+    text-align: center;
+    font-size: 14px;
+  }
+  .city-item-content {
+    margin: 4px;
+    padding: 6px;
+    background-color: white;
+    border: 1px solid #dedede;
+    color: #333;
+    font-size: 14px;
+  }
+  .city-item-content:active {
+    background-color: #0872b0;
+    color: white;
+  }
+
+</style>
+<template>
+  <view class="city-item" @tap="onCityTap" data-city="{{ city_name }}">
+    <view class='city-item-content'>
+      {{ city_name }}
+    </view>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  export default class CityItem extends wepy.component {
+    props = {
+      city_name: {}
+    }
+    methods = {
+      onCityTap(ev) {
+        this.$emit('select-province', { city: this.city_name, cityIndex: Number(this.$index) })
+      }
+    }
+
+  }
+</script>

@@ -1,0 +1,90 @@
+<style lang="less">
+  .express-item-wrapper {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 12px;
+    background-color: white;
+    margin-top: 8px;
+    box-shadow: 0 1px 1px #dedede;
+  }
+  .avatar-image {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+  }
+  .user-name {
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap;
+    word-break:keep-all;
+  }
+
+</style>
+<template>
+  <view class="express-item-wrapper">
+    <view class="item_row_container">
+      <view class="item_row_container" style="flex:1 1 auto; width: 50vw; padding: 0; align-items: flex-end;">
+        <text class="item_title_text">{{ item_data.title }}</text>
+        <block wx:if="{{ item_data.keyword }}">
+          <text class="item_sub_title_text">(</text>
+          <text class="item_sub_title_text">{{ item_data.keyword }}</text>
+          <text class="item_sub_title_text">)</text>
+        </block>
+      </view>
+      <view class="item_row_container" style="flex:0 0 auto; padding-left: 6px">
+        <text class="item_right_corner_text">{{ item_data.paymentStr }}</text>
+        <block>
+          <text class="item_right_corner_text">/</text>
+          <text class="item_right_corner_text">篇</text>
+        </block>
+      </view>
+    </view>
+
+    <view class="item_row_container" style="flex-wrap: wrap; width: 90vw; margin-top: 8px;">
+      <block wx:if="{{ item_data.platformStr }}">
+        <text class="item_main_atrr_text">{{ item_data.platformStr }}</text>
+        <text style="margin-left: 6px;"></text>
+      </block>
+      <text class="item_main_atrr_text">{{ item_data.fansNumStr }}粉丝</text>
+    </view>
+
+    <block wx:if="{{ item_data.city }}">
+      <view class="item_row_container" style="flex-wrap: wrap; width: 90vw; margin-top: 8px;">
+        <text class="item_main_atrr_text">{{ item_data.city }}</text>
+      </view>
+    </block>
+
+    <view class="item_row_container" style="flex-wrap: wrap; width: 90vw; margin-top: 8px;">
+      <repeat for="{{ item_data.tags }}" item="item" index="index" key="index">
+        <text class="item_tag_text" style="margin-right: 6px;">{{ item }}</text>
+      </repeat>
+    </view>
+
+    <view class="item_row_container" style="margin-top: 8px;">
+      <view class="item_row_container" style="flex:1 1 auto; width: 50vw; padding: 0; align-items: center;">
+        <text class="item_foot_text">需求人数: </text>
+        <text class="item_foot_text" style="margin-left: 6px; color: #0872b0">{{ item_data.recruitNum }}</text>
+        <text class="item_foot_text" style="margin-left: 6px;">报名人数: </text>
+        <text class="item_foot_text" style="margin-left: 6px; color: #eea932">{{ item_data.appliedNum }}</text>
+      </view>
+      <view class="item_row_container" style="flex:0 0 auto; align-items: center; padding-left: 6px">
+        <text class="item_foot_text">{{item_data.lastUpdateTimeStr}}</text>
+      </view>
+    </view>
+
+    <image style="align-self: flex-end; margin-top: -64px; margin-bottom: 32px; width: 32px; height: 32px;"
+           src="{{ item_data.checked ? '/images/selected.png' : '/images/unselected.png' }}"/>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  export default class PreAnnounceItem extends wepy.component {
+
+    props = {
+      item_data: {}
+    }
+    methods = {
+    }
+
+  }
+</script>

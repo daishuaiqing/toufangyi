@@ -1,0 +1,44 @@
+<style lang="less">
+  .area-panel {
+    display: flex;
+    flex-flow: row wrap;
+    align-content: space-around;
+    flex: 1;
+  }
+  .area-title-text {
+    font-size: 13px;
+    padding: 4px;
+    writing-mode: vertical-lr;
+    text-align: center;
+    color: #9f9f9f;
+  }
+</style>
+<template>
+  <view style="display: flex; flex-flow: row nowrap; padding: 4px 0">
+    <view class="area-title-text">{{ area_data.name }}</view>
+    <view class="area-panel">
+      <repeat for="{{ area_data.child }}" key="index" index="index" item="item">
+        <city_item :city_name="item"></city_item>
+      </repeat>
+    </view>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  import CityItem from './city_item'
+  //  城市选择页面，区域块华东 华南 华中 西南 西北 东北 华北
+  export default class AreaPanel extends wepy.component {
+    props = {
+      area_data: {},
+    }
+    events = {
+      'select-province': (cityData) => {
+        cityData.areaIndex = Number(this.$index)
+      },
+    }
+    components = {
+      city_item: CityItem
+    }
+
+  }
+</script>

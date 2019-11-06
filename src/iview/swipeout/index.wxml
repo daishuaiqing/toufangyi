@@ -1,0 +1,21 @@
+<view class="i-swipeout-wrap i-class">
+    <view class="i-swipeout-item" bindtouchstart="handlerTouchstart" bindtouchmove="handlerTouchmove" bindtouchend="handlerTouchend" style="{{parse.setPosition(position)}}">
+        <view class="i-swipeout-content">
+            <slot name="content"></slot>
+        </view>
+        <view class="i-swipeout-button-right-group" catchtouchend="loop"  bind:tap="handlerParentButton"  style="width:{{operateWidth}}px;right:-{{operateWidth}}px;">
+         删除
+        </view>
+    </view>
+</view>
+<wxs module="parse">
+    module.exports = {
+        setStyle : function( item ){
+            var defaults = '#f7f7f7';
+            return 'background:' + ( item.background ? item.background : defaults ) +';' + 'color:'+ item.color;
+        },
+        setPosition : function( position ){
+            return 'transform:translate(' + position.pageX + 'px,0);';
+        }
+    }
+</wxs>

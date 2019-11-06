@@ -1,0 +1,230 @@
+
+<style lang="less" src='./assets/iconfont.scss'></style>
+
+<script>
+import wepy from 'wepy'
+import 'wepy-async-function'
+import { setStore } from 'wepy-redux'
+import configStore from './store'
+const store = configStore()
+setStore(store)
+
+export default class extends wepy.app {
+  config = {
+    pages: [
+      'pages/express_area',
+      'pages/add_platform',
+      'pages/kol_mine',
+      'pages/message',
+    ],
+    "subPackages": [{
+      root: "packageA",
+      pages: [
+        'person_preannounces',
+        'person_announces',
+        'kol_detail',
+        'express_detail',
+        'addmyInfo',
+        'authorize'
+      ]
+    }, {
+      root: "packageB",
+      pages: [
+        'choose_identify',
+        'bind_phone',
+        'edit_myplatform',
+        'myaddress',
+        'setting',
+        'addaddress',
+        'addpicture',
+        'jinzhupage'
+      ]
+    }],
+    tabBar: {
+      color: '#333',
+      selectedColor: '#1296db',
+      backgroundColor: '#f2f2f2',
+      borderStyle: 'black',
+      position: 'bottom',
+      list: [
+        {
+          selectedIconPath: 'images/tonggao_pre.png',
+          iconPath: 'images/hezi.png',
+          pagePath: 'pages/express_area',
+          text: '红人'
+        },
+        {
+          selectedIconPath: 'images/fabu.png',
+          iconPath: 'images/fabu (1).png',
+          pagePath: 'pages/add_platform',
+          text: '发布'
+        },
+        {
+          selectedIconPath: 'images/message.png',
+          iconPath: 'images/time.png',
+          pagePath: 'pages/message',
+          text: '消息'
+        },
+        {
+          selectedIconPath: 'images/wpde.png',
+          iconPath: 'images/weibiaoti-.png',
+          pagePath: 'pages/kol_mine',
+          text: '我的'
+        }
+      ]
+    },
+    window: {
+      backgroundColor: '#FFFFFF',
+      backgroundTextStyle: 'dark',
+      navigationBarBackgroundColor: '#5dd5c8',
+      navigationBarTitleText: '投放易',
+      navigationBarTextStyle: 'white',
+      enablePullDownRefresh: true
+    },
+    permission: {
+      'scope.userLocation': {
+        desc: '你的位置信息将用于小程序位置接口的效果展示'
+      }
+    },
+    networkTimeout: {
+      request: 3000
+    }
+  }
+  globalData = {
+    userInfo: null,
+    verify: 1,
+    wxinfo: null,
+    scopeu: false,
+    baseURL: 'http://192.168.43.23:9000'
+  }
+  constructor() {
+    super()
+    this.use('requestfix')
+    this.use('promisify')
+  }
+  onShow(options) {
+    this.checkUserInfo()
+    console.log(options)
+    // 确定进入程序的方式
+    let referUser = options.query ? options.query.referUser : ''
+    if (referUser) {
+      wx.setStorageSync('referUserPhoneNo', referUser)
+    }
+    var verify = wepy.getStorageSync('verify')
+    console.log(verify, '当前verify')
+    this.globalData.verify = verify
+    // 通过分享进入
+    if (options.scene === 1044) {
+      let shareTicket = options.shareTicket
+      console.log(shareTicket)
+      wx.getShareInfo({
+        shareTicket: shareTicket,
+        complete(res) {
+          console.log(res)
+        }
+      })
+    }
+  }
+  onLaunch(options) {
+    let logs = wx.getStorageSync('logs') || []
+    logs.unshift(Date.now())
+    wx.setStorageSync('logs', logs)
+  }
+  checkUserInfo() {
+    var that = this
+    wx.getSetting({ success: res => {
+      if (res.authSetting['scope.userInfo']) {
+        that.globalData.scopeu = true
+        console.log(that.globalData.scopeu, '已授权')
+        wx.getUserInfo({
+          success(res) {
+            console.log(res, '已授权')
+            that.globalData.wxinfo = res.userInfo
+            that.wxcheckSession()
+          }
+        })
+      } else {
+        that.globalData.scopeu = false
+        console.log(that.globalData.scopeu, '登录状态，未授权')
+        wx.removeStorageSync('userInfo')
+        wx.redirectTo({ url: '/packageA/authorize' })
+      }
+    }
+    })
+  }
+  wxcheckSession() {
+    var that = this
+    wx.checkSession({
+      success(res) {
+        console.log('session', res)
+        wx.getStorage({
+          key: 'userInfo',
+          success(res) {
+            console.log(res, '获取的用户缓存信息')
+            if (res.data) {
+              that.globalData.userInfo = res.data
+            } else {
+              wx.removeStorageSync('userInfo')
+              that.login()
+            }
+          }
+        })
+      },
+      fail(err) {
+        var that = this
+        console.log(err, '过期session')
+        that.globalData.userInfo = null
+        wx.removeStorageSync('userInfo')
+        that.login()
+      }
+    })
+    wx.getStorage({
+      key: 'token',
+      success(res) {
+        // session_key 未过期，并且在本生命周期一直有效
+        that.globalData.token = res.token
+      },
+      fail() {
+        that.login()
+      }
+    })
+  }
+  login() {
+    wx.login({
+      success(res) {
+        console.log(res, '执行wx.login获取的数据')
+        if (res.code) {
+          var data = {code: res.code}
+          console.log(data, '发送给服务端的数据')
+        }
+      }
+    })
+  }
+  // login() {
+  //   wx.login({
+  //     success(res) {
+  //       console.log(res, 'login')
+  //       if (res.code) {
+  //         console.log(res)
+  //         var data = {code: res.code}
+  //         data.WX_NickName = that.globalData.wxinfo.nickName
+  //         data.WX_AvatarUrl = that.globalData.wxinfo.avatarUrl
+  //         data.WX_Gender = that.globalData.wxinfo.gender
+  //         data.NickName = that.globalData.wxinfo.nickName
+  //         data.AvatarUrl = that.globalData.wxinfo.avatarUrl
+  //         data.Gender = that.globalData.wxinfo.gender
+  //         data.WX_Province = that.globalData.wxinfo.province
+  //         data.WX_City = that.globalData.wxinfo.city
+  //         data.WX_Country = that.globalData.wxinfo.country
+  //         console.log(data)
+  //         // utils.request("api/Customer/GetWXInfo", data).then(
+  //         //   function(res) {
+  //         //     console.log(res.data.status)
+  //         //   }
+  //         // )
+  //       }
+  //     }
+  //   })
+  // }
+}
+</script>

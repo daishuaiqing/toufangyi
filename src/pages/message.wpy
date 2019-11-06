@@ -1,0 +1,188 @@
+<style lang="less">
+.react{
+    border-bottom: 2px solid #f1f0f0;
+    display: flex;
+    font-size: 14px;
+}
+.select{
+    margin: 8px 15px;
+    border-bottom: 1px solid #cccccc;
+}
+.react-item{
+    color:orange;
+    margin: 8px 15px;
+    border-bottom: 1px solid orange;
+}
+.content-item{
+    width:100vw;
+}
+.interest{
+    margin:5px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 80px;
+}
+</style>
+<template>
+<view>
+    <!-- 求职者界面 -->
+    <block wx:if="{{verify}}">
+        <view class="container" style="min-height: 100vh; background-color: white">
+      <view class="react">
+        <view class="{{num==0?'react-item':'select'}}" @tap="change(0)">对我感兴趣</view>
+        <view class="{{num==1?'react-item':'select'}}" @tap="change(1)">我申请过的</view>
+      </view>
+      <!-- <swiper>
+        <swiper-item></swiper-item>
+      </swiper> -->
+      <!-- 对我感兴趣界面 -->
+      <block wx:if="{{num == 0}}">
+        <repeat>
+          <SimpleItem />
+        </repeat> 
+      </block>
+      <!-- 我关注的界面 -->
+    <block wx:if="{{num == 1}}">
+      <repeat for="{{announce_data}}">
+        <swipeout  i-class="i-swipeout-demo-item" style="height:100%;"  @change="delItem">
+        <view slot="content"  @tap="clickItem" id="{{item.announceId}}">
+         <express :item_data="item"/>
+        </view>
+        </swipeout>
+      </repeat>
+    </block>
+    <mp-tabbar current="{{1}}" style="position:fixed;bottom:0;width:100%;left:0;right:0;" list="{{list}}" bindchange="tabChange"></mp-tabbar>
+  </view>
+</block>
+    <!-- boss界面 -->
+ <block wx:if="{{!verify}}">
+      <view class="container" style="min-height: 100vh; background-color: white">
+      <view class="react">
+        <view class="react-item">对我感兴趣</view>
+      </view>
+      <!-- 申请过工作界面 -->
+        <view class="content-item">
+        <repeat for="{{array}}" key="{{index}}">
+            <view class="interest">
+                <image style="width:50px;height:50px;border-radius:50%;margin-right:10px;" src="https://up.enterdesk.com/edpic_source/ad/d7/2d/add72da3d716f887c941c8b880b405fb.jpg"/>
+                <view style="flex:1;border-bottom:1px solid #cccccc;height:100%;">     
+                    <view style="font-size:14px;margin-top:8px;">姓名</view>
+                     <view style="display:flex;font-size:13px;align-items:center;">
+                        <view style="flex:1;">类别：美妆</view>
+                        <view style="border:1px solid orange;color:orange;padding:5px;border-radius:5px;">去看看</view>
+                    </view>
+                    <view style="font-size:13px;">小红书、抖音1k粉左右</view>
+                </view>
+            </view>
+        </repeat>
+      </view>
+  </view>
+</block>
+</view>
+</template>
+<script>
+  import wepy from 'wepy'
+  import { getRequest } from "../utils/request"
+  import ExpressAreaItem from '../components/express_area/express_item'
+  import SimpleItem from '../components/simpleItem'
+  export default class message extends wepy.page {
+    config = {
+      navigationBarTitleText: '消息',
+      "usingComponents": {
+        "mp-tabbar": '../../custom-tab-bar/tabbar/tabbar',
+        "swipeout": '../../iview/swipeout/index'
+      }
+    }
+    components = {
+      express: ExpressAreaItem,
+      SimpleItem
+    }
+    data = {
+      announce_data: [],
+      list: [{
+        text: "通告",
+        iconPath: "/images/hezi.png",
+        selectedIconPath: "/images/tonggao_pre.png",
+      },
+      {
+        text: "消息",
+        iconPath: "/images/time.png",
+        selectedIconPath: "/images/message.png"
+      },
+      {
+        text: "我的",
+        iconPath: "/images/weibiaoti-.png",
+        selectedIconPath: "/images/wpde.png",
+      }],
+      verify: null,
+      num: 0,
+      array: 5
+    }
+    methods = {
+      clickItem(e) {
+        var id = e.currentTarget.id
+        // 应聘者界面
+        if (this.verify === true) {
+          wepy.navigateTo({
+            url: '../packageA/express_detail?announceID=' + id
+          })
+        } else {
+          // 金主界面
+          wepy.navigateTo({
+            url: '../packageA/kol_detail'
+          })
+        }
+      },
+      todetail() {
+        wepy.navigateTo({ url: '/packageA/express_detail' })
+      },
+      tabChange(e) {
+        if (e.detail.index === 0) {
+          wepy.switchTab({ url: '/pages/express_area' })
+        }
+        if (e.detail.index === 1) {
+          wepy.switchTab({ url: '/pages/message' })
+        }
+        if (e.detail.index === 2) {
+          wepy.switchTab({ url: '/pages/kol_mine' })
+        }
+      },
+      change(e) {
+        this.num = e
+      },
+    }
+    requestRefresh() {
+      // 我申请过的
+      getRequest({ url: '/bms_celebrity_financier_log/find/all/10000' }).then(res => {
+        var code = res.data.code
+        if (code === 200) {
+          this.announce_data = res.data.data
+          console.log(this.announce_data)
+        }
+      })
+    }
+    onLoad(options) {
+      this.requestRefresh()
+    }
+    onShow() {
+      var verify = this.$parent.globalData.verify
+      if (verify === 1) {
+        console.log('这是红人界面')
+        this.verify = true
+        wepy.setNavigationBarTitle({
+          title: "与我有关"
+        })
+        wepy.hideTabBar({
+          animation: false
+        })
+      } else {
+        console.log('这是金主界面')
+        this.verify = false
+        wepy.setNavigationBarTitle({
+          title: "消息"
+        })
+      }
+    }
+  }
+</script>

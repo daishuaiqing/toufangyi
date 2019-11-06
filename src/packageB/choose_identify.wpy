@@ -1,0 +1,59 @@
+<style lang="less">
+    .choose_identify{
+        width: 100vw;
+        height: 100vh;
+        text-align: center;
+        .choose_area{
+            display: flex;
+            justify-content: space-around;
+            .choose_select{
+                padding: 10px;
+                border-radius: 10px;
+                background: #dedede;
+            }
+        }
+    }
+    .choose_title{
+        width: 100vw;
+        margin: 100px auto;
+    }
+</style>
+<template>
+  <view class="choose_identify">
+      <view class="choose_title">请选择你的身份</view>
+      <view class="choose_area">
+          <view class="choose_select" @tap='changeverify'>我是金主</view>
+          <view class="choose_select" @tap='changeuser'>我是红人</view>
+      </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  export default class choose_identify extends wepy.page {
+    config = {
+      enablePullDownRefresh: false
+    }
+    data = {
+      verify: null
+    }
+    methods = {
+    //  为2的则为金主角色
+      changeverify() {
+        this.verify = 2
+        wepy.navigateTo({
+          url: './bind_phone'
+        })
+        wepy.setStorageSync('verify', this.verify)
+      },
+      changeuser() {
+         // verify为1则为红人，
+        this.verify = 1
+        wepy.navigateTo({
+          url: './bind_phone'
+        })
+        wepy.setStorageSync('verify', this.verify)
+      }
+    }
+  }
+</script>

@@ -1,0 +1,483 @@
+<style lang="less">
+  .operation-item {
+    display: flex;
+    align-items: center;
+    border:1px solid white;
+    background-color: #5dd5c8;
+    flex: 1;
+    justify-content: center;
+  }
+  .operation-item text {
+    color: white;
+  }
+  #detail_share_button {
+    border-radius: 0;
+    background-color: transparent;
+    font-size: 14px;
+    color: white;
+    flex: 1;
+  }
+  #detail_share_button::after {
+    border: 0;
+  }
+  .express-item-wrapper {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 12px;
+    background-color: white;
+    margin-top: 8px;
+    box-shadow: 0 1px 1px #dedede;
+  }
+  .avatar-image {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+  }
+  .user-name {
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap;
+    word-break:keep-all;
+  }
+  .container{
+    font-size: 14px;
+  }
+  .apply-active{
+     display: flex;
+    align-items: center;
+    border:1px solid white;
+    background-color: #dedede;
+    flex: 1;
+    justify-content: center;
+    color:white;
+  }
+  .wechatlayer{
+    background:rgba(198, 202, 198,0.4);
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+  }
+  .layercontent{
+    width:250px;
+    height:150px;
+    border-radius:10px;
+    background:white;
+    margin:200px auto;
+    display:flex;
+    text-align: center;
+   flex-direction:column;
+  }
+  .wechat{
+    height:40px;
+    line-height:40px;
+    text-align:center;
+    font-size:16px;
+    width:100%;
+    border-top:1px solid #999;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+  }
+  .mask{
+  position: fixed;
+  top: 0;
+  left: 0; 
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0,0.3);
+  // opacity: 0;
+  display: flex;
+  justify-content: center; 
+  align-items: center;
+  }
+.canvas-box{
+  position: fixed;
+  background: white;
+  width:370px;
+  height: 500px;
+  position: relative;
+  border-radius: 5px;
+  }
+  .shareImg{
+    width: 350px;
+    height: 450px;
+    margin-left: 10px;
+  }
+  // 画布绘制过程不能隐藏，但是又不能被用户看见，所以定位在用户看不到的地方
+  canvas{
+    position: fixed;
+    top:0;
+    left:1000px;
+  }
+  .bottomButton{
+    width:100%;
+    position: absolute;
+    bottom: 0;
+  }
+  .buttonItem{
+    width: 45%;
+    margin:0 2%;
+    display: inline-block;
+  }
+</style>
+<template>
+  <view class="container">
+    <view class="express-item-wrapper">
+      <view class="item_row_container">
+         <view class="item_row_container" style="font-weight:550;font-size:16px;flex:1 1 auto; width: 80vw; align-items: flex-end;">
+        <text class="item_title_text">{{ announce_detail.announceName }}</text>
+        <block wx:if="{{ announce_detail.appName }}">
+          <text class="item_sub_title_text">(</text>
+          <text class="item_sub_title_text">{{announce_detail.appName  }}</text>
+          <text class="item_sub_title_text">)</text>
+        </block>
+      </view>
+        <view class="item_row_container" style="flex:0 0 auto;font-size:13px; margin-top: 3px;padding-left: 6px;display:flex;">
+        <view>
+           <text class="item_right_corner_text">{{ announce_detail.salary }}</text>
+        <block>
+          <text class="item_right_corner_text">/</text>
+          <text class="item_right_corner_text">篇</text>
+        </block>
+        </view>
+        <view style="margin-left:10px;">
+           <block wx:if="{{ announce_detail.fansNumb }}">
+        <text class="item_main_atrr_text">{{ announce_detail.fansNumb}}</text>
+        <text style="margin-left: 6px;"></text>
+      </block>
+      <text class="item_main_atrr_text">{{ item_data.fansNumStr }}粉丝</text>
+        </view>
+      </view>
+    </view>
+      <block wx:if="{{announce_detail.city}}">
+        <view class="item_row_container" style="flex-wrap: wrap; width: 90vw; margin-top: 8px;">
+          <text class="item_main_atrr_text">{{announce_detail.city}}</text>
+        </view>
+      </block>
+      <view class="item_row_container" style="font-size:12px;flex-wrap: wrap; width: 90vw; margin-top: 8px;">
+      <text class="item_foot_text">需求人数: </text>
+      <text class="item_foot_text" style="margin-left: 6px;color: #eea932">{{announce_detail.needNumb}}</text>
+      <text class="item_foot_text" style="margin-left: 6px;">报名人数: </text>
+      <text class="item_foot_text" style="margin-left: 6px; color: #eea932">{{announce_detail.needNumb}}</text>
+    </view>
+    </view>
+    <view class="express-item-wrapper">
+      <view class="item_row_container">
+          <view style="display: flex; flex-direction: column; width: 50vw; flex:1 1 auto; padding-left: 6px;">
+            <view class="item_row_container">
+              <image class="avatar-image" src="{{item_data.owner.faceImgUrl}}" @tap="gotoPersonPage"/>
+           <text class="user-name" style="margin-left: 6px;font-size:12px">{{item_data.owner.userName}}</text>
+           <text class="user-name" style="margin-left: 6px;font-size:12px">{{item_data.owner.jobPosition}}</text>
+            </view>
+            <view class="item_row_container" style="margin-top: 8px;">
+              <text class="item_foot_text">公司: </text>
+              <text class="item_foot_text" style="margin-left: 6px;">{{item_data.owner.company}}</text>
+            </view>
+            <!-- <view class="item_row_container" style="margin-top: 8px;">
+              <view class="item_row_container" style="width: 50vw; flex:1 1 auto;">
+                <text class="item_foot_text">发布通告: </text>
+                <text class="item_foot_text" style="margin-left: 6px; color: #eea932">{{item_data.owner.totalValidAnnounceCount}}</text>
+                <text class="item_foot_text">/</text>
+                <text class="item_foot_text">{{item_data.owner.totalAnnounceCount}}</text>
+                <text class="item_foot_text">条</text>
+              </view>
+            </view> -->
+          </view>
+      </view>
+    </view>
+    <!-- 产品信息 -->
+    <view class="express-item-wrapper">
+      <text class="user-name">通告详情</text>
+      <text class="item_foot_text" style="margin-top: 8px;">{{announce_detail.detail}}</text>
+    </view>
+    <!-- <block wx:if="{{ item_data.invalidTimeStr || item_data.addr }}"> -->
+      <view class="express-item-wrapper">
+        <!-- <block wx:if="{{ item_data.invalidTimeStr }}"> -->
+          <view class="item_row_container">
+            <text class="item_foot_text">报名截至时间: </text>
+            <text class="item_foot_text" style="margin-left: 6px;">{{announce_detail.endTime}}</text>
+          </view>
+          <!-- <block wx:if="{{ item_data.addr }}">
+            <view class="item_row_container" style="margin-top: 8px;">
+            </view>
+          </block> -->
+        <!-- </block> -->
+        <!-- <block wx:if="{{ item_data.addr }}">
+          <view class="item_row_container">
+            <text class="item_foot_text">地址: </text>
+            <text class="item_foot_text" style="margin-left: 6px;">{{item_data.addr}}</text>
+          </view>
+        </block> -->
+      </view>
+    <!-- </block> -->
+    <view wx:if="{{isShow}}" class="wechatlayer">
+        <view class="layercontent">
+      <text style="font-size:15px;font-weight:500;flex:1;margin-top:30px;">金主的微信号为</text>
+      <text style="font-size:12px;color:#999;margin:5px 0;">点击复制微信号</text>
+      <view class="wechat" @tap='copy' data-copy='{{value}}'>{{value}}</view>
+    </view>
+    </view> 
+    
+    <!-- 生成分享图 -->
+    <view class="mask" wx:if="{{showShare}}">
+      <view class='canvas-box'>
+      <image class="shareImg" src="{{prurl}}" />
+      <view class="bottomButton">
+         <button type='mini' class="buttonItem" bindtap='save'>保存分享图</button>
+         <button type='mini' class="buttonItem" bindtap='cancelsave'>取消</button>
+      </view>
+     </view>
+    </view>
+    <canvas style="width:300px; height:300px;" canvas-id="shareImg"/>
+         <!-- 底部固定操作栏 -->
+    <view style="display: flex; height: 50px; position: fixed; bottom: 0; left: 0; width: 100vw;">
+      <view class="operation-item" @tap="shareImage" style="background-color: #5dd5c8">
+        <text>生成分享图</text>
+      </view>
+      <view class="operation-item">
+        <button id="detail_share_button" open-type="share">分享</button>
+      </view>
+       <view class="{{applied?'apply-active':'operation-item'}}">
+        <text @tap="applyJob">{{applied?'已申请':'申请工作'}}</text>
+      </view>
+    </view>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  import { getRequest } from "../utils/request"
+  export default class ExpressDetailPage extends wepy.page {
+    config = {
+      navigationBarTitleText: '通告详情',
+      enablePullDownRefresh: false
+    }
+    components = {
+    }
+    data = {
+      announce_detail: {},
+      showShare: false,
+      prurl: '',
+      imagePath: "https://up.enterdesk.com/edpic_source/ad/d7/2d/add72da3d716f887c941c8b880b405fb.jpg",
+      value: 'b222889564',
+      allinfo: {},
+      applied: false,
+      isShow: false,
+      canvasHidden: true, // 设置画板的显示与隐藏
+      shareImgPath: '' // 用于存储canvas生成的图片
+    }
+    computed = {}
+    methods = {
+      // 分享图
+      shareImage() {
+        wepy.showLoading({
+          title: '努力生成中...'
+        })
+        this.showShare = true
+        wx.hideLoading()
+      },
+      // 保存分享图
+      save() {
+        var that = this
+        wx.saveImageToPhotosAlbum({
+          filePath: this.prurl,
+          success: res => {
+            console.log('保存成功')
+            that.showShare = false
+          },
+          fail: (err) => {
+            console.log('保存失败', err)
+          }
+        })
+      },
+      cancelsave() {
+        this.showShare = false
+        console.log('隐藏分享图')
+      },
+      // 点击复制微信号
+      copy(e) {
+        var copy = e.currentTarget.dataset.copy
+        wepy.setClipboardData({
+          data: copy,
+          success: res => {
+            wepy.showToast({
+              title: '复制成功'
+            })
+          }
+        })
+        this.isShow = false
+      },
+      applyJob() {
+        this.applied = true
+        this.isShow = true
+      },
+      gotoPersonPage(ev) {
+        const { userID } = this.item_data.owner
+        wepy.navigateTo({
+          url: '../packageA/person_announces?userIDs=' + userID
+        })
+      },
+      callPhone(ev) {
+        const { announceID } = this.item_data
+        const { userName, mobileNo, userID } = this.item_data.owner
+        wepy.showModal({
+          title: '是否拨打电话',
+          content: userName,
+        }).then(function (res) {
+          if (res.confirm) {
+            wepy.makePhoneCall({
+              phoneNumber: mobileNo
+            })
+            LoginApi.saveDialHistory(userID, announceID)
+          } else if (res.cancel) {
+            console.log('用户点击取消')
+          }
+        })
+      }
+    }
+    onShareAppMessage1(res) {
+      if (res.from === 'button') {
+        // 来自页面内转发按钮
+        console.log(res.target)
+      }
+      let loggedUser = wepy.getStorageSync('loggedUser')
+      let loggedUserAccountNo = loggedUser ? loggedUser.accountNo : ''
+      return {
+        desc: `${this.item_data.platformStr ? this.item_data.platformStr : 'KOL'}通告`,
+        path: '/pages/express_detail?data=' + JSON.stringify(this.item_data) + '&referUser=' + loggedUserAccountNo,
+        success: function (res) {
+          let shareTicket = res.shareTickets[0]
+          console.log(shareTicket)
+          wx.getShareInfo({
+            shareTicket: shareTicket,
+            complete(res) {
+              console.log(res)
+            }
+          })
+          // 转发成功
+          console.log(res)
+        },
+        fail: function (res) {
+          // 转发失败
+          console.log(res)
+        }
+      }
+    }
+    onShareAppMessage(res) {
+      if (res.from === 'button') {
+        // 来自页面内转发按钮
+        console.log(res.target)
+      }
+      let loggedUser = wepy.getStorageSync('loggedUser')
+      let loggedUserAccountNo = loggedUser ? loggedUser.accountNo : ''
+
+      return {
+        desc: `${this.item_data.platformStr ? this.item_data.platformStr : 'KOL'}通告`,
+//        title: `${this.item_data.title}`,
+        path: '/pages/express_detail_from_share?announceId=' + this.item_data.announceID + '&referUser=' + loggedUserAccountNo,
+        success: function (res) {
+          let shareTicket = res.shareTickets[0]
+
+          console.log(shareTicket) // 奇怪为什么 shareTickets 是个数组？这个数组永远只有一个值。
+
+          wx.getShareInfo({
+            shareTicket: shareTicket,
+            complete(res) {
+              console.log(res)
+            }
+          })
+          // 转发成功
+          console.log(res)
+        },
+        fail: function (res) {
+          // 转发失败
+          console.log(res)
+        }
+      }
+    }
+    // 获取通告详情
+    getannounceDetail() {
+      getRequest({url: '/bms_announce/find/8'}).then(res => {
+        console.log(res)
+        var code = res.data.code
+        console.log(code)
+        if (code === 200) {
+          this.announce_detail = res.data.data
+          console.log(this.announce_detail)
+        }
+      })
+    }
+    onLoad(option) {
+      console.log(option)
+      var announceID = option.announceID
+      this.announceID = announceID
+      console.log(this.announceID)
+      this.getannounceDetail()
+      // 二维码
+      let promise1 = new Promise(function(resolve, reject) {
+        wx.getImageInfo({
+          src: '/images/timg.jpg',
+          success(res1) {
+            resolve(res1)
+          }
+        })
+      })
+      // 头像
+      let promise2 = new Promise(function(resolve, reject) {
+        wx.getImageInfo({
+          src: 'https://wx.qlogo.cn/mmopen/vi_32/xicxPHAeWALf0BkRXgfBwHN2G2rzo3fvRhqP6SYJ5QQlNLoibIXHswus2PjzkeW71Qqq8embahlnXaZnrXZS3ia3w/132',
+          success(res1) {
+            resolve(res1)
+          }
+        })
+      })
+      Promise.all([promise1, promise2]).then(res1 => {
+        const ctx = wx.createCanvasContext('shareImg')
+        ctx.setFillStyle('white')
+        ctx.fillRect(0, 0, 300, 600)
+        ctx.drawImage('../' + res1[0].path, 100, 180, 100, 80)
+
+        ctx.setFontSize(10)
+        ctx.setFillStyle('#000')
+        ctx.fillText('扫描图中二维码查看', 90, 280)
+
+        ctx.setFontSize(10)
+        ctx.fillText('需要抖音粉丝量在1万粉以上发布广告', 70, 120)
+        ctx.fillText('报名截止时间: ' + this.item_data.invalidTimeStr, 70, 140)
+
+        ctx.setFontSize(12)
+        ctx.fillText('madrid', 80, 45)
+        ctx.fillText('邀请你一起参加活动，快来报名吧~', 80, 65)
+        var avatarurl_width = 40
+        var avatarurl_height = 40
+        var avatarurl_x = 30
+        var avatarurl_y = 30
+        ctx.save()
+        ctx.beginPath()
+        ctx.arc(avatarurl_width / 2 + avatarurl_x, avatarurl_height / 2 + avatarurl_y, avatarurl_width / 2, 0, 2 * Math.PI)
+        ctx.clip()
+        ctx.drawImage(res1[1].path, avatarurl_x, avatarurl_y, avatarurl_width, avatarurl_height)
+        ctx.restore()
+        // ctx.draw()
+        // 绘制
+        ctx.stroke()
+        ctx.draw()
+      })
+      var that = this
+       // 将生成好的图片保存到本地，需要延迟一会，绘制期间耗时
+      setTimeout(function() {
+        wx.canvasToTempFilePath({
+          canvasId: 'shareImg',
+          success(res) {
+            var tempFilePath = res.tempFilePath
+            that.prurl = tempFilePath
+            console.log(that.prurl)
+          }
+        })
+      }, 500)
+      wepy.showShareMenu({
+        withShareTicket: true // 要求小程序返回分享目标信息
+      })
+    }
+  }
+</script>
