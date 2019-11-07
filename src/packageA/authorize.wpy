@@ -1,30 +1,38 @@
 <style lang="less">
-.container{
+.authorize{
   height:100vw;
   overflow: hidden;
   overflow-y: hidden;
+  font-size: 16px;
 }
 .box_author{
-  margin-top:120px;
   display: flex;
   align-items: center;
+  margin-top:130px;
   justify-content: center;
+  flex-direction: column;
+}
+.box_author .promise {
+  font-size: 100px;
+  color:#5dd5c8;
 }
  .box_author .bottom_promise{
     border-radius: 8px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     font-size: 16px;
+    text-align: center;
+    line-height: 50px;
     height:50px;
     width: 90vw;
-    background:#dedede;
-    color:#000000;
+    color:white;
+    background:#5dd5c8;
+    margin-top: 50px;
 }
 </style>
 <template>
-  <view class="container" style="min-height: 100vh; background-color: white">
+  <view class="container authorize" style="min-height: 100vh; background-color: white">
 <view class="box_author" wx:if="{{canIUse}}">
+  <view class="iconfont promise">&#xe653;</view>
+     <view style="margin:20px auto;">需要您的授权才可以使用哦~</view>
     <button class='bottom_promise' open-type="getUserInfo" lang="zh_CN" bindgetuserinfo="bindGetUserInfo">
         允许授权
     </button>
@@ -34,6 +42,7 @@
 </template>
 <script>
   import wepy from 'wepy'
+  import { postRequest } from "../utils/request"
   export default class RulePage extends wepy.page {
     config = {
       navigationBarTitleText: '授权',
@@ -42,6 +51,7 @@
     components = {
     }
     data = {
+      code: '',
       canIUse: wx.canIUse('button.open-type.getUserInfo')
     }
     bindGetUserInfo(e) {
@@ -50,7 +60,8 @@
         let that = this
         wx.login({
           success(res) {
-            // const code = res.code
+            var code = res.code
+            that.code = code
             wx.getSetting({
               success(res) {
                 if (res.authSetting['scope.userInfo']) {
@@ -59,22 +70,35 @@
                     success(res) {
                       var userInfo = res.userInfo
                       that.userInfo = userInfo
-                      console.log(that.userInfo, 'userinfo授权')
                       that.$parent.globalData.wxinfo = userInfo
                       that.$parent.globalData.scopeu = true
-                      wx.switchTab({ url: '/pages/express_area' })
-                      var nickName = res.userInfo.nickName
-                      that.nickName = nickName
-                      // var avatarUrl = res.userInfo.avatarUrl
-                      // wx.setStorageSync('nickName', nickName)
-                      // wx.setStorageSync('avatarUrl', avatarUrl)
-                      // var iv = res.iv
-                      // var encryptedData = res.encryptedData
-                      // var postData = {}
-                      // postData.code = code
-                      // postData.iv = res.iv
-                      // postData.encryptedData = res.encryptedData
-                      // app.globalData.userInfo = res.rawData
+                      that.$parent.globalData.scopeuInfo = res
+                      var encryptedData = that.$parent.globalData.scopeuInfo.encryptedData
+                      var iv = that.$parent.globalData.scopeuInfo.iv
+                      var phoneNumb = wx.getStorageSync('referUserPhoneNo')
+                      var rawData = that.$parent.globalData.scopeuInfo.rawData
+                      var signature = that.$parent.globalData.scopeuInfo.signature
+                      var wxNumb = wx.getStorageSync('wechatNum')
+                      var data = {
+                        code: that.code,
+                        encryptedData: encryptedData,
+                        iv: iv,
+                        phoneNumb: phoneNumb,
+                        rawData: rawData,
+                        signature: signature,
+                        wxNumb: wxNumb
+                      }
+                      console.log(data)
+                      postRequest({url: '/ums/user/login'}, data).then(res => {
+                        console.log("res_data", res)
+                        if (res.data.data) {
+                          console.log(res.data.data.token, '22222')
+                          wx.setStorageSync('token', res.data.data.token)
+                          wepy.switchTab({ url: '/pages/express_area' })
+                        } else {
+                          console.log("用户信息校验失败")
+                        }
+                      })
                     }
                   })
                 }

@@ -126,7 +126,7 @@
     <view class="express-item-wrapper">
       <view class="item_row_container">
          <view class="item_row_container" style="font-weight:550;font-size:16px;flex:1 1 auto; width: 80vw; align-items: flex-end;">
-        <text class="item_title_text">{{ announce_detail.announceName }}</text>
+        <text class="item_title_text">{{ announce_detail.announceName}}</text>
         <block wx:if="{{ announce_detail.appName }}">
           <text class="item_sub_title_text">(</text>
           <text class="item_sub_title_text">{{announce_detail.appName  }}</text>
@@ -335,83 +335,23 @@
         })
       }
     }
-    onShareAppMessage1(res) {
-      if (res.from === 'button') {
-        // 来自页面内转发按钮
-        console.log(res.target)
-      }
-      let loggedUser = wepy.getStorageSync('loggedUser')
-      let loggedUserAccountNo = loggedUser ? loggedUser.accountNo : ''
-      return {
-        desc: `${this.item_data.platformStr ? this.item_data.platformStr : 'KOL'}通告`,
-        path: '/pages/express_detail?data=' + JSON.stringify(this.item_data) + '&referUser=' + loggedUserAccountNo,
-        success: function (res) {
-          let shareTicket = res.shareTickets[0]
-          console.log(shareTicket)
-          wx.getShareInfo({
-            shareTicket: shareTicket,
-            complete(res) {
-              console.log(res)
-            }
-          })
-          // 转发成功
-          console.log(res)
-        },
-        fail: function (res) {
-          // 转发失败
-          console.log(res)
-        }
-      }
-    }
-    onShareAppMessage(res) {
-      if (res.from === 'button') {
-        // 来自页面内转发按钮
-        console.log(res.target)
-      }
-      let loggedUser = wepy.getStorageSync('loggedUser')
-      let loggedUserAccountNo = loggedUser ? loggedUser.accountNo : ''
-
-      return {
-        desc: `${this.item_data.platformStr ? this.item_data.platformStr : 'KOL'}通告`,
-//        title: `${this.item_data.title}`,
-        path: '/pages/express_detail_from_share?announceId=' + this.item_data.announceID + '&referUser=' + loggedUserAccountNo,
-        success: function (res) {
-          let shareTicket = res.shareTickets[0]
-
-          console.log(shareTicket) // 奇怪为什么 shareTickets 是个数组？这个数组永远只有一个值。
-
-          wx.getShareInfo({
-            shareTicket: shareTicket,
-            complete(res) {
-              console.log(res)
-            }
-          })
-          // 转发成功
-          console.log(res)
-        },
-        fail: function (res) {
-          // 转发失败
-          console.log(res)
-        }
-      }
-    }
     // 获取通告详情
     getannounceDetail() {
-      getRequest({url: '/bms_announce/find/8'}).then(res => {
+      var that = this
+      var announceid = that.announceID
+      getRequest({url: '/bms/announce/find/' + announceid}).then(res => {
         console.log(res)
         var code = res.data.code
-        console.log(code)
         if (code === 200) {
-          this.announce_detail = res.data.data
+          this.announce_detail = res.data.data.bmsAnnounce
           console.log(this.announce_detail)
         }
       })
     }
     onLoad(option) {
-      console.log(option)
-      var announceID = option.announceID
+      console.log(option, '通告页面传递来的参数')
+      var announceID = option.announceId
       this.announceID = announceID
-      console.log(this.announceID)
       this.getannounceDetail()
       // 二维码
       let promise1 = new Promise(function(resolve, reject) {

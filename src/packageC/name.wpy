@@ -1,0 +1,27 @@
+<style lang="less">
+</style>
+<template>
+  <view class="container" style="min-height: 100vh; background-color: white">
+      <form bindsubmit="formSubmit" bindreset="formReset">
+          <input placeholder="请输入姓名"/>
+         <button formType="submit" style="width:80px;height:40px;font-size:16px;line-height:40px;">保存</button>
+      </form>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  export default class InputName extends wepy.page {
+    config = {
+      navigationBarTitleText: '姓名',
+      enablePullDownRefresh: false,
+    }
+    components = {
+    }
+    data = {
+    }
+    methods = {
+    }
+    onLoad(options) {
+    }
+  }
+</script>

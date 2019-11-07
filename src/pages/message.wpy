@@ -152,18 +152,21 @@
         this.num = e
       },
     }
-    requestRefresh() {
-      // 我申请过的
-      getRequest({ url: '/bms_celebrity_financier_log/find/all/10000' }).then(res => {
-        var code = res.data.code
-        if (code === 200) {
-          this.announce_data = res.data.data
-          console.log(this.announce_data)
-        }
+    onLoad(options) {
+      this.getinterseList()
+      this.getKolList()
+    }
+    // 对我感兴趣的金主的列表
+    getinterseList() {
+      getRequest({ url: '/bms/financier/celebrity/log/list?pageNum=2' }).then(res => {
+        console.log(res, '对我感兴趣金主的列表')
       })
     }
-    onLoad(options) {
-      this.requestRefresh()
+    // 对我感兴趣的红人的列表
+    getKolList() {
+      getRequest({ url: '/bms/celebrity/financier/log/list?pageNum=1' }).then(res => {
+        console.log(res, '对我感兴趣金主的列表')
+      })
     }
     onShow() {
       var verify = this.$parent.globalData.verify

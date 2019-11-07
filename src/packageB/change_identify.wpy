@@ -2,18 +2,7 @@
     .choose_identify{
         width: 100vw;
         height: 100vh;
-        text-align: center;
-        .choose_area{
-            display: flex;
-            justify-content: space-around;
-            .choose_select{
-                width: 80px;
-                padding: 10px;
-                border-radius: 10px;
-                background: #5dd5c8;
-                color:white;
-            }
-        }
+        text-align: center;  
     }
     .choose_title{
        font-size: 20px;
@@ -21,14 +10,23 @@
         width: 100vw;
         margin: 170px 0 130px 0;
     }
+    .choose_select{
+      padding: 10px 15px;
+      border-radius: 10px;
+      background: #5dd5c8;
+      width: 120px;
+      margin: 30px auto;
+       color:white;
+    }
 </style>
 <template>
   <view class="choose_identify">
-      <view class="choose_title">请选择你的身份</view>
+      <view class="choose_title">您当前的身份是{{verify==1?'红人':'金主'}}</view>
       <view class="choose_area">
-          <view class="choose_select" @tap='changeverify'>我是金主</view>
-          <view class="choose_select" @tap='changeuser'>我是红人</view>
+          <view class="choose_select" wx:if="{{verify==1}}" @tap='changeverify'>切换身份为金主</view>
+          <view class="choose_select" wx:if="{{verify==2}}" @tap='changeuser'>切换身份为红人</view>
       </view>
+      <view class="choose_select" @tap="backtomine">返回</view>
   </view>
 </template>
 
@@ -43,7 +41,7 @@
     }
     watch = {
       verify(newvalue, oldValue) {
-        if (newvalue === false) {
+        if (newvalue === 1) {
           console.log('转换身份为红人')
           this.$parent.globalData.verify = 1
         } else {
@@ -54,22 +52,22 @@
       }
     }
     methods = {
+      backtomine() {
+        wepy.switchTab({ url: '/pages/express_area' })
+      },
     //  为2的则为金主角色
       changeverify() {
         this.verify = 2
-        wepy.navigateTo({
-          url: './bind_phone'
-        })
         wepy.setStorageSync('verify', this.verify)
       },
       changeuser() {
          // verify为1则为红人，
         this.verify = 1
-        wepy.navigateTo({
-          url: './bind_phone'
-        })
         wepy.setStorageSync('verify', this.verify)
       }
+    }
+    onLoad() {
+      this.verify = wx.getStorageSync('verify')
     }
   }
 </script>

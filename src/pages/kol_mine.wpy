@@ -121,6 +121,15 @@
   margin-top:5px;
   font-size:13px;
 }
+.myinfoItem{
+  display:flex;
+  justify-content:space-between;
+  border-bottom:1px solid #dedede;
+  background:white;
+  padding:15px;
+  font-size:15px;
+  padding-left: 20px;
+}
 </style>
 <template>
 <view>
@@ -144,44 +153,38 @@
           </block> 
         </view>
       </view>
-<!-- 添加平台 -->
-      <!-- <view wx:if="{{platform_data}}">
-           <text style="color: #9f9f9f; font-size: 12px;margin:6px;">我的平台</text>
-            <view style="display: flex; flex-direction: column; justify-content: space-between;padding:6px;">
-            <repeat for="{{ platform_data }}" item="item" index="index" key="index">
-              <view data-announce-id="{{item.kolPlatformID}}" data-announce-index="{{index}}">
-                <platform_item :item_data="item"/>
-              </view>
-            </repeat>
-          </view>
-      </view> -->
     <!-- 其余设置 -->
       <view style="margin-top:20px;">
-        <view style="display:flex;justify-content:space-between;border-bottom:1px solid #dedede;background:white;padding:15px;font-size:15px;padding-left: 20px;" @tap="tomyInfo">
+        <view class="myinfoItem"  @tap="tomyInfo">
             <view class="iconfont" style="font-size:20px;margin-right:10px;" >&#xe79a;</view>
             <text style="flex:1">个人资料</text>
             <view class="iconfont" style="color:#999;">&#xe683;</view>
         </view>
-        <view style="display:flex;justify-content:space-between;border-bottom:1px solid #dedede;background:white;padding:15px;font-size:15px;padding-left: 20px;" @tap="tomyaddress">
+        <view class="myinfoItem" @tap="tomyaddress">
             <view class="iconfont" style="font-size:20px;margin-right:10px;" >&#xe64b;</view>
             <text style="flex:1">收货地址</text>
             <view class="iconfont" style="color:#999;">&#xe683;</view>
         </view>
-        <view style="display:flex;justify-content:space-between;background:white;border-bottom:1px solid #dedede;padding:15px;font-size:15px;padding-left: 20px;">
+        <view class="myinfoItem" style="margin-top:10px;">
              <view class="iconfont" style="font-size:20px;margin-right:10px;">&#xe655;</view>
              <text style="flex:1">关于我们</text>
              <view class="iconfont" style="color:#999;">&#xe683;</view>
         </view>
-        <view style="display:flex;justify-content:space-between;background:white;padding:15px;font-size:15px;padding-left: 20px;" @tap="clickContactService">
+        <view class="myinfoItem" @tap="clickContactService">
             <view class="iconfont" style="font-size:20px;margin-right:10px;">&#xe6b7;</view>
             <text style="flex:1">联系客服</text>
             <view class="iconfont" style="color:#999;">&#xe683;</view>
         </view>
-        <view style="display:flex;justify-content:space-between;border-bottom:1px solid #dedede;background:white;padding:15px;font-size:15px;padding-left: 20px;margin-top:10px;" @tap="setting">
+         <view class="myinfoItem" @tap="tochangeidentify">
+            <view class="iconfont" style="font-size:20px;margin-right:10px;" >&#xe6a7;</view>
+            <text style="flex:1">切换身份</text>
+            <view class="iconfont" style="color:#999;">&#xe683;</view>
+        </view>
+        <!-- <view style="display:flex;justify-content:space-between;border-bottom:1px solid #dedede;background:white;padding:15px;font-size:15px;padding-left: 20px;margin-top:10px;" @tap="setting">
             <view class="iconfont" style="font-size:20px;margin-right:10px;" >&#xe6a7;</view>
             <text style="flex:1">设置</text>
             <view class="iconfont" style="color:#999;">&#xe683;</view>
-        </view>
+        </view> -->
             <!-- <button open-type="getUserInfo" lang="zh_CN" bindgetuserinfo="onGotUserInfo">获取用户信息</button> -->
      </view>
            <mp-tabbar current="{{2}}" style="position:fixed;bottom:0;width:100%;left:0;right:0;" list="{{list}}" bindchange="tabChange"></mp-tabbar>
@@ -207,33 +210,38 @@
         </view>
       </view>
     <!-- 通告维护 -->
-      <view style="display:flex;justify-content:space-between;margin:10px 0;border-bottom:1px solid #dedede;background:white;padding:15px;font-size:15px;padding-left: 20px;"  @tap="gotoMineAnnouncePage">
+      <view class="myinfoItem"  @tap="gotoMineAnnouncePage">
       <view class="iconfont" style="font-size:20px;margin-right:10px;">&#xe62c;</view>
             <text style="flex:1">我的通告列表</text>
             <view class="iconfont" style="color:#999;">&#xe683;</view>
       </view>
-      <view style="display:flex;justify-content:space-between;border-bottom:1px solid #dedede;background:white;padding:15px;font-size:15px;padding-left: 20px;"  @tap="tomypage">
+      <view class="myinfoItem"  @tap="tomypage">
       <view class="iconfont" style="font-size:20px;margin-right:10px;">&#xe641;</view>
             <text style="flex:1">我的资料</text>
             <view class="iconfont" style="color:#999;">&#xe683;</view>
       </view>
       <!-- 其余设置 -->
     <view style="margin-top:10px;"> 
-             <view style="display:flex;justify-content:space-between;background:white;border-bottom:1px solid #dedede;padding:15px;font-size:15px;padding-left: 20px;">
+             <view class="myinfoItem">
             <view class="iconfont" style="font-size:20px;margin-right:10px;">&#xe655;</view>
              <text style="flex:1">关于我们</text>
              <view class="iconfont" style="color:#999;">&#xe683;</view>
              </view>
-             <view style="display:flex;justify-content:space-between;border-bottom:1px solid #dedede;background:white;padding:15px;font-size:15px;padding-left: 20px;" @tap="clickContactService">
+             <view class="myinfoItem" @tap="clickContactService">
             <view class="iconfont" style="font-size:20px;margin-right:10px;">&#xe6b7;</view>
              <text style="flex:1">拨打客服电话</text>
              <view class="iconfont" style="color:#999;">&#xe683;</view>
              </view>
-             <view style="display:flex;justify-content:space-between;border-bottom:1px solid #dedede;background:white;padding:15px;font-size:15px;padding-left: 20px;" @tap="setting">
+              <view class="myinfoItem" @tap="tochangeidentify">
+            <view class="iconfont" style="font-size:20px;margin-right:10px;" >&#xe6a7;</view>
+            <text style="flex:1">切换身份</text>
+            <view class="iconfont" style="color:#999;">&#xe683;</view>
+            </view>
+             <!-- <view style="display:flex;justify-content:space-between;border-bottom:1px solid #dedede;background:white;padding:15px;font-size:15px;padding-left: 20px;" @tap="setting">
              <view class="iconfont" style="font-size:20px;margin-right:10px;" @tap="setting">&#xe6a7;</view>
               <text style="flex:1" @tap="setting">设置</text>
               <view class="iconfont" style="color:#999;">&#xe683;</view>
-            </view>
+            </view> -->
            </view>   
     </view>
   </view>
@@ -255,6 +263,7 @@
       platform_item: PlatformItem
     }
     data = {
+      promise: null,
       userPhone: '',
       userInfo: '',
       nickName: '',
@@ -276,6 +285,9 @@
       verify: false
     }
     methods = {
+      tochangeidentify() {
+        wepy.navigateTo({ url: '/packageB/change_identify' })
+      },
       tomypage() {
         wepy.navigateTo({ url: '/packageB/jinzhupage' })
       },
@@ -304,6 +316,7 @@
       setting() {
         wepy.navigateTo({url: '/packageB/setting'})
       },
+      // 我的通告列表
       gotoMinePreAnnouncePage(ev) {
         wepy.navigateTo({
           url: '../packageA/person_preannounces'
@@ -341,12 +354,14 @@
     }
     onShow() {
       // 判断用户是否授权
-      // var scopeu = this.$parent.globalData.scopeu
-      // if (scopeu === true) {
-      //   this.promise = true
-      // } else {
-      //   this.promise = false
-      // }
+      var scopeu = this.$parent.globalData.scopeu
+      if (scopeu === true) {
+        this.promise = true
+      } else {
+        this.promise = false
+      }
+      var userPhone = wx.getStorageSync('referUserPhoneNo')
+      this.userPhone = userPhone
       // 用户身份信息
       this.userInfo = this.$parent.globalData.wxinfo
       // 身份验证

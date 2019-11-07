@@ -20,6 +20,7 @@
       tap() {
       // 获取页面栈集合
         var pages = getCurrentPages()
+        console.log(pages)
         for (var i = 0; i < pages.length - 1; i++) {
           if ("/" + pages[i].route === this.url) {
             var index = i

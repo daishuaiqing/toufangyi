@@ -80,6 +80,7 @@
     display:flex;
     justify-content: center;
     width: 100%;
+    border: 1px solid #000;
     height: 150px;
   }
   // 底部添加名片
@@ -104,17 +105,16 @@
         </view>
         <view class="pictures">
           <!-- 当前没有照片 -->
-          <view  wx:if="{{false}}" class="img_user" >
-            <jump url='/packageB/addpicture'>点击上传照片</jump>
+          <view  wx:if="{{true}}" class="img_user" >
+            <view>当前您的摩卡库中还没有图片哦</view>
+            <view>点击上传图片</view>
+            <!-- <jump url='/packageB/addpicture'>点击上传照片</jump> -->
           </view>
           <!-- 用户上传了照片 -->
           <view wx:else class="img_user">
            <swiper style="width:100%;height:100%;" indicator-dots = "true" autoplay="{{true}}" interval="{{3000}}" duration="{{5000}} " circular indicator-color='white'>
              <swiper-item>
-                <image style="width: 100vw; height: 150px;" src="https://up.enterdesk.com/edpic_source/ad/d7/2d/add72da3d716f887c941c8b880b405fb.jpg"/>
-             </swiper-item>
-             <swiper-item>
-                <image style="width: 100vw; height: 150px;" src="https://up.enterdesk.com/edpic_source/ad/d7/2d/add72da3d716f887c941c8b880b405fb.jpg"/>
+                <image style="width: 100vw; height: 100%" src="https://up.enterdesk.com/edpic_source/ad/d7/2d/add72da3d716f887c941c8b880b405fb.jpg"/>
              </swiper-item>
            </swiper>
         </view>

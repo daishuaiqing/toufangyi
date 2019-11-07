@@ -57,19 +57,9 @@
   <view class="form_container" wx:if="{{!verify}}">
      <form bindsubmit="formSubmit" bindreset="formReset">
       <view class="form_input_label">
-        <text class="labelname">商品名称</text>
-        <input  type="text" class="input_edit" name="announceName" @input="inputgoodsName" placeholder="请输入商品名称" value="{{goodsName}}" />
+        <text class="labelname">通告名称</text>
+        <input  type="text" class="input_edit" name="announceName" @input="inputgoodsName" placeholder="请输入通告名称" value="{{goodsName}}" />
       </view>
-    <!-- <view class="input_wrapper">
-      <view class="form_input_label">
-        <text class="labelname">文章篇数</text>
-         <picker name="articleNum" bindchange="bindPickerChange" value="{{index}}" range="{{array}}">
-          <view class="picker right_content">
-            {{array[index]}}篇 ▾
-          </view>
-      </picker>
-      </view>
-    </view> -->
       <view class="form_input_label">
         <text class="labelname">平台类型</text>
          <picker name="appName" class="filter_button {{ filter_condition.platform ?  'filtered' : '' }}" @change="clickFilterByPlatform" value="{{filter_condition.platformIndex}}" range="{{platform_name_data}}">
@@ -113,15 +103,15 @@
         </block>
       </view>
     <view class="form_input_label">
-      <text class="labelname">报名截止时间:{{data}}</text>
-       <picker  mode="date" value="{{endTime}}"  start="2019-10-01" end="2030-12-31" bindchange="bindDateChange" name="endTime">
+      <text class="labelname">报名截止时间</text>
+       <picker  mode="date" value="{{date}}"  start="2019-10-01" end="2030-12-31" bindchange="bindDateChange" name="endTime">
           <view class="filter_button" >
            {{date? date: '年 - 月 - 日'}}
           </view>
         </picker>
     </view>
     <view class="button_all">
-        <button class="edit_button" formType="submit">保存</button>
+        <button class="edit_button" formType="submit">提交</button>
         <button class="edit_button" wx:if="{{fromPersonPage}}" @tap="delplatinfo">删除</button> 
         <button class="edit_button" wx:else @tap="delplatinfo">重置</button>    
     </view>
@@ -150,6 +140,8 @@
       salary: '',
       needNUmb: '',
       endTime: '',
+      date: '',
+      fansubmit: null,
       index: 0,
       array: ['1', '2', '3', '4', '5', '6'],
       verify: false,
@@ -216,39 +208,25 @@
     }
      // 日期选择
     bindDateChange(e) {
-      this.endTime = e.detail.value
+      this.date = e.detail.value
     }
     methods = {
       formSubmit(e) {
         var announcevalue = e.detail.value
         var data = {
-          "address": 'fdgf gfdg gdf',
-          "announceCategory": announcevalue.announceCategory,
+          "address": '',
+          "announceCategory": this.filter_condition.platform.displayText,
           "announceName": announcevalue.announceName,
-          "appName": announcevalue.appName,
+          "appName": this.filter_condition.contentType.displayText,
           "detail": announcevalue.detail,
-          "endTime": "2019-11-04T07:22:08.905Z",
-          "financierId": 22,
-          "id": 1
+          "endTime": this.date + ' 23:59:59'
         }
-        data.fansNumb = parseInt(announcevalue.fansNumb)
+        data.fansNumb = this.fansubmit
         data.needNumb = parseInt(announcevalue.needNumb)
         data.salary = parseInt(announcevalue.salary)
         console.log(data)
-        // var data = {
-        //   "address": "dfsdfsdf",
-        //   "announceCategory": "其他",
-        //   "announceName": "点赞",
-        //   "appName": "绿洲",
-        //   "detail": "20",
-        //   "endTime": "2019-11-04T07:22:08.905Z",
-        //   "fansNumb": 1000,
-        //   "financierId": 221,
-        //   "id": 11,
-        //   "needNumb": 300,
-        //   "salary": 30
-        // }
-        postRequest({ url: '/bms_announce/add' }, data).then(res => {
+        postRequest({ url: '/bms/announce/add' }, data).then(res => {
+          console.log(res)
           if (res.data.code === 200) {
             console.log(res.data)
             wepy.showToast({
@@ -285,24 +263,28 @@
       clickFilterByPlatform(ev) {
         let value = ev.detail.value
         this.filter_condition.platformIndex = value
-
         let plt = this.platform_data[value]
         this.filter_condition.platform = plt && plt.platformId ? plt : ''
+        console.log(this.filter_condition.platform.displayText)
       },
       // 粉丝数量
       clickFilterByFansNum(ev) {
         let value = ev.detail.value
         this.filter_condition.fansNumIndex = value
         let fnd = this.fans_num_data[value]
+        console.log(fnd.beginNum, '2222')
+        var fansubmit = fnd.beginNum / 1000
+        this.fansubmit = fansubmit
+        console.log(fansubmit, '22222222222222')
         this.filter_condition.fans_num = fnd && fnd.beginNum ? fnd : ''
       },
-      // 类型
+      // 类别
       clickFilterByContentType(ev) {
         let value = ev.detail.value
         this.filter_condition.contentTypeIndex = value
-
         let plt = this.contentType_data[value]
         this.filter_condition.contentType = plt && plt.contentTypeId ? plt : ''
+        console.log(this.filter_condition.contentType.displayText)
       }
     }
     onShareAppMessage() {

@@ -18,7 +18,7 @@
 		}
 	},
 	"compileType": "miniprogram",
-	"appid": "wx1eb2742e18074c4e",
+	"appid": "wx83385be55dba1c62",
 	"projectname": "my-project",
 	"miniprogramRoot": "dist/",
 	"simulatorType": "wechat",
@@ -40,7 +40,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 39,
+			"current": 44,
 			"list": [
 				{
 					"id": -1,
@@ -319,6 +319,41 @@
 					"id": -1,
 					"name": "packageB/jinzhupage",
 					"pathName": "packageB/jinzhupage",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageA/authorize",
+					"pathName": "packageA/authorize",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/kol_mine",
+					"pathName": "pages/kol_mine",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageA/kol_detail",
+					"pathName": "packageA/kol_detail",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/add_platform",
+					"pathName": "pages/add_platform",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageA/person_announces",
+					"pathName": "packageA/person_announces",
 					"scene": null
 				}
 			]
