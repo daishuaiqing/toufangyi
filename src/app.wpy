@@ -43,6 +43,9 @@ export default class extends wepy.app {
     }, {
       root: "packageC",
       pages: [
+        'name',
+        'company',
+        'inputJob'
       ]
     }],
     tabBar: {
@@ -100,7 +103,7 @@ export default class extends wepy.app {
     verify: 1,
     wxinfo: null,
     scopeu: false,
-    baseURL: 'http://10.145.104.240:8999',
+    baseURL: 'http://10.145.105.114:8999',
     scopeuInfo: ''
   }
   constructor() {

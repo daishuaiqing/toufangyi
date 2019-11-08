@@ -35,15 +35,15 @@
                 </view>
              </view>
           </view>
-             <view class="mypageitem" @tap='inputName'>
+             <view class="mypageitem" @tap="inputName">
                 <text>姓名：</text>
                 <view class="rightitem iconfont">&#xe683;</view>
              </view>
-            <view class="mypageitem">
+            <view class="mypageitem" @tap="inputCompany">
               <text>所属公司</text>
               <view class="rightitem iconfont">&#xe683;</view>
             </view>
-             <view class="mypageitem">
+             <view class="mypageitem" @tap="inputJob">
                 <text style="flex:1">我的职务</text>
                  <view class="rightitem iconfont">&#xe683;</view>
              </view>
@@ -60,7 +60,7 @@
 </template>
 <script>
 import wepy from 'wepy'
-export default class RulePage extends wepy.page {
+export default class NamePage extends wepy.page {
   config = {
     navigationBarTitleText: '我的主页',
     enablePullDownRefresh: false
@@ -72,7 +72,13 @@ export default class RulePage extends wepy.page {
   }
   methods = {
     inputName() {
-      wepy.redirectTo({ url: '/packageC/name.wpy' })
+      wx.redirectTo({ url: '/packageC/name' })
+    },
+    inputCompany() {
+      wx.redirectTo({ url: '/packageC/company' })
+    },
+    inputJob() {
+      wx.redirectTo({ url: '/packageC/inputJob' })
     }
   }
   onLoad(options) {

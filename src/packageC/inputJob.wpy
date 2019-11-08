@@ -1,5 +1,5 @@
 <style lang="less">
-.inputname{
+.input_item{
   border:1px solid #dedede;
   height: 40px;
   box-sizing: border-box;
@@ -10,14 +10,14 @@
 <template>
   <view class="container" style="min-height: 100vh; background-color: white">
       <form bindsubmit="formSubmit" bindreset="formReset">
-          <input placeholder="请输入名字" class="inputname" />
-          <button formType="submit" style="width:80px;height:40px;font-size:16px;line-height:40px;">保存</button>
+          <input placeholder="请输入职位" class="input_item"/>
+         <button formType="submit" style="width:80px;height:40px;font-size:16px;line-height:40px;">保存</button>
       </form>
   </view>
 </template>
 <script>
   import wepy from 'wepy'
-  export default class InputName extends wepy.page {
+  export default class InputJob extends wepy.page {
     config = {
       navigationBarTitleText: '职位',
       enablePullDownRefresh: false,

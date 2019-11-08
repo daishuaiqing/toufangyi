@@ -40,7 +40,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 48,
+			"current": 51,
 			"list": [
 				{
 					"id": -1,
@@ -375,6 +375,27 @@
 					"id": -1,
 					"name": "packageA/kol_detail",
 					"pathName": "packageA/kol_detail",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageA/kol_detail",
+					"pathName": "packageA/kol_detail",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/jinzhupage",
+					"pathName": "packageB/jinzhupage",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageC/name",
+					"pathName": "packageC/name",
 					"query": "",
 					"scene": null
 				},

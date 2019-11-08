@@ -39,15 +39,19 @@
     height: 160px;
   }
   .noImg{
-    display: flex;
-    justify-content: center;
     width: 100%;
     height: 160px;
+    text-align: center;
   }
   .toupimg{
-    height: 50px;
+    width:120px;
+    margin:20px auto;
+    height: 40px;
     border:1px solid #dedede;
     border-radius: 8px;
+    line-height: 40px;
+    color:white;
+    background: #5dd5c8;
   }
   .operation-item {
     display: flex;
@@ -124,9 +128,9 @@
         </view>
         <view class="pictures">
           <!-- 当前没有照片 -->
-          <view  wx:if="{{false}}" class= "noImg">
-            <view>当前您的摩卡库中还没有图片哦</view>
-            <view class="toupimg">点击上传图片</view>
+          <view  wx:if="{{noImage}}" class= "noImg">
+            <view style="margin-top:15px;">当前您的摩卡库中还没有图片哦</view>
+            <view class="toupimg" @tap="toupimg">点击上传图片</view>
           </view>
           <!-- 用户上传了照片 -->
           <view wx:else class="img_user" >
@@ -140,7 +144,7 @@
         </view>
         </view>
         <!-- 平台 -->
-        <view wx:if="{{true}}" style="display: flex; flex-direction: column; justify-content: space-between">
+        <view  style="display: flex; flex-direction: column; justify-content: space-between">
           <repeat for="{{KolDetail}}" item ="item" index = "index" key="index">
             <view @tap="clickItem" data-item="{{item}}">
               <platform_item :item_data="item"/>
@@ -192,6 +196,7 @@
       platform_item: PlatformItem,
     }
     data = {
+      noImage: null,
       KolImage: [],
       KolDetail: [],
       tempFilePaths: [],
@@ -202,6 +207,9 @@
       platform_data: []
     }
     methods = {
+      toupimg() {
+        wepy.navigateTo({url: '/packageB/addpicture'})
+      },
       editmyPhoto() {
         wepy.navigateTo({url: '/packageB/addpicture'})
       },
@@ -269,9 +277,12 @@
         if (res.data.code === 200) {
           var KolDetail = res.data.data.umsCelebrityCards
           var KolImage = res.data.data.urls
-          KolImage = JSON.parse(KolImage)
-          this.KolImage = KolImage
-          console.log(KolImage, '红人图片')
+          if (KolImage) {
+            KolImage = JSON.parse(KolImage)
+            this.KolImage = KolImage
+          } else {
+            this.noImage = true
+          }
           this.KolDetail = KolDetail
           console.log(this.KolDetail, '红人的详细信息')
         }

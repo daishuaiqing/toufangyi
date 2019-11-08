@@ -1,4 +1,4 @@
-const baseURL = "http://10.145.104.240:8999"
+const baseURL = "http://10.145.105.114:8999"
 
 import wepy from 'wepy'
 // get方法
