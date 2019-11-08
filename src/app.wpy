@@ -35,7 +35,6 @@ export default class extends wepy.app {
         'bind_phone',
         'edit_myplatform',
         'myaddress',
-        // 'setting',
         'addaddress',
         'addpicture',
         'jinzhupage',
@@ -117,12 +116,12 @@ export default class extends wepy.app {
       wx.setStorageSync('referUserPhoneNo', referUser)
     }
     var verify = wepy.getStorageSync('verify')
-    console.log(verify, '当前verify')
+    console.log(verify, '当前verify,1为红人，2是金主')
     this.globalData.verify = verify
     // 通过分享进入
+
     if (options.scene === 1044) {
       let shareTicket = options.shareTicket
-      console.log(shareTicket)
       wx.getShareInfo({
         shareTicket: shareTicket,
         complete(res) {

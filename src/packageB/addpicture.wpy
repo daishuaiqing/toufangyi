@@ -72,6 +72,8 @@
 </template>
 <script>
 import wepy from 'wepy'
+import { postRequest } from "../utils/request"
+
 export default class PicturePage extends wepy.page {
   config = {
     navigationBarTitleText: '添加摩卡',
@@ -82,6 +84,29 @@ export default class PicturePage extends wepy.page {
     tempFilePaths: [],
     editStatus: false,
   }
+  async queue(tempFilePaths) {
+        let urls = []
+        for (var i = 0; i < tempFilePaths.length; i++) {
+          let url = await this.uploadImage(tempFilePaths[i])
+          urls.push(url)
+        }
+        return urls
+    }
+    uploadImage(path){
+      return new Promise((resolve, reject) => {
+        wx.uploadFile({
+          url: 'http://10.145.104.240:8999/upload/image',
+          filePath: path,
+          name: 'image',
+          success: res => {
+            console.log(res)
+            let data = JSON.parse(res.data)
+            resolve(data.url)
+          },
+          fail: () => {}
+        })
+      })
+    }
   methods = {
         // 点击上传图片
     uploadImg() {
@@ -95,24 +120,7 @@ export default class PicturePage extends wepy.page {
           } else {
             that.tempFilePaths = [...that.tempFilePaths, ...tempFilePaths]
           }
-          console.log(that.tempFilePaths, '上传的图片')
           wepy.startPullDownRefresh({ success: res => {} })
-            // // 上传完后把文件上传到服务器
-            // for (var i = 0; i < that.tempFilePaths.length; i++) {
-            //   wx.uploadFile({
-            //     url: 'https://a1.easemob.com',
-            //     filePath: that.tempFilePaths[i],
-            //     name: 'name',
-            //     success: res => {
-            //       wx.hideLoading()
-            //       console.log(res)
-            //       console.log('上传到服务器成功')
-            //     },
-            //     fail: () => {
-            //       console.log('上传图片失败')
-            //     }
-            //   })
-            // }
         }
       })
     },
@@ -124,42 +132,25 @@ export default class PicturePage extends wepy.page {
         success: res => {}
       })
       var that = this
-      for (var i = 0; i < that.tempFilePaths.length; i++) {
-        wx.uploadFile({
-          url: that.$parent.globalData.baseURL + '/upload/image',
-          filePath: that.tempFilePaths[i],
-          name: 'image',
-          success: res => {
-            if (res.statusCode === 200) {
-              wepy.hideLoading()
-              wepy.showToast({
-                title: '图片上传成功',
-                icon: 'success',
-                duration: 2000,
-                mask: true,
-                success: res => {
-                  that.tempFilePaths = ''
-                  cosole.log('22')
-                }
-              })
-            }
-          },
-          fail: () => {
-            wepy.showToast({
-              title: '系统异常',
-              icon: 'none',
-              duration: 2000,
-              mask: true,
-              success: res => {}
-            })
-          }
-        })
-      }
+      console.log(that.tempFilePaths, '上传的所有图片')
+      this.queue(that.tempFilePaths).then(res=>{
+        postRequest({ url: '/ums/celebrity/modify/showing' },{
+          showUrls: JSON.stringify(res)
+        }).then(res => {
+        var code = res.data.code
+        if (code === 200) {
+          console.log(res, '修改成功')
+          
+        }
+      })
+      })
+      
     },
-         // 编辑照片的状态
-    // edit_myphoto() {
-    //   this.editStatus = true
-    // },
+    
+    // 编辑照片的状态
+    edit_myphoto() {
+      this.editStatus = true
+    },
     delImage(e) {
       console.log('删除了图片')
       var index = e.currentTarget.index

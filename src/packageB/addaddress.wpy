@@ -90,7 +90,7 @@ input{
           "address": this.detailaddress,
           "area": this.area,
           "city": this.city,
-          "id": 11,
+          "id": 0,
           "isDefault": 0,
           "mobile": this.mobileNO,
           "name": this.name,
@@ -99,12 +99,6 @@ input{
         }
         postRequest({ url: '/ums_address/add' }, data).then(res => {
           console.log(res)
-          if (res.data.code === 200) {
-            wepy.showToast({
-              title: '保存成功',
-              icon: 'success',
-            })
-          }
         })
       }
     }

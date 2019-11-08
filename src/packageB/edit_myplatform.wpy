@@ -205,16 +205,18 @@
     }
     // 提交表单
     formSubmit(e) {
+      var fans = this.filter_condition.fans_num.beginNum / 1000
       var data = {
         "appLink": this.appLink,
         "appName": this.filter_condition.platform.displayText,
         "appNickname": this.platformUserId,
         "category": this.filter_condition.contentType.displayText,
-        "celebrityId": 1,
-        "fansNumb": this.filter_condition.fans_num.beginNum,
-        "id": 1
+        "celebrityId": '',
+        "fansNumb": fans,
+        "id": ''
       }
-      postRequest({url: '/ums_celebrity_card/add'}, data).then(res => {
+      console.log(data, '提交名片信息')
+      postRequest({url: '/ums/celebrity/card/add'}, data).then(res => {
         console.log(res)
         if (res.data.code === 200) {
           wepy.showToast({
@@ -225,29 +227,54 @@
             wx.navigateBack({delta: 1})
           }, 3000)
         } else {
-          wepy.showToast({
-            title: '请准确填写表单',
-            icon: 'none'
-          })
+          console.log('提交表单错误')
         }
       })
     }
     // 编辑中的删除平台信息
     delplatform() {
-      getRequest({ url: '/ums_celebrity_card/delete/3' }).then(res => {
+      getRequest({ url: '/ums/celebrity/card/delete/1' }).then(res => {
+        console.log(res, '点击删除返回的信息')
+        // if (res.data.code === 200) {
+        //   wepy.showToast({
+        //     title: '成功删除',
+        //     icon: 'success',
+        //   })
+        //   setTimeout(function() {
+        //     wx.navigateBack({delta: 1})
+        //   }, 3000)
+        // }
+      })
+    }
+    // 编辑中的确认修改
+    changeplarformDetail() {
+      var fans = this.filter_condition.fans_num.beginNum / 1000
+      var data = {
+        "appLink": this.appLink,
+        "appName": this.filter_condition.platform.displayText,
+        "appNickname": this.platformUserId,
+        "category": this.filter_condition.contentType.displayText,
+        "celebrityId": '',
+        "fansNumb": fans,
+        "id": ''
+      }
+      console.log(data, '提交名片信息')
+      postRequest({url: '/ums/celebrity/card/modify/1'}, data).then(res => {
+        console.log(res)
         if (res.data.code === 200) {
           wepy.showToast({
-            title: '成功删除',
-            icon: 'success',
+            title: '保存成功',
+            icon: 'success'
           })
           setTimeout(function() {
             wx.navigateBack({delta: 1})
           }, 3000)
+        } else {
+          console.log('提交表单错误')
         }
       })
+
     }
-    // 编辑中的保存平台信息
-    changeplarformDetail() {}
     // 保存平台信息
     saveplatformDetail() {}
     // 获取平台信息 点击编辑平台信息时候显示当前的平台信息

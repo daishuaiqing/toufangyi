@@ -91,16 +91,7 @@
         <text class="labelname">通告详情</text>
       </view>
       <view class="txt_input_container">
-        <block>
-          <view  hidden="{{!hasContent}}" @tap="inputCase" style="color:#837f7f;border:1px solid #999;min-height:100px;font-size:12px;">
-            <view>1、推广时间在9月或者10月初</view>
-            <view>2、颜值高的小姐姐优先，笔记需要收录</view>
-            <view>3、粉丝要求1w以上，固定报价100元</view>
-            <view style="padding-bottom: 16px;">4、拖稿的小姐姐就不要来了</view>
-            <view>至少输入8个字才可提交</view>
-          </view>
-           <textarea name="detail" id="" hidden="{{hasContent}}"  style="padding:10px;height:100px;width:92%;margin:0 auto;border:1px solid #888;line-height:20px;"></textarea>
-        </block>
+           <textarea name="detail" id="" placeholder="{{placeholder}}"  style="padding:10px;height:100px;width:92%;margin:0 auto;border:1px solid #888;line-height:20px;"></textarea>
       </view>
     <view class="form_input_label">
       <text class="labelname">报名截止时间</text>
@@ -134,6 +125,7 @@
       jump
     }
     data = {
+      placeholder: '1.推广时间，2.报名要求，3.具体报价',
       province: '',
       city: '',
       area: '',
@@ -145,9 +137,7 @@
       index: 0,
       array: ['1', '2', '3', '4', '5', '6'],
       verify: false,
-      hasContent: true,
       platformUserId: '',
-      goodsName: '',
       announceDetail: '',
       tempFilePaths: [],
       filter_condition: {
@@ -252,7 +242,7 @@
       },
       // 输入通告详情
       inputCase(e) {
-        this.hasContent = false
+        this.placeholder = ''
         this.announceDetail = e.detail.value
       },
       // 输入商品名称

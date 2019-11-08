@@ -40,7 +40,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 44,
+			"current": 48,
 			"list": [
 				{
 					"id": -1,
@@ -354,6 +354,34 @@
 					"id": -1,
 					"name": "packageA/person_announces",
 					"pathName": "packageA/person_announces",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/addpicture",
+					"pathName": "packageB/addpicture",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/edit_myplatform",
+					"pathName": "packageB/edit_myplatform",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageA/kol_detail",
+					"pathName": "packageA/kol_detail",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageA/kol_detail",
+					"pathName": "packageA/kol_detail",
 					"scene": null
 				}
 			]

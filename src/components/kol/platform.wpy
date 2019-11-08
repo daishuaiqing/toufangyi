@@ -1,7 +1,7 @@
 <style lang="less">
 </style>
 <template>
-  <view style="display: flex; flex-direction: column; padding: 15px;margin-top:5px; background-color: white">
+  <view style="display: flex; flex-direction: column; padding: 15px 20px;border-bottom:1px solid #dedede;margin-top:5px; background-color: white">
     <view style="display: flex; align-items: center">
       <text style="font-size: 16px;font-weight:600">{{item_data.appNickname}}</text>
       <view  style="display: flex; flex: 1; justify-content: flex-end; align-items: center;font-size:13px;">{{item_data.fansNumb}} 粉丝</view>

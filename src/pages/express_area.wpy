@@ -72,12 +72,10 @@
 </template>
 <script>
   import wepy from 'wepy'
-  // import jump from "../components/common/jump"
   import { FILTER_CONDITION } from '../data/filter'
   import ExpressAreaItem from '../components/express_area/express_item'
   import ApplyItem from '../components/express_area/apply_item'
   import BounceLoadingView from '../components/bounce_loading_view'
-  import * as LoginApi from '../api/login'
   import {checkphonewechat} from '../utils/login_util'
   import { getRequest } from "../utils/request"
   export default class ExpressAreaPage extends wepy.page {
@@ -94,6 +92,7 @@
       ApplyItem
     }
     data = {
+      pageNum: 1,
       current: 0,
       list: [{
         text: "通告",
@@ -110,7 +109,6 @@
         iconPath: "/images/weibiaoti-.png",
         selectedIconPath: "/images/wpde.png",
       }],
-      // 进入时不允许看，因为可能还未登录
       verify: false,
       current_page_index: 0,
       filter_condition: {
@@ -210,15 +208,37 @@
     }
     // 触底加载
     onReachBottom(e) {
-    }
-    // 获取通告列表
-    getannounceList() {
-      getRequest({ url: '/bms/announce/list' }).then(res => {
+      var that = this
+      var pageNum = this.pageNum + 1
+      this.pageNum = pageNum
+      getRequest({ url: '/bms/announce/list?pageNum=' + pageNum }).then(res => {
         var code = res.data.code
         console.log(res)
         if (code === 200) {
+          var announce_data = res.data.data
+          if (announce_data.length) {
+            that.announce_data = [...that.announce_data, ...announce_data]
+            console.log(that.announce_data, '触底加载下一页通告内容')
+          } else {
+            console.log('没有内容了')
+          }
+        }
+      })
+    }
+    // 获取通告列表
+    getannounceList() {
+      wepy.showLoading({})
+      var pageNum = 1
+      var that = this
+      that.pageNum = pageNum
+      getRequest({ url: '/bms/announce/list?pageNum=' + that.pageNum }).then(res => {
+        if (res.data.code === 200) {
           this.announce_data = res.data.data
-          console.log(this.announce_data, '通告列表')
+          console.log(that.announce_data, '通告列表')
+          wepy.hideLoading()
+        } else {
+          wepy.hideLoading()
+          console.log('显示异常')
         }
       })
     }
@@ -226,7 +246,9 @@
     getKolList() {
       getRequest({ url: '/ums/celebrity/card/list?pageNum=1' }).then(res => {
         var code = res.data.code
-        console.log(res, '获取的红人列表')
+        if (code === 200) {
+          console.log(res, '获取的红个人列表')
+        }
       })
     }
     onLoad(option) {

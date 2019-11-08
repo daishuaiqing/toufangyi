@@ -9,18 +9,50 @@
   flex: 1; 
   width: 100vw; 
   min-height: 100vh;
-  background-color: #f2f2f2; 
+  background: white; 
 }
 // 内容显示
 .content_show{
   display: flex; 
+  width: 100%;
   flex-direction: column; 
   margin-bottom: 8px;
-  box-shadow: 0 1px 1px #dedede;
 }
+// 摩卡展示
+.kolimgarea{
+  display:flex;
+  justify-content:space-between;
+  height:28px;
+  align-items:center;
+  box-shadow: 0 1px 2px rgb(233, 223, 223);
+}
+  .pictures{
+    height: 160px;
+    margin-top:5px;
+    box-shadow: 0 1px 2px rgb(233, 223, 223);
+    margin-bottom:5px;
+  }
+  .img_user{
+    display:flex;
+    justify-content: center;
+    width: 100%;
+    height: 160px;
+  }
+  .noImg{
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: 160px;
+  }
+  .toupimg{
+    height: 50px;
+    border:1px solid #dedede;
+    border-radius: 8px;
+  }
   .operation-item {
     display: flex;
-    border: 1px solid #000;
+    width:100%;
+    border: 1px solid red;
     align-items: center;
     border:1px solid white;
     background-color: #5dd5c8;
@@ -69,20 +101,7 @@
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
   }
-  // 摩卡区域
-  .pictures{
-    height: 160px;
-    margin-bottom: 8px;
-    margin-top:5px;
-    box-shadow: 0 1px 1px #dedede;
-  }
-  .img_user{
-    display:flex;
-    justify-content: center;
-    width: 100%;
-    border: 1px solid #000;
-    height: 150px;
-  }
+  
   // 底部添加名片
   .addIDcard{
     position: fixed;
@@ -91,7 +110,7 @@
     bottom: 0;
     height: 45px;
     text-align: center;
-    background: white;
+    background: rgb(207, 196, 196);
     font-size: 14px;
   }
 </style>
@@ -99,39 +118,40 @@
   <view class="container">
     <view class="container_koldetail">
       <view class="content_show">
-        <view style="display:flex;justify-content:space-between;height:28px;align-items:center;">
+        <view class="kolimgarea">
           <text style="font-size: 13px;margin-left:10px;">摩卡展示</text>
           <view wx:if="{{isFromMine}}" style="font-size: 13px;margin-right:10px;" @tap="editmyPhoto">编辑</view>
         </view>
         <view class="pictures">
           <!-- 当前没有照片 -->
-          <view  wx:if="{{true}}" class="img_user" >
+          <view  wx:if="{{false}}" class= "noImg">
             <view>当前您的摩卡库中还没有图片哦</view>
-            <view>点击上传图片</view>
-            <!-- <jump url='/packageB/addpicture'>点击上传照片</jump> -->
+            <view class="toupimg">点击上传图片</view>
           </view>
           <!-- 用户上传了照片 -->
-          <view wx:else class="img_user">
+          <view wx:else class="img_user" >
            <swiper style="width:100%;height:100%;" indicator-dots = "true" autoplay="{{true}}" interval="{{3000}}" duration="{{5000}} " circular indicator-color='white'>
-             <swiper-item>
-                <image style="width: 100vw; height: 100%" src="https://up.enterdesk.com/edpic_source/ad/d7/2d/add72da3d716f887c941c8b880b405fb.jpg"/>
+            <repeat for="{{KolImage}}" item ="item" index = "index" key="index">
+             <swiper-item>           
+                 <image src="{{item}}"/>
              </swiper-item>
+             </repeat>
            </swiper>
         </view>
         </view>
         <!-- 平台 -->
-        <view wx:if="{{isFromMine}}" style="display: flex; flex-direction: column; justify-content: space-between">
-          <repeat for="{{platform_data}}" item ="item" index = "index" key="index">
-            <view @tap="clickItem" id="{{item.id}}">
+        <view wx:if="{{true}}" style="display: flex; flex-direction: column; justify-content: space-between">
+          <repeat for="{{KolDetail}}" item ="item" index = "index" key="index">
+            <view @tap="clickItem" data-item="{{item}}">
               <platform_item :item_data="item"/>
             </view>
           </repeat>
         </view>
-        <view wx:else style="display: flex; flex-direction: column; justify-content: space-between">
+        <!-- <view wx:else style="display: flex; flex-direction: column; justify-content: space-between">
           <repeat for="{{platform_data}}" item ="item" index = "index" key="index">
               <platform_item :item_data="item"/>
           </repeat>
-        </view>
+        </view> -->
         <jump url="/packageB/edit_myplatform?addplatform=true" class="addIDcard">+ 添加名片</jump>
         <!-- 是否展示微信号 -->
         <view wx:if="{{isShow}}" class="wechatlayer">
@@ -172,6 +192,8 @@
       platform_item: PlatformItem,
     }
     data = {
+      KolImage: [],
+      KolDetail: [],
       tempFilePaths: [],
       editStatus: false,
       isFromMine: null, // 判断是不是从我的资料页面进入此页面
@@ -184,8 +206,9 @@
         wepy.navigateTo({url: '/packageB/addpicture'})
       },
       clickItem(e) {
-        var id = e.currentTarget.id
-        wepy.navigateTo({url: '/packageB/edit_myplatform?platformID=' + id})
+        var platformDetail = e.currentTarget.dataset.platform
+        console.log(platformDetail)
+        wepy.navigateTo({url: '/packageB/edit_myplatform?platformDetail=' + platformDetail})
       },
          // 编辑照片的状态
       edit_myphoto() {
@@ -240,17 +263,22 @@
         this.isShow = true
       }
     }
-    onShow() {
-      // 获取所有平台信息
-      let celebrity_id = 10000
-      getRequest({url: '/ums_celebrity_card/find/all/' + celebrity_id}).then(res => {
+    getKOLdetil() {
+      getRequest({url: '/ums/celebrity/card/find/all'}).then(res => {
         console.log(res)
         if (res.data.code === 200) {
-          var platform_data = res.data.data
-          this.platform_data = platform_data
-          console.log(this.platform_data)
+          var KolDetail = res.data.data.umsCelebrityCards
+          var KolImage = res.data.data.urls
+          KolImage = JSON.parse(KolImage)
+          this.KolImage = KolImage
+          console.log(KolImage, '红人图片')
+          this.KolDetail = KolDetail
+          console.log(this.KolDetail, '红人的详细信息')
         }
       })
+    }
+    onShow() {
+      this.getKOLdetil()
     }
     onLoad(options) {
       console.log(options)

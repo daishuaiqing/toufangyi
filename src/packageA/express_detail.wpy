@@ -126,14 +126,14 @@
     <view class="express-item-wrapper">
       <view class="item_row_container">
          <view class="item_row_container" style="font-weight:550;font-size:16px;flex:1 1 auto; width: 80vw; align-items: flex-end;">
-        <text class="item_title_text">{{ announce_detail.announceName}}</text>
+        <text class="item_title_text;">{{ announce_detail.announceName}}</text>
         <block wx:if="{{ announce_detail.appName }}">
           <text class="item_sub_title_text">(</text>
           <text class="item_sub_title_text">{{announce_detail.appName  }}</text>
           <text class="item_sub_title_text">)</text>
         </block>
       </view>
-        <view class="item_row_container" style="flex:0 0 auto;font-size:13px; margin-top: 3px;padding-left: 6px;display:flex;">
+        <view class="item_row_container" style="flex:0 0 auto;font-size:13px; margin-top: 8px;padding-left: 6px;display:flex;">
         <view>
            <text class="item_right_corner_text">{{ announce_detail.salary }}</text>
         <block>
@@ -191,26 +191,13 @@
       <text class="user-name">通告详情</text>
       <text class="item_foot_text" style="margin-top: 8px;">{{announce_detail.detail}}</text>
     </view>
-    <!-- <block wx:if="{{ item_data.invalidTimeStr || item_data.addr }}"> -->
       <view class="express-item-wrapper">
-        <!-- <block wx:if="{{ item_data.invalidTimeStr }}"> -->
           <view class="item_row_container">
             <text class="item_foot_text">报名截至时间: </text>
             <text class="item_foot_text" style="margin-left: 6px;">{{announce_detail.endTime}}</text>
           </view>
-          <!-- <block wx:if="{{ item_data.addr }}">
-            <view class="item_row_container" style="margin-top: 8px;">
-            </view>
-          </block> -->
-        <!-- </block> -->
-        <!-- <block wx:if="{{ item_data.addr }}">
-          <view class="item_row_container">
-            <text class="item_foot_text">地址: </text>
-            <text class="item_foot_text" style="margin-left: 6px;">{{item_data.addr}}</text>
-          </view>
-        </block> -->
       </view>
-    <!-- </block> -->
+    <!-- 微信号显示 -->
     <view wx:if="{{isShow}}" class="wechatlayer">
         <view class="layercontent">
       <text style="font-size:15px;font-weight:500;flex:1;margin-top:30px;">金主的微信号为</text>
@@ -255,6 +242,7 @@
     components = {
     }
     data = {
+      endTime: '',
       announce_detail: {},
       showShare: false,
       prurl: '',
@@ -340,11 +328,13 @@
       var that = this
       var announceid = that.announceID
       getRequest({url: '/bms/announce/find/' + announceid}).then(res => {
-        console.log(res)
         var code = res.data.code
         if (code === 200) {
-          this.announce_detail = res.data.data.bmsAnnounce
-          console.log(this.announce_detail)
+          that.announce_detail = res.data.data.bmsAnnounce
+          var endTime = that.announce_detail.endTime
+          console.log(endTime)
+          this.endTime = endTime.split('')[0]
+          console.log(this.endTime)
         }
       })
     }
@@ -365,7 +355,7 @@
       // 头像
       let promise2 = new Promise(function(resolve, reject) {
         wx.getImageInfo({
-          src: 'https://wx.qlogo.cn/mmopen/vi_32/xicxPHAeWALf0BkRXgfBwHN2G2rzo3fvRhqP6SYJ5QQlNLoibIXHswus2PjzkeW71Qqq8embahlnXaZnrXZS3ia3w/132',
+          src: 'https://wx.qlogo.cn/mmopen/vi_32/6uLpwJypNNWPMR1vqVtelbb0g4xvrnIOBJQrZeEJCWEYIZvMSh3q5TB9ZLGPIvFG5mcaCnFkBHXRibu1ZZ51OLA/132',
           success(res1) {
             resolve(res1)
           }
