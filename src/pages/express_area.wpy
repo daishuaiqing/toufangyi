@@ -139,14 +139,14 @@
     methods = {
       // 去详情页面
       clickItem(e) {
-        var kolId = e.currentTarget.id
-        var announceid = e.currentTarget.id
         // 通告详情界面
         if (this.verify === true) {
+          var announceid = e.currentTarget.id
           wepy.navigateTo({
             url: '../packageA/express_detail?announceId=' + announceid
           })
         } else {
+          var kolId = e.currentTarget.id
           // 红人个人主页
           wepy.navigateTo({
             url: '../packageA/kol_detail?kolId=' + kolId
@@ -218,10 +218,9 @@
       } else {
         await getRequest({ url: '/ums/celebrity/card/list?pageNum=' + pageNum }).then(res => {
           var code = res.data.code
-          console.log(res)
           if (code === 200) {
             var allKolList = res.data.data
-            if (allKolList.length) {
+            if (allKolList) {
               that.allKolList = [...that.allKolList, ...allKolList]
               console.log(that.allKolList, '触底加载下一页红人内容')
             } else {

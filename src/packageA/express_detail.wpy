@@ -133,20 +133,17 @@
           <text class="item_sub_title_text">)</text>
         </block>
       </view>
-        <view class="item_row_container" style="flex:0 0 auto;font-size:13px; margin-top: 8px;padding-left: 6px;display:flex;">
+        <view class="item_row_container" style="flex:0 0 auto;font-size:13px; margin-top: 8px;display:flex;">
         <view>
+          <text class="item_right_corner_text">报酬： </text>
            <text class="item_right_corner_text">{{ announce_detail.salary }}</text>
-        <block>
-          <text class="item_right_corner_text">/</text>
-          <text class="item_right_corner_text">篇</text>
-        </block>
         </view>
         <view style="margin-left:10px;">
            <block wx:if="{{ announce_detail.fansNumb }}">
-        <text class="item_main_atrr_text">{{ announce_detail.fansNumb}}</text>
+        <text class="item_main_atrr_text">{{ announce_detail.fansNumb}}K+</text>
         <text style="margin-left: 6px;"></text>
       </block>
-      <text class="item_main_atrr_text">{{ item_data.fansNumStr }}粉丝</text>
+      <text class="item_main_atrr_text">{{ announce_detail.fansNumb }}粉丝</text>
         </view>
       </view>
     </view>
@@ -166,7 +163,7 @@
       <view class="item_row_container">
           <view style="display: flex; flex-direction: column; width: 50vw; flex:1 1 auto; padding-left: 6px;">
             <view class="item_row_container">
-              <image class="avatar-image" src="{{announceUser.avatar}}" @tap="gotoPersonPage"/>
+              <image class="avatar-image" src="{{announceUser.avatar}}"/>
            <text class="user-name" style="margin-left: 6px;font-size:12px">{{announceUser.nick}}</text>
            <text class="user-name" style="margin-left: 6px;font-size:12px">{{announceUser.position}}</text>
             </view>
@@ -177,7 +174,7 @@
           </view>
       </view>
     </view>
-    <!-- 产品信息 -->
+
     <view class="express-item-wrapper">
       <text class="user-name">通告详情</text>
       <text class="item_foot_text" style="margin-top: 8px;">{{announce_detail.detail}}</text>
@@ -233,28 +230,23 @@
     components = {
     }
     data = {
-      endTime: '',
       announce_detail: {},
       announceUser: {},
       showShare: false,
       prurl: '',
-      imagePath: "https://up.enterdesk.com/edpic_source/ad/d7/2d/add72da3d716f887c941c8b880b405fb.jpg",
       value: 'b222889564',
-      allinfo: {},
       applied: false,
       isShow: false,
       canvasHidden: true, // 设置画板的显示与隐藏
       shareImgPath: '' // 用于存储canvas生成的图片
     }
-    computed = {}
     methods = {
-      // 分享图
+      // 点击分享图分享图
       shareImage() {
-        wepy.showLoading({
-          title: '努力生成中...'
-        })
+        // wepy.showLoading({
+        //   title: '努力生成中...'
+        // })
         this.showShare = true
-        wx.hideLoading()
       },
       // 保存分享图
       save() {
@@ -291,23 +283,23 @@
         this.applied = true
         this.isShow = true
       },
-      callPhone(ev) {
-        const { announceID } = this.item_data
-        const { userName, mobileNo, userID } = this.item_data.owner
-        wepy.showModal({
-          title: '是否拨打电话',
-          content: userName,
-        }).then(function (res) {
-          if (res.confirm) {
-            wepy.makePhoneCall({
-              phoneNumber: mobileNo
-            })
-            LoginApi.saveDialHistory(userID, announceID)
-          } else if (res.cancel) {
-            console.log('用户点击取消')
-          }
-        })
-      }
+      // callPhone(ev) {
+      //   const { announceID } = this.item_data
+      //   const { userName, mobileNo, userID } = this.item_data.owner
+      //   wepy.showModal({
+      //     title: '是否拨打电话',
+      //     content: userName,
+      //   }).then(function (res) {
+      //     if (res.confirm) {
+      //       wepy.makePhoneCall({
+      //         phoneNumber: mobileNo
+      //       })
+      //       // LoginApi.saveDialHistory(userID, announceID)
+      //     } else if (res.cancel) {
+      //       console.log('用户点击取消')
+      //     }
+      //   })
+      // }
     }
     // 获取通告详情
     async getannounceDetail() {
@@ -320,19 +312,17 @@
           console.log(that.announce_detail, '通告详情')
           that.announceUser = res.data.data.umsUser
           console.log(that.announceUser, '金主信息')
+          this.getshareImage()
         }
       })
-      that.$apply()
+      this.$apply()
     }
-    onLoad(option) {
-      var announceID = option.announceId
-      this.announceID = announceID
-      this.getannounceDetail()
+    getshareImage() {
+      var that = this
       // 生成二维码
       let promise1 = new Promise(function(resolve, reject) {
-        var avatar = this.announceUser.avatar
         wx.getImageInfo({
-          src: avatar,
+          src: that.announceUser.avatar,
           success(res1) {
             resolve(res1)
           }
@@ -341,28 +331,32 @@
       // 头像
       let promise2 = new Promise(function(resolve, reject) {
         wx.getImageInfo({
-          src: 'https://wx.qlogo.cn/mmopen/vi_32/6uLpwJypNNWPMR1vqVtelbb0g4xvrnIOBJQrZeEJCWEYIZvMSh3q5TB9ZLGPIvFG5mcaCnFkBHXRibu1ZZ51OLA/132',
+          src: that.announceUser.avatar,
           success(res1) {
             resolve(res1)
           }
         })
       })
       Promise.all([promise1, promise2]).then(res1 => {
+        console.log(res1)
         const ctx = wx.createCanvasContext('shareImg')
         ctx.setFillStyle('white')
         ctx.fillRect(0, 0, 300, 600)
-        ctx.drawImage('../' + res1[0].path, 100, 180, 100, 80)
-
+        // ctx.drawImage(, 100, 180, 100, 80)
+   
         ctx.setFontSize(10)
         ctx.setFillStyle('#000')
         ctx.fillText('扫描图中二维码查看', 90, 280)
 
         ctx.setFontSize(10)
-        ctx.fillText('需要抖音粉丝量在1万粉以上发布广告', 70, 120)
-        ctx.fillText('报名截止时间: ' + this.item_data.invalidTimeStr, 70, 140)
+        ctx.fillText(that.announce_detail.announceName, 70, 100)
+
+        ctx.setFontSize(10)
+        ctx.fillText('需要' + that.announce_detail.appName + that.announce_detail.fansNumb + '位粉丝', 70, 120)
+        ctx.fillText('报名截止时间: ' + that.announce_detail.endTime, 70, 140)
 
         ctx.setFontSize(12)
-        ctx.fillText('madrid', 80, 45)
+        ctx.fillText(that.announceUser.nick, 80, 45)
         ctx.fillText('邀请你一起参加活动，快来报名吧~', 80, 65)
         var avatarurl_width = 40
         var avatarurl_height = 40
@@ -379,7 +373,6 @@
         ctx.stroke()
         ctx.draw()
       })
-      var that = this
        // 将生成好的图片保存到本地，需要延迟一会，绘制期间耗时
       setTimeout(function() {
         wx.canvasToTempFilePath({
@@ -391,9 +384,16 @@
           }
         })
       }, 500)
+    }
+    onLoad(option) {
+      var announceID = option.announceId
+      this.announceID = announceID
+      this.getannounceDetail()
+      var that = this
       wepy.showShareMenu({
         withShareTicket: true // 要求小程序返回分享目标信息
       })
+      that.$apply()
     }
   }
 </script>
