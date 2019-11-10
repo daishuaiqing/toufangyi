@@ -97,8 +97,16 @@ input{
           "province": this.province,
           "userId": 1
         }
-        postRequest({ url: '/ums_address/add' }, data).then(res => {
-          console.log(res)
+        postRequest({ url: '/ums/address/add' }, data).then(res => {
+          if (res.data.code === 200) {
+            wepy.showToast({
+              title: '成功提交',
+              icon: 'success',
+            })
+            wepy.navigateBack({
+              delta: 1
+            })
+          }
         })
       }
     }

@@ -141,6 +141,7 @@ export default class PicturePage extends wepy.page {
           var code = res.data.code
           if (code === 200) {
             console.log(res, '修改成功')
+            wx.hideLoading()
           }
         })
       })
@@ -163,6 +164,11 @@ export default class PicturePage extends wepy.page {
       })
     },
   }
-  onLoad(options) {}
+  onLoad(options) {
+    console.log(options, '编辑的图片')
+    var images = JSON.parse(options.Images)
+    images = images.images
+    this.tempFilePaths = images
+  }
 }
 </script>

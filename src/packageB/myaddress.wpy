@@ -1,5 +1,10 @@
 <style lang="less">
-
+.address_one{
+  display: flex;
+  flex:1;
+  flex-direction: column;
+  height: 100%;
+}
 </style>
 <template>
   <view class="container" style="min-height: 100vh; background-color: white">
@@ -9,15 +14,17 @@
               <text style="flex:1">从微信获取地址</text>
               <view class="iconfont" style="color:#999;">&#xe683;</view>
             </view> -->
+            <repeat for="{{myaddress}}" key="index">
              <view style="display:flex;justify-content:space-between;align-items:center;background:white;border-bottom:1px solid #dedede;padding:15px;font-size:15px;padding-left: 20px;" @tap="addaddress">
             <view class="iconfont" style="font-size:20px;margin-right:10px;">&#xe623;</view>
-             <view style="margin:0 10px;">
-               <text>madiri</text>
-               <text>上海市云南南路86号放到沙发上地方士大夫发生地发挥司法所</text>
+             <view class="address_one">
+               <view style="margin-bottom:5px;">{{item.name}}</view>
+               <text>{{item.province}}-{{item.city}}-{{item.area}} {{item.address}}</text>
              </view>
              <view class="iconfont" style="color:#999;">&#xe64b;</view>
              </view>
-             <view style="display:flex;justify-content:space-between;background:white;border-bottom:1px solid #dedede;padding:15px;font-size:15px;padding-left: 20px;" @tap="addaddress">
+             </repeat>
+              <view style="display:flex;justify-content:space-between;background:white;border-bottom:1px solid #dedede;padding:15px;font-size:15px;padding-left: 20px;" @tap="addaddress">
             <view class="iconfont" style="font-size:20px;margin-right:10px;">&#xe67b;</view>
              <text style="flex:1">新增地址</text>
              <view class="iconfont" style="color:#999;">&#xe683;</view>
@@ -28,6 +35,7 @@
 
 <script>
   import wepy from 'wepy'
+  import { getRequest } from "../utils/request"
   export default class addaddress extends wepy.page {
     config = {
       navigationBarTitleText: '我的收货地址地址',
@@ -36,13 +44,26 @@
     components = {
     }
     data = {
+      myaddress: []
     }
     methods = {
       addaddress() {
         wepy.navigateTo({ url: './addaddress' })
       }
     }
+    async getmyaddress() {
+      var pageNum = 1
+      await getRequest({ url: '/ums/address/list?pageNum=' + pageNum }).then(res => {
+        if (res.data.code === 200) {
+          var myaddress = res.data.data.content
+          console.log(myaddress, '我的所有地址')
+          this.myaddress = myaddress
+        }
+      })
+      this.$apply()
+    }
     onLoad(options) {
+      this.getmyaddress()
     }
   }
 </script>

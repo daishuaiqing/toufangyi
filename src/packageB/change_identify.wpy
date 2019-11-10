@@ -2,6 +2,7 @@
     .choose_identify{
         width: 100vw;
         height: 100vh;
+        font-size: 16px;
         text-align: center;  
     }
     .choose_title{
@@ -23,8 +24,8 @@
   <view class="choose_identify">
       <view class="choose_title">您当前的身份是{{verify==1?'红人':'金主'}}</view>
       <view class="choose_area">
-          <view class="choose_select" wx:if="{{verify==1}}" @tap='changeverify'>切换身份为金主</view>
-          <view class="choose_select" wx:if="{{verify==2}}" @tap='changeuser'>切换身份为红人</view>
+          <view class="choose_select" wx:if="{{show}}" @tap='changeverify'>切换身份为金主</view>
+          <view class="choose_select" wx:else @tap='changeuser'>切换身份为红人</view>
       </view>
       <view class="choose_select" @tap="backtomine">返回</view>
   </view>
@@ -37,37 +38,49 @@
       enablePullDownRefresh: false
     }
     data = {
-      verify: null
+      verify: null,
+      show: null
     }
-    watch = {
-      verify(newvalue, oldValue) {
-        if (newvalue === 1) {
-          console.log('转换身份为红人')
-          this.$parent.globalData.verify = 1
-        } else {
-          console.log('转换身份为金主')
-          this.$parent.globalData.verify = 2
-        }
-        wepy.setStorageSync('verify', this.$parent.globalData.verify)
-      }
-    }
+    // watch = {
+    //   verify(newvalue, oldValue) {
+    //     if (newvalue === 1) {
+    //       console.log('转换身份为红人')
+    //       this.$parent.globalData.verify = 1
+    //     } else {
+    //       console.log('转换身份为金主')
+    //       this.$parent.globalData.verify = 2
+    //     }
+    //   }
+    // }
     methods = {
       backtomine() {
         wepy.switchTab({ url: '/pages/express_area' })
       },
-    //  为2的则为金主角色
+      // 为2的则为金主角色
       changeverify() {
         this.verify = 2
+        console.log('当前身份为金主')
+        this.show = false
+        // this.$parent.globalData.verify = 2
         wepy.setStorageSync('verify', this.verify)
       },
       changeuser() {
-         // verify为1则为红人，
+        // verify为1则为红人，
         this.verify = 1
+        this.show = true
+        console.log('当前身份为红人')
+        // this.$parent.globalData.verify = 1
         wepy.setStorageSync('verify', this.verify)
       }
     }
-    onLoad() {
+    async onLoad() {
       this.verify = wx.getStorageSync('verify')
+      console.log(this.verify)
+      if (this.verify === 1) {
+        this.show = true
+      } else {
+        this.show = false
+      }
     }
   }
 </script>

@@ -43,7 +43,7 @@
 <script>
   import wepy from 'wepy'
   import { postRequest } from "../utils/request"
-  export default class RulePage extends wepy.page {
+  export default class authorizePage extends wepy.page {
     config = {
       navigationBarTitleText: '授权',
       enablePullDownRefresh: false
@@ -88,11 +88,10 @@
                         signature: signature,
                         wxNumb: wxNumb
                       }
-                      console.log(data)
                       postRequest({url: '/ums/user/login'}, data).then(res => {
-                        console.log("res_data", res)
+                        console.log("登录接口返回的信息", res)
                         if (res.data.data) {
-                          console.log(res.data.data.token, '22222')
+                          console.log(res.data.data.token, 'token')
                           wx.setStorageSync('token', res.data.data.token)
                           wepy.switchTab({ url: '/pages/express_area' })
                         } else {

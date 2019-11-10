@@ -31,7 +31,6 @@
       </view>
   </view>
 </template>
-
 <script>
   import wepy from 'wepy'
   export default class choose_identify extends wepy.page {
@@ -41,34 +40,39 @@
     data = {
       verify: null
     }
-    watch = {
-      verify(newvalue, oldValue) {
-        if (newvalue === false) {
-          console.log('转换身份为红人')
-          this.$parent.globalData.verify = 1
-        } else {
-          console.log('转换身份为金主')
-          this.$parent.globalData.verify = 2
-        }
-        wepy.setStorageSync('verify', this.$parent.globalData.verify)
-      }
-    }
+    // watch = {
+    //   verify(newvalue, oldValue) {
+    //     if (newvalue === false) {
+    //       console.log('选择身份为金主')
+    //       this.$parent.globalData.verify = 1
+    //       wepy.setStorageSync('verify', this.$parent.globalData.verify)
+    //     } else {
+    //       console.log('选择身份为金主')
+    //       this.$parent.globalData.verify = 2
+    //       wepy.setStorageSync('verify', this.$parent.globalData.verify)
+    //     }
+    //   }
+    // }
     methods = {
     //  为2的则为金主角色
       changeverify() {
         this.verify = 2
-        wepy.navigateTo({
-          url: './bind_phone'
-        })
+        // this.$parent.globalData.verify = 2
+        console.log('选择身份为金主')
         wepy.setStorageSync('verify', this.verify)
+        wepy.navigateTo({
+          url: '/packageB/bind_phone'
+        })
       },
       changeuser() {
-         // verify为1则为红人，
+         // verify为1则为红人
         this.verify = 1
-        wepy.navigateTo({
-          url: './bind_phone'
-        })
+        // this.$parent.globalData.verify = 1
+        console.log('选择身份为红人')
         wepy.setStorageSync('verify', this.verify)
+        wepy.navigateTo({
+          url: '/packageB/bind_phone'
+        })
       }
     }
   }

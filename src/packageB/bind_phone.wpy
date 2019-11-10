@@ -142,6 +142,7 @@
       }
     }
     methods = {
+      // 输入微信号
       wechatInputChanged(e) {
         this.wechat = e.detail.value
       },
@@ -261,110 +262,112 @@
     }
     // 点击提交
     formSubmit(e) {
-      console.log('form发生了submit事件，携带数据为：', e.detail.value)
-      let that = this
-      wepy.showLoading({
-        title: '正在登录...',
-        mask: true,
-      })
-      if (this.login_type === 'register') {
-        LoginApi.registerWithConfirmCode(this.login_key, this.code)
-          .then((res) => {
-            console.log(res)
-            wepy.setStorageSync('logged', true)
-            wepy.hideLoading()
-            if (that.origin === 'main') {
-              wepy.switchTab({
-                url: '/pages/express_area'
-              })
-            } else if (that.origin === 'share') {
-              wepy.redirectTo({
-                url: '/pages/express_detail_from_share'
-              })
-            } else if (that.origin === 'report') {
-              wepy.switchTab({
-                url: '/pages/empty_kol_report'
-              })
-            } else {
-              wepy.switchTab({
-                url: '/pages/express_area'
-              })
-            }
-            wepy.showToast({
-              title: '成功',
-              icon: 'success',
-              duration: 2000
-            })
-          })
-          .catch((err) => {
-            wepy.hideLoading()
-            if (err.is_internal && err.code === 1004) {
-              wepy.showModal({
-                title: '提示',
-                content: err.message,
-              })
-            } else {
-              wepy.showToast({
-                title: err.message || '登录失败',
-                icon: 'success',
-                duration: 2000
-              })
-            }
-          })
+      var data = e.detail.value
+      console.log(data, '点击提交')
+      var wechatNum = data.wechat
+      var phoneNum = data.phone
+      wx.setStorageSync('wechatNum', phoneNum)
+      wx.setStorageSync('referUserPhoneNo', wechatNum)
+      wepy.navigateTo({ url: '/packageA/authorize' })
+      // let that = this
+      // if (this.login_type === 'register') {
+      //   LoginApi.registerWithConfirmCode(this.login_key, this.code)
+      //     .then((res) => {
+      //       console.log(res)
+      //       wepy.setStorageSync('logged', true)
+      //       wepy.hideLoading()
+      //       if (that.origin === 'main') {
+      //         wepy.switchTab({
+      //           url: '/pages/express_area'
+      //         })
+      //       } else if (that.origin === 'share') {
+      //         wepy.redirectTo({
+      //           url: '/pages/express_detail_from_share'
+      //         })
+      //       } else if (that.origin === 'report') {
+      //         wepy.switchTab({
+      //           url: '/pages/empty_kol_report'
+      //         })
+      //       } else {
+      //         wepy.switchTab({
+      //           url: '/pages/express_area'
+      //         })
+      //       }
+      //       wepy.showToast({
+      //         title: '成功',
+      //         icon: 'success',
+      //         duration: 2000
+      //       })
+      //     })
+      //     .catch((err) => {
+      //       wepy.hideLoading()
+      //       if (err.is_internal && err.code === 1004) {
+      //         wepy.showModal({
+      //           title: '提示',
+      //           content: err.message,
+      //         })
+      //       } else {
+      //         wepy.showToast({
+      //           title: err.message || '登录失败',
+      //           icon: 'success',
+      //           duration: 2000
+      //         })
+      //       }
+      //     })
 
-      } else {
-        // 用验证码登录
-        LoginApi.loginWithConfirmCode(this.login_key, this.code)
-          .then((res) => {
-            console.log(res, '用验证码登录')
-            wepy.setStorageSync('logged', true)
-            wepy.setStorageSync('referUserPhoneNo', this.phone)
-            wepy.hideLoading()
-            if (that.origin === 'main') {
-              // 跳转到首页
-              var mymsg = {
-                verify: this.verify,
-                phone: e.detail.value.phone
-              }
-              console.log(mymsg)
-              wepy.switchTab({
-                url: '/pages/express_area?mymsg=' + mymsg
-              })
-            } else if (that.origin === 'share') {
-              wepy.redirectTo({
-                url: '/pages/express_detail_from_share'
-              })
-            } else if (that.origin === 'report') {
-              wepy.switchTab({
-                url: '/pages/empty_kol_report'
-              })
-            } else {
-              wepy.switchTab({
-                url: '/pages/express_area'
-              })
-            }
-            wepy.showToast({
-              title: '成功',
-              icon: 'success',
-              duration: 2000
-            })
-          })
-          .catch((err) => {
-            wepy.hideLoading()
-            if (err.is_internal && err.code === 1004) {
-              wepy.showModal({
-                title: '提示',
-                content: err.message,
-              })
-            } else {
-              wepy.showToast({
-                title: err.message || '登录失败',
-                icon: 'success',
-                duration: 2000
-              })
-            }
-          })
-      }
+      // } else {
+      //   // 用验证码登录
+      //   LoginApi.loginWithConfirmCode(this.login_key, this.code)
+      //     .then((res) => {
+      //       console.log(res, '用验证码登录')
+      //       wepy.setStorageSync('logged', true)
+      //       wepy.setStorageSync('referUserPhoneNo', this.phone)
+      //       wepy.hideLoading()
+      //       if (that.origin === 'main') {
+      //         // 跳转到首页
+      //         var mymsg = {
+      //           verify: this.verify,
+      //           phone: e.detail.value.phone
+      //         }
+      //         console.log(mymsg)
+      //         wepy.switchTab({
+      //           url: '/pages/express_area?mymsg=' + mymsg
+      //         })
+      //       } else if (that.origin === 'share') {
+      //         wepy.redirectTo({
+      //           url: '/pages/express_detail_from_share'
+      //         })
+      //       } else if (that.origin === 'report') {
+      //         wepy.switchTab({
+      //           url: '/pages/empty_kol_report'
+      //         })
+      //       } else {
+      //         wepy.switchTab({
+      //           url: '/pages/express_area'
+      //         })
+      //       }
+      //       wepy.showToast({
+      //         title: '成功',
+      //         icon: 'success',
+      //         duration: 2000
+      //       })
+      //     })
+      //     .catch((err) => {
+      //       wepy.hideLoading()
+      //       if (err.is_internal && err.code === 1004) {
+      //         wepy.showModal({
+      //           title: '提示',
+      //           content: err.message,
+      //         })
+      //       } else {
+      //         wepy.showToast({
+      //           title: err.message || '登录失败',
+      //           icon: 'success',
+      //           duration: 2000
+      //         })
+      //       }
+      //     })
+      // }
     }
   }
 </script>

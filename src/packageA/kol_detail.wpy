@@ -124,11 +124,11 @@
       <view class="content_show">
         <view class="kolimgarea">
           <text style="font-size: 13px;margin-left:10px;">摩卡展示</text>
-          <view wx:if="{{isFromMine}}" style="font-size: 13px;margin-right:10px;" @tap="editmyPhoto">编辑</view>
+          <view wx:if="{{isFromMine}}" style="font-size: 13px;margin-right:10px;" data-images={{KolImage}} @tap="editmyPhoto">编辑</view>
         </view>
         <view class="pictures">
           <!-- 当前没有照片 -->
-          <view  wx:if="{{noImage}}" class= "noImg">
+          <view  wx:if="{{noImages}}" class= "noImg">
             <view style="margin-top:15px;">当前您的摩卡库中还没有图片哦</view>
             <view class="toupimg" @tap="toupimg">点击上传图片</view>
           </view>
@@ -137,14 +137,14 @@
            <swiper style="width:100%;height:100%;" indicator-dots = "true" autoplay="{{true}}" interval="{{3000}}" duration="{{5000}} " circular indicator-color='white'>
             <repeat for="{{KolImage}}" item ="item" index = "index" key="index">
              <swiper-item>           
-                 <image src="{{item}}"/>
+                 <image style="width:100%;height:100%;" src="{{item}}" mode="aspectFit" lazy-load/>
              </swiper-item>
              </repeat>
            </swiper>
         </view>
         </view>
         <!-- 平台 -->
-        <view  style="display: flex; flex-direction: column; justify-content: space-between">
+        <view wx:if="{{true}}" style="display: flex; flex-direction: column; justify-content: space-between">
           <repeat for="{{KolDetail}}" item ="item" index = "index" key="index">
             <view @tap="clickItem" data-item="{{item}}">
               <platform_item :item_data="item"/>
@@ -196,7 +196,8 @@
       platform_item: PlatformItem,
     }
     data = {
-      noImage: null,
+      noImages: null,
+      kolId: null,
       KolImage: [],
       KolDetail: [],
       tempFilePaths: [],
@@ -210,30 +211,20 @@
       toupimg() {
         wepy.navigateTo({url: '/packageB/addpicture'})
       },
-      editmyPhoto() {
-        wepy.navigateTo({url: '/packageB/addpicture'})
+      // 点击编辑按钮
+      editmyPhoto(e) {
+        console.log(e.currentTarget.dataset.images)
+        var Images = e.currentTarget.dataset.images
+        var images = {
+          images: Images
+        }
+        images = JSON.stringify(images)
+        wepy.navigateTo({url: '/packageB/addpicture?Images=' + images})
       },
       clickItem(e) {
-        var platformDetail = e.currentTarget.dataset.platform
+        var platformDetail = e.currentTarget.dataset.item
         console.log(platformDetail)
         wepy.navigateTo({url: '/packageB/edit_myplatform?platformDetail=' + platformDetail})
-      },
-         // 编辑照片的状态
-      edit_myphoto() {
-        this.editStatus = true
-      },
-      delImage(e) {
-        console.log('删除了图片')
-        var index = e.currentTarget.index
-        this.tempFilePaths.splice(index, 1)
-      },
-      previewImage(e) {
-        console.log(e)
-        var that = this
-        wepy.previewImage({
-          current: e.currentTarget.dataset.image,
-          urls: that.tempFilePaths
-        })
       },
       callPhone(ev) {
         var userPhone = wx.getStorageSync('referUserPhoneNo')
@@ -271,8 +262,8 @@
         this.isShow = true
       }
     }
-    getKOLdetil() {
-      getRequest({url: '/ums/celebrity/card/find/all'}).then(res => {
+    async getKOLdetil() {
+      await getRequest({url: '/ums/celebrity/card/find/all'}).then(res => {
         console.log(res)
         if (res.data.code === 200) {
           var KolDetail = res.data.data.umsCelebrityCards
@@ -281,18 +272,39 @@
             KolImage = JSON.parse(KolImage)
             this.KolImage = KolImage
           } else {
-            this.noImage = true
+            this.noImages = false
           }
           this.KolDetail = KolDetail
           console.log(this.KolDetail, '红人的详细信息')
         }
       })
+      this.$apply()
     }
-    onShow() {
-      this.getKOLdetil()
+    async seeKolPage() {
+      var kolId = this.kolId
+      await getRequest({url: '/ums/celebrity/card/find/' + kolId}).then(res => {
+        console.log(res)
+        if (res.data.code === 200) {
+          var KolDetail = res.data.data.umsCelebrityCard
+          var KolcardArray = []
+          KolcardArray.push(KolDetail)
+          this.KolDetail = KolcardArray
+          console.log(this.KolDetail, '红人的名片')
+          var KolImage = res.data.data.umsCelebrity.showUrls
+          if (KolImage) {
+            KolImage = JSON.parse(KolImage)
+            this.KolImage = KolImage
+            console.log(this.KolImage, '红人的照片')
+          } else {
+            this.noImages = false
+          }
+        }
+      })
+      this.$apply()
     }
     onLoad(options) {
-      console.log(options)
+      var kolId = options.kolId
+      this.kolId = kolId
       // 判断从哪个页面跳转过来
       let pages = getCurrentPages()
       let prevpage = pages[pages.length - 2]
@@ -300,15 +312,13 @@
       // 从个人资料页面跳转过来 隐藏底部导航
       if (prevpage.route === 'pages/kol_mine') {
         this.isFromMine = true
+        this.getKOLdetil()
+      } else {
+        this.seeKolPage()
       }
       wepy.showShareMenu({
         withShareTicket: true // 要求小程序返回分享目标信息
       })
-      let data = options.data
-      if (data) {
-        data = JSON.parse(data)
-        this.item_data = data
-      }
     }
   }
 </script>

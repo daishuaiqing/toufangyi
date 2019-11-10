@@ -1,10 +1,10 @@
-const baseURL = "http://10.145.105.114:8999"
+const baseURL = "http://212.64.59.35:8999"
 
 import wepy from 'wepy'
-// get方法
+// get
 function getRequest(obj) {
     return new Promise((resolve, reject) => {
-        var token = wx.getStorageSync('token')
+        var token = wepy.getStorageSync('token')
         wx.request({
           url: baseURL + obj.url,
           method: 'GET',
@@ -13,7 +13,9 @@ function getRequest(obj) {
           },
           dataType: 'json', //如果设为json，会尝试对返回的数据做一次 JSON.parse
           success: res => {
-              resolve(res)
+              if (res.statusCode === 200) {
+                resolve(res)
+              }  
           },
           fail: (err) => {
               reject(err)
@@ -25,7 +27,7 @@ function getRequest(obj) {
 // post方法
 function postRequest(obj, data) {
     return new Promise((resolve, reject) => {
-        var token = wx.getStorageSync('token')
+        var token = wepy.getStorageSync('token')
         wx.request({
           url: baseURL + obj.url,
           data: data,
@@ -50,10 +52,3 @@ module.exports = {
     getRequest: getRequest,
     postRequest: postRequest
 }
-
-
-//使用 const request = request('../utils/request.js')
-//var banner = request({url:''})
-//var p =Promise.all([banner])
-// p.then(res=> {})
-//或者request({url:''}).then(res=> {})

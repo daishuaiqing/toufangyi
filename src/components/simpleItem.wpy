@@ -13,19 +13,17 @@
 <template>
   <view >
       <view class="content-item">
-        <repeat for="{{5}}" key="{{index}}">
             <view class="interest" @tap="topersonInfo">
-                <image style="width:50px;height:50px;border-radius:50%;margin-right:10px;" src="https://up.enterdesk.com/edpic_source/ad/d7/2d/add72da3d716f887c941c8b880b405fb.jpg"/>
+                <image style="width:50px;height:50px;border-radius:50%;margin-right:10px;" src="{{item_data.avatar}}"/>
                 <view style="flex:1;border-bottom:1px solid #cccccc;height:100%;">     
-                    <view style="font-size:14px;margin-top:8px;">姓名  .  CEO</view>
+                    <view style="font-size:14px;margin-top:8px;">{{item_data.nick}} .  {{item_data.position}}</view>
                      <view style="display:flex;font-size:13px;align-items:center;">
-                        <view style="flex:1;">公司：XXX公司</view>
+                        <view style="flex:1;">公司：{{item_data.company}}</view>
                         <view style="border:1px solid orange;color:orange;padding:5px;border-radius:5px;">去看看</view>
                     </view>
                     <view style="font-size:12px;">查看了您</view>
                 </view>
             </view>
-        </repeat>
     </view>
   </view>
 </template>
@@ -33,6 +31,7 @@
   import wepy from 'wepy'
   export default class SimpleItem extends wepy.component {
     props = {
+      item_data: {}
     }
     methods = {
       topersonInfo() {

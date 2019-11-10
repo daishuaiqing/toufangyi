@@ -28,17 +28,17 @@
     <view class="item_row_container">
       <!-- 名称 -->
       <view class="item_row_container" style="font-weight:550;font-size:16px;flex:1 1 auto; width: 80vw; align-items: flex-end;">
-        <text class="item_title_text">{{item_data.announceName}}</text>
+        <text class="item_title_text">{{item_data.bmsAnnounce.announceName}}</text>
       </view>
       <!-- 篇数 以及粉丝数-->
       <view class="item_row_container" style="flex:0 0 auto;font-size:13px; margin-top: 3px;display:flex;">
            <block>
-             <text class="item_main_atrr_text">{{item_data.appName}}</text>
+             <text class="item_main_atrr_text">{{item_data.bmsAnnounce.appName}}</text>
              <text style="margin-left: 6px;"></text>
           </block>
-             <text class="item_main_atrr_text">{{item_data.fansNumb }}粉丝</text>
+             <text class="item_main_atrr_text">{{item_data.bmsAnnounce.fansNumb }}粉丝</text>
              <text style="margin-left: 6px;"></text>
-             <text class="item_right_corner_text">{{item_data.salary }}</text>
+             <text class="item_right_corner_text">{{item_data.bmsAnnounce.salary }}</text>
           <block>
               <text class="item_right_corner_text">/</text>
               <text class="item_right_corner_text">篇</text>
@@ -47,17 +47,17 @@
     </view>
     <view class="item_row_container" style="font-size:12px;flex-wrap: wrap; width: 90vw; margin-top: 8px;">
       <text class="item_foot_text">需求人数: </text>
-      <text class="item_foot_text" style="margin-left: 6px;color: #eea932">{{item_data.needNumb }}</text>
+      <text class="item_foot_text" style="margin-left: 6px;color: #eea932">{{item_data.bmsAnnounce.needNumb }}</text>
       <text class="item_foot_text" style="margin-left: 6px;">报名人数: </text>
-      <text class="item_foot_text" style="margin-left: 6px; color: #eea932">{{ item_data.appliedNum }}</text>
+      <text class="item_foot_text" style="margin-left: 6px; color: #eea932">{{ item_data.bmsAnnounce.appliedNum }}</text>
     </view>
     <!-- 头像以及公司和最后更新时间 -->
     <view class="item_row_container" style="margin-top: 8px;">
       <view class="item_row_container" style="flex:1 1 auto;display:flex; width: 50vw; padding: 0; align-items: center;">
-        <image class="avatar-image" src="{{myInfo.avatarUrl}}"/>
-        <text class="user-name" style="margin-left: 6px;font-size:12px">{{myInfo.nickName}}</text>
-        <text class="user-name" style="margin-left: 6px;font-size:12px">{{item_data.owner.jobPosition}}</text>
-        <text class="item_foot_text" style="flex:1;position:absolute;right:10px;color:#ccc;font-size:10px;">{{item_data.updateTime}}</text>
+        <image class="avatar-image" src="{{ item_data.umsUser.avatar}}"/>
+        <text class="user-name" style="margin-left: 6px;font-size:12px">{{item_data.umsUser.nick}}</text>
+        <text class="user-name" style="margin-left: 6px;font-size:12px">{{item_data.umsUser.position}}</text>
+        <text class="item_foot_text" style="flex:1;position:absolute;right:10px;color:#ccc;font-size:10px;">{{item_data.umsUser.updateTime}}</text>
       </view>
     </view>
     <block wx:if="{{ !item_data.owner.isMySelf }}">

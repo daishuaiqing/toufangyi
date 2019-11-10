@@ -27,47 +27,30 @@
     <view class="item_row_container">
       <!-- 红人头像以及名字 -->
       <view class="item_row_container" style="font-weight:550;margin-bottom:10px;font-size:16px;flex:1 1 auto; width: 80vw; align-items: center;">
-        <image class="avatar-image" src="{{item_data.owner.faceImgUrl}}"/>
-        <text>{{item_data.owner.userName}}</text>
+        <image class="avatar-image" src="{{item_data.umsUser.avatar}}"/>
+        <text>{{item_data.umsUser.nick}}</text>
       </view>
       <!-- 平台以及粉丝数-->
       <view class="item_row_container" style="flex:0 0 auto;font-size:13px; margin-top: 3px;display:flex;">
         <view>
-        <block wx:if="{{ item_data.platformStr }}">
-        <text class="item_main_atrr_text">{{ item_data.platformStr }}</text>
+        <block wx:if="{{ item_data.umsCelebrityCard.appName}}">
+        <text class="item_main_atrr_text">{{ item_data.umsCelebrityCard.appName}} </text>
         <text style="margin-left: 12px;"></text>
         </block>
-        <text style="margin-left: 12px;"></text>
-         <text class="item_main_atrr_text">{{ item_data.fansNumStr }}粉丝</text>
+         <text class="item_main_atrr_text">( {{item_data.umsCelebrityCard.category}} )</text>
         </view>
       </view>
-        <!-- 期望薪资 -->
-      <view class="item_row_container" style="flex:0 0 auto;font-size:13px; margin-top: 5px;display:flex;">
-        <view>
-        <block>
-        <text class="item_main_atrr_text">期望薪资</text>
-        <text style="margin-left: 10px;"></text>
-        </block>
-         <text class="item_main_atrr_text">1000/篇</text>
-        </view>
+       <view class="item_row_container" style="margin:5px 0;font-size:16px;flex:1 1 auto; width: 80vw; align-items: center;">
+        <text>{{ item_data.umsCelebrityCard.fansNumb }}K+ 粉丝</text> 
+      </view>
+      <view class="item_row_container" style="margin-bottom:10px;font-size:16px;flex:1 1 auto; width: 80vw; align-items: center;">
+        <text>{{item_data.umsCelebrityCard.appLink}}</text>
       </view>
     </view>
-
-    <!-- <view class="item_row_container" style="flex-wrap: wrap; font-size:12px;width: 90vw; margin-top: 8px;">
-      <repeat for="{{ item_data.tags }}" item="item" index="index" key="index">
-        <text class="item_tag_text" style="margin-right: 12px;border-radius:5px;background:rgba(216, 209, 209, 0.3);padding:3px;">{{ item }}</text>
-      </repeat>
-    </view> -->
-
     <block wx:if="{{ !item_data.owner.isMySelf }}">
       <image style="align-self: flex-end; margin-top: -64px; margin-bottom: 32px;margin-right:10px; width: 32px; height: 32px;"
              src="/images/express-list-call.png" @tap.stop="onClickCall"
              data-phone="{{item_data.owner.mobileNo}}"/>
-    </block>
-
-    <block wx:if="{{ item_data.owner.isMySelf }}">
-      <image style="align-self: flex-end; margin-top: -64px; margin-bottom: 32px; width: 32px; height: 32px;"
-             src="{{ item_data.checked ? '/images/selected.png' : '/images/unselected.png' }}"/>
     </block>
      <!-- 城市 -->
     <block wx:if="{{ item_data.city }}">

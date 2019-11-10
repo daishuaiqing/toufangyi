@@ -187,7 +187,7 @@
         </view> -->
             <!-- <button open-type="getUserInfo" lang="zh_CN" bindgetuserinfo="onGotUserInfo">获取用户信息</button> -->
      </view>
-           <mp-tabbar current="{{2}}" style="position:fixed;bottom:0;width:100%;left:0;right:0;" list="{{list}}" bindchange="tabChange"></mp-tabbar>
+           <mp-tabbar current="{{2}}" style="position:fixed;bottom:0;width:100%;left:0;right:0;" list="{{list}}"></mp-tabbar>
     </view>
   </view>
     <!-- boss身份-->
@@ -242,13 +242,15 @@
               <text style="flex:1" @tap="setting">设置</text>
               <view class="iconfont" style="color:#999;">&#xe683;</view>
             </view> -->
-           </view>   
+           </view>  
+           <mp-tabbar current="{{3}}" style="position:fixed;bottom:0;width:100%;left:0;right:0;" list="{{otherlist}}"></mp-tabbar> 
     </view>
   </view>
 </view> 
 </template>
 <script>
   import wepy from 'wepy'
+  import { tabbarlist } from '../data/tabbarList'
   import PlatformItem from '../components/kol/platform'
   import mta from '../utils/mta_analysis'
   export default class KOLMinePage extends wepy.page {
@@ -267,26 +269,14 @@
       userPhone: '',
       userInfo: '',
       nickName: '',
-      list: [{
-        text: "通告",
-        iconPath: "/images/hezi.png",
-        selectedIconPath: "/images/tonggao_pre.png",
-      },
-      {
-        text: "消息",
-        iconPath: "/images/time.png",
-        selectedIconPath: "/images/message.png"
-      },
-      {
-        text: "我的",
-        iconPath: "/images/weibiaoti-.png",
-        selectedIconPath: "/images/wpde.png",
-      }],
+      list: tabbarlist.list,
+      otherlist: tabbarlist.otherlist,
       verify: false
     }
     methods = {
+      // 切换身份
       tochangeidentify() {
-        wepy.navigateTo({ url: '/packageB/change_identify' })
+        wepy.redirectTo({ url: '/packageB/change_identify' })
       },
       tomypage() {
         wepy.navigateTo({ url: '/packageB/jinzhupage' })
@@ -298,35 +288,10 @@
       tomyInfo() {
         wepy.navigateTo({ url: '/packageA/kol_detail' })
       },
-      // tabbar
-      tabChange(e) {
-        this.current = e.detail.index
-        console.log(e)
-        if (e.detail.index === 0) {
-          wepy.switchTab({ url: '/pages/express_area' })
-        }
-        if (e.detail.index === 1) {
-          wepy.switchTab({ url: '/pages/message' })
-        }
-        if (e.detail.index === 2) {
-          wepy.switchTab({ url: '/pages/kol_mine' })
-        }
-      },
-      // 点击设置
-      setting() {
-        wepy.navigateTo({url: '/packageB/setting'})
-      },
       // 我的通告列表
-      gotoMinePreAnnouncePage(ev) {
-        wepy.navigateTo({
-          url: '../packageA/person_preannounces'
-        })
-      },
-      gotoMineAnnouncePage(ev) {
-        let loggedUser = wepy.getStorageSync('loggedUser')
-        loggedUser = { userID: 1 }
-        wepy.navigateTo({
-          url: '../packageA/person_announces?userIDs=' + loggedUser.userID
+      gotoMineAnnouncePage() {
+        wx.navigateTo({
+          url: '/packageA/person_announces'
         })
       },
       clickContactService(ev) {
@@ -344,7 +309,7 @@
         })
       }
     }
-    onLoad(options) {
+    async onLoad(options) {
       var userPhone = wx.getStorageSync('referUserPhoneNo')
       this.userPhone = userPhone
       wepy.showShareMenu({
@@ -365,24 +330,18 @@
       // 用户身份信息
       this.userInfo = this.$parent.globalData.wxinfo
       // 身份验证
-      var verify = this.$parent.globalData.verify
+      var verify = wx.getStorageSync('verify')
       if (verify === 1) {
         console.log('这是红人界面')
         this.verify = true
         wepy.setNavigationBarTitle({
           title: '我的主页'
         })
-        wepy.hideTabBar({
-          animation: false
-        })
       } else {
         console.log('这是金主界面')
         this.verify = false
         wepy.setNavigationBarTitle({
           title: '我的'
-        })
-        wepy.showTabBar({
-          animation: false
         })
       }
     }

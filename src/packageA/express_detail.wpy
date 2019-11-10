@@ -166,23 +166,14 @@
       <view class="item_row_container">
           <view style="display: flex; flex-direction: column; width: 50vw; flex:1 1 auto; padding-left: 6px;">
             <view class="item_row_container">
-              <image class="avatar-image" src="{{item_data.owner.faceImgUrl}}" @tap="gotoPersonPage"/>
-           <text class="user-name" style="margin-left: 6px;font-size:12px">{{item_data.owner.userName}}</text>
-           <text class="user-name" style="margin-left: 6px;font-size:12px">{{item_data.owner.jobPosition}}</text>
+              <image class="avatar-image" src="{{announceUser.avatar}}" @tap="gotoPersonPage"/>
+           <text class="user-name" style="margin-left: 6px;font-size:12px">{{announceUser.nick}}</text>
+           <text class="user-name" style="margin-left: 6px;font-size:12px">{{announceUser.position}}</text>
             </view>
             <view class="item_row_container" style="margin-top: 8px;">
               <text class="item_foot_text">公司: </text>
-              <text class="item_foot_text" style="margin-left: 6px;">{{item_data.owner.company}}</text>
+              <text class="item_foot_text" style="margin-left: 6px;">{{announceUser.company}}</text>
             </view>
-            <!-- <view class="item_row_container" style="margin-top: 8px;">
-              <view class="item_row_container" style="width: 50vw; flex:1 1 auto;">
-                <text class="item_foot_text">发布通告: </text>
-                <text class="item_foot_text" style="margin-left: 6px; color: #eea932">{{item_data.owner.totalValidAnnounceCount}}</text>
-                <text class="item_foot_text">/</text>
-                <text class="item_foot_text">{{item_data.owner.totalAnnounceCount}}</text>
-                <text class="item_foot_text">条</text>
-              </view>
-            </view> -->
           </view>
       </view>
     </view>
@@ -244,6 +235,7 @@
     data = {
       endTime: '',
       announce_detail: {},
+      announceUser: {},
       showShare: false,
       prurl: '',
       imagePath: "https://up.enterdesk.com/edpic_source/ad/d7/2d/add72da3d716f887c941c8b880b405fb.jpg",
@@ -299,12 +291,6 @@
         this.applied = true
         this.isShow = true
       },
-      gotoPersonPage(ev) {
-        const { userID } = this.item_data.owner
-        wepy.navigateTo({
-          url: '../packageA/person_announces?userIDs=' + userID
-        })
-      },
       callPhone(ev) {
         const { announceID } = this.item_data
         const { userName, mobileNo, userID } = this.item_data.owner
@@ -324,29 +310,29 @@
       }
     }
     // 获取通告详情
-    getannounceDetail() {
+    async getannounceDetail() {
       var that = this
       var announceid = that.announceID
-      getRequest({url: '/bms/announce/find/' + announceid}).then(res => {
+      await getRequest({url: '/bms/announce/find/' + announceid}).then(res => {
         var code = res.data.code
         if (code === 200) {
           that.announce_detail = res.data.data.bmsAnnounce
-          var endTime = that.announce_detail.endTime
-          console.log(endTime)
-          this.endTime = endTime.split('')[0]
-          console.log(this.endTime)
+          console.log(that.announce_detail, '通告详情')
+          that.announceUser = res.data.data.umsUser
+          console.log(that.announceUser, '金主信息')
         }
       })
+      that.$apply()
     }
     onLoad(option) {
-      console.log(option, '通告页面传递来的参数')
       var announceID = option.announceId
       this.announceID = announceID
       this.getannounceDetail()
-      // 二维码
+      // 生成二维码
       let promise1 = new Promise(function(resolve, reject) {
+        var avatar = this.announceUser.avatar
         wx.getImageInfo({
-          src: '/images/timg.jpg',
+          src: avatar,
           success(res1) {
             resolve(res1)
           }

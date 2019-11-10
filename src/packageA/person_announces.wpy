@@ -46,7 +46,6 @@
   #confirm_button:active {
     opacity: 0.7;
   }
-
   #contact_service_button {
     color: #333;
     text-decoration: underline;
@@ -55,14 +54,13 @@
     font-size: 12px;
     background: white;
   }
-
 </style>
 <template>
     <view class="container" style="min-height: 100vh;">
       <view style="display: flex; flex-direction: column; flex: 1; ">
         <repeat for="{{ myAllAnnounce }}" item="item" index="index" key="index">
           <view @tap="clickItem">
-            <ExpressAreaItem :item_data="item"/>
+            <MyAnnounce :item_data="item"/>
           </view>
         </repeat>
       </view>
@@ -72,70 +70,49 @@
 <script>
   import wepy from 'wepy'
   import { getRequest } from "../utils/request"
-  import ExpressAreaItem from '../components/express_area/express_item'
+  import MyAnnounce from '../components/express_area/myannounce'
   import BounceLoadingView from '../components/bounce_loading_view'
   export default class PersonAnnouncePage extends wepy.page {
     config = {
-      navigationBarTitleText: '用户通告列表',
+      navigationBarTitleText: '金主通告列表',
       onReachBottomDistance: 100
     }
     components = {
-      ExpressAreaItem,
+      MyAnnounce,
       bounce_loading: BounceLoadingView,
     }
 
     data = {
       msg: '',
       myAllAnnounce: [],
-      announce_data: [],
-      isLoadingMore: false,
-      hasMore: true,
-      isRefreshing: false, // 可以是筛选完毕之后自动触发的一次 Loading. 和Loading more 有区别
-      current_page_index: 0,
       selectAllFlag: true,
       isMine: false
     }
     methods = {
-      // 去详情页面
-      clickItem(ev) {
-        const { announceIndex } = ev.currentTarget.dataset
-        let item = this.announce_data[announceIndex]
-        if (item) {
-          if (!this.isMine) {
-            wepy.navigateTo({
-              url: '../pages/express_detail?data=' + JSON.stringify(item)
-            })
-          } else {
-            if (item.checked) {
-              item.checked = 0
-            } else {
-              item.checked = 1
-            }
-          }
-        }
-      }
     }
     // 获取我的所有通告列表
-    getmyAllAnnounce() {
+    async getmyAllAnnounce() {
       wx.showLoading({
         title: '正在加载',
       })
       var pageNum = 1
       var that = this
       that.pageNum = pageNum
-      getRequest({ url: '/bms/financier/announce/list?pageNum=' + pageNum }).then(res => {
-        console.log(res, '金主的通告列表')
+      await getRequest({ url: '/bms/financier/announce/list?pageNum=' + pageNum }).then(res => {
+        console.log(res, '金主的所有通告')
         if (res.data.data) {
           var myAllAnnounce = res.data.data.content
           that.myAllAnnounce = myAllAnnounce
+          console.log(myAllAnnounce, '金主的所有通告')
           wx.hideLoading()
         } else {
           console.log('当前还没有通告')
+          wx.hideLoading()
         }
       })
+      that.$apply()
     }
     onReachBottom() {
-      console.log('触底加载下一页')
       var that = this
       that.pageNum = that.pageNum + 1
       getRequest({ url: '/bms/financier/announce/list?pageNum=' + this.pageNum }).then(res => {
@@ -152,9 +129,6 @@
     }
     onPullDownRefresh(e) {
       this.getmyAllAnnounce()
-    }
-    onShow(option) {
-      this.selectAllFlag = true
     }
     onLoad(option) {
       this.getmyAllAnnounce()

@@ -21,7 +21,6 @@ export default class extends wepy.app {
     "subPackages": [{
       root: "packageA",
       pages: [
-        'person_preannounces',
         'person_announces',
         'kol_detail',
         'express_detail',
@@ -40,19 +39,13 @@ export default class extends wepy.app {
         'jinzhupage',
         'change_identify'
       ]
-    }, {
-      root: "packageC",
-      pages: [
-        'name',
-        'company',
-        'inputJob'
-      ]
     }],
-    tabBar: {
+    "tabBar": {
+      custom: true,
       color: '#333',
       selectedColor: '#1296db',
       backgroundColor: '#f2f2f2',
-      borderStyle: 'black',
+      borderStyle: 'white',
       position: 'bottom',
       list: [
         {
@@ -81,6 +74,9 @@ export default class extends wepy.app {
         }
       ]
     },
+    usingComponents: {
+      "mp-tabbar": './custom-tab-bar/tabbar/tabbar'
+    },
     window: {
       backgroundColor: '#FFFFFF',
       backgroundTextStyle: 'dark',
@@ -100,10 +96,10 @@ export default class extends wepy.app {
   }
   globalData = {
     userInfo: null,
-    verify: 1,
+    verify: null,
     wxinfo: null,
     scopeu: false,
-    baseURL: 'http://10.145.105.114:8999',
+    baseURL: 'http://212.64.59.35:8999',
     scopeuInfo: ''
   }
   constructor() {
@@ -113,32 +109,14 @@ export default class extends wepy.app {
   }
   onShow(options) {
     this.checkUserInfo()
-    // 确定进入程序的方式
-    let referUser = options.query ? options.query.referUser : ''
-    if (referUser) {
-      wx.setStorageSync('referUserPhoneNo', referUser)
-    }
     var verify = wepy.getStorageSync('verify')
-    console.log(verify, '当前verify,1为红人，2是金主')
+    console.log('当前verify为', verify, '1为红人，2是金主')
     this.globalData.verify = verify
-    // 通过分享进入
-
-    if (options.scene === 1044) {
-      let shareTicket = options.shareTicket
-      wx.getShareInfo({
-        shareTicket: shareTicket,
-        complete(res) {
-          console.log(res)
-        }
-      })
-    }
   }
   onLaunch(options) {
     let logs = wx.getStorageSync('logs') || []
     logs.unshift(Date.now())
     wx.setStorageSync('logs', logs)
-    wx.setStorageSync('wechatNum', '16262626626')
-    wx.setStorageSync('referUserPhoneNo', '11111111111')
   }
   checkUserInfo() {
     var that = this

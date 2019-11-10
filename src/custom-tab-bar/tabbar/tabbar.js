@@ -113,12 +113,14 @@ Component({
     },
     methods: {
         tabChange: function tabChange(e) {
-            console.log(this.data.list)
-            var index = e.currentTarget.dataset.index;
+            var index = e.currentTarget.dataset.index
+            var url = this.data.list[index].path
+            wx.switchTab({ url: url })
+            
             // this.setData({
             //     current: index
             // })
-            this.triggerEvent('change', { index: index, item: this.data.list[index] });
+            // this.triggerEvent('change', { index: index, item: this.data.list[index] });
         }
     }
 });

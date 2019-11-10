@@ -38,15 +38,15 @@
       </swiper> -->
       <!-- 对我感兴趣界面 -->
       <block wx:if="{{num == 0}}">
-        <repeat>
-          <SimpleItem />
+        <repeat for="{{allemployers}}" key="index">
+          <SimpleItem :item_data.sync="item"/>
         </repeat> 
       </block>
       <!-- 我关注的界面 -->
     <block wx:if="{{num == 1}}">
-      <repeat for="{{announce_data}}">
+      <repeat for="{{applyedArray}}">
         <swipeout  i-class="i-swipeout-demo-item" style="height:100%;"  @change="delItem">
-        <view slot="content"  @tap="clickItem" id="{{item.announceId}}">
+        <view slot="content"  @tap="clickItem" id="{{item.bmsAnnounce.id}}">
          <express :item_data="item"/>
         </view>
         </swipeout>
@@ -78,12 +78,14 @@
         </repeat>
       </view>
   </view>
+  <mp-tabbar current="{{2}}" style="position:fixed;bottom:0;width:100%;left:0;right:0;" list="{{otherlist}}" bindchange="tabChange"></mp-tabbar>
 </block>
 </view>
 </template>
 <script>
   import wepy from 'wepy'
   import { getRequest } from "../utils/request"
+  import { tabbarlist } from '../data/tabbarList'
   import ExpressAreaItem from '../components/express_area/express_item'
   import SimpleItem from '../components/simpleItem'
   export default class message extends wepy.page {
@@ -99,33 +101,21 @@
       SimpleItem
     }
     data = {
-      announce_data: [],
-      list: [{
-        text: "通告",
-        iconPath: "/images/hezi.png",
-        selectedIconPath: "/images/tonggao_pre.png",
-      },
-      {
-        text: "消息",
-        iconPath: "/images/time.png",
-        selectedIconPath: "/images/message.png"
-      },
-      {
-        text: "我的",
-        iconPath: "/images/weibiaoti-.png",
-        selectedIconPath: "/images/wpde.png",
-      }],
+      allemployers: [],
+      applyedArray: [],
+      list: tabbarlist.list,
+      otherlist: tabbarlist.otherlist,
       verify: null,
       num: 0,
       array: 5
     }
     methods = {
       clickItem(e) {
-        var id = e.currentTarget.id
-        // 应聘者界面
+        var announceid = e.currentTarget.id
+        // 应聘者申请过的
         if (this.verify === true) {
           wepy.navigateTo({
-            url: '../packageA/express_detail?announceID=' + id
+            url: '../packageA/express_detail?announceId=' + announceid
           })
         } else {
           // 金主界面
@@ -152,35 +142,54 @@
         this.num = e
       },
     }
-    onLoad(options) {
-      this.getinterseList()
-      this.getKolList()
+    async onLoad(options) {
+
     }
     // 对我感兴趣的金主的列表
-    getinterseList() {
-      getRequest({ url: '/bms/financier/celebrity/log/list?pageNum=2' }).then(res => {
-        console.log(res, '对我感兴趣金主的列表')
+    async getinterseList() {
+      await getRequest({ url: '/bms/financier/celebrity/log/list?pageNum=1' }).then(res => {
+        if (res.data.code === 200) {
+          var allemployers = res.data.data
+          this.allemployers = allemployers
+          console.log(this.allemployers, '对我感兴趣的所有金主的列表')
+        }
       })
+      this.$apply()
     }
     // 对我感兴趣的红人的列表
-    getKolList() {
-      getRequest({ url: '/bms/celebrity/financier/log/list?pageNum=1' }).then(res => {
-        console.log(res, '对我感兴趣金主的列表')
+    async getKolList() {
+      await getRequest({ url: '/bms/celebrity/financier/log/list?pageNum=1' }).then(res => {
+        console.log(res, '对我感兴趣红人的列表')
+        if (res.data.code === 200) {
+
+        }
+        this.$apply()
+      })
+    }
+    // 我申请过的
+    async haveapplyed() {
+      getRequest({ url: '/bms/celebrity/announce/list?pageNum=1' }).then(res => {
+        console.log(res, '对我申请过通告列表')
+        if (res.data.code === 200) {
+          var applyedArray = res.data.data
+          console.log(applyedArray, '我申请多的通告列表')
+          this.applyedArray = applyedArray
+        }
       })
     }
     onShow() {
-      var verify = this.$parent.globalData.verify
+      var verify = wx.getStorageSync('verify')
       if (verify === 1) {
         console.log('这是红人界面')
         this.verify = true
+        this.haveapplyed()
+        this.getinterseList()
         wepy.setNavigationBarTitle({
           title: "与我有关"
         })
-        wepy.hideTabBar({
-          animation: false
-        })
       } else {
         console.log('这是金主界面')
+        this.getKolList()
         this.verify = false
         wepy.setNavigationBarTitle({
           title: "消息"

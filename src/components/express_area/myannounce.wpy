@@ -1,0 +1,71 @@
+<style lang="less">
+  .express-item-wrapper {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 20px;
+    background-color: white;
+    font-size: 14px;
+    margin-top: 8px;
+    box-shadow: 0 1px 1px #dedede;
+  }
+
+  .avatar-image {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+  }
+
+  .user-name {
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap;
+    word-break:keep-all;
+  }
+
+</style>
+<template>
+  <view class="express-item-wrapper">
+    <view class="item_row_container">
+      <!-- 名称 -->
+      <view class="item_row_container" style="font-weight:550;font-size:16px;flex:1 1 auto; width: 80vw; align-items: flex-end;">
+        <text class="item_title_text">{{item_data.announceName}}</text>
+      </view>
+      <!-- 篇数 以及粉丝数-->
+      <view class="item_row_container" style="flex:0 0 auto;font-size:13px; margin-top: 3px;display:flex;">
+           <block>
+             <text class="item_main_atrr_text">{{item_data.appName}}</text>
+             <text style="margin-left: 6px;"></text>
+          </block>
+             <text class="item_main_atrr_text">{{item_data.fansNumb }}粉丝</text>
+             <text style="margin-left: 6px;"></text>
+             <text style="margin-left: 6px;">报酬：</text>
+             <text class="item_right_corner_text">{{item_data.salary }}</text>
+          <block>
+          </block>
+      </view>
+    </view>
+    <view class="item_row_container" style="font-size:12px;flex-wrap: wrap; width: 90vw; margin-top: 8px;">
+      <text class="item_foot_text">需求人数: </text>
+      <text class="item_foot_text" style="margin-left: 6px;color: #eea932">{{item_data.needNumb }}</text>
+      <text class="item_foot_text" style="margin-left: 6px;">报名人数: </text>
+      <text class="item_foot_text" style="margin-left: 6px; color: #eea932">{{ item_data.appliedNum }}</text>
+    </view>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  export default class Myannounce extends wepy.component {
+    props = {
+      item_data: {}
+    }
+    onLoad() {
+    }
+    methods = {
+      onClickCall(ev) {
+        const { announceID } = this.item_data
+        const { userName, mobileNo, userID } = this.item_data.owner
+        this.$emit('click-call-phone', { user: userName, phone: mobileNo, announceId: announceID, dialUserId: userID })
+      }
+    }
+  }
+</script>

@@ -62,20 +62,19 @@
       </view>
       <view class="form_input_label">
         <text class="labelname">平台类型</text>
-         <picker name="appName" class="filter_button {{ filter_condition.platform ?  'filtered' : '' }}" @change="clickFilterByPlatform" value="{{filter_condition.platformIndex}}" range="{{platform_name_data}}">
+         <picker name="appName" class="filter_button" @change="clickFilterByPlatform" value="{{filter_condition.platformIndex}}" range="{{platform_name_data}}">
         <text>{{filter_platform_text}} ▾</text>
         </picker>
       </view>
        <view class="form_input_label">
         <text class="labelname">类别</text>
-         <picker name="announceCategory" class="filter_button right_content {{ filter_condition.contentType ?  'filtered' : '' }}" @change="clickFilterByContentType" value="{{filter_condition.contentTypeIndex}}" range="{{contentType_text_data}}">
+         <picker name="announceCategory" class="filter_button right_content" @change="clickFilterByContentType" value="{{filter_condition.contentTypeIndex}}" range="{{contentType_text_data}}">
         <text>{{filter_contentType_text}} ▾</text>
       </picker>
       </view> 
-
       <view class="form_input_label">
         <text class="labelname">粉丝数</text>
-         <picker  name="fansNumb" class="filter_button {{ filter_condition.fans_num ?  'filtered' : '' }}" @change="clickFilterByFansNum" value="{{filter_condition.fansNumIndex}}" range="{{fans_num_name_data}}">
+         <picker  name="fansNumb" class="filter_button" @change="clickFilterByFansNum" value="{{filter_condition.fansNumIndex}}" range="{{fans_num_name_data}}">
         <text>{{filter_fans_num_text}} ▾</text>
       </picker>
       </view>
@@ -91,7 +90,7 @@
         <text class="labelname">通告详情</text>
       </view>
       <view class="txt_input_container">
-           <textarea name="detail" id="" placeholder="{{placeholder}}"  style="padding:10px;height:100px;width:92%;margin:0 auto;border:1px solid #888;line-height:20px;"></textarea>
+           <textarea value="{{announceDetail}}" name="detail" id="" placeholder="1.推广时间，2.报名要求，3.具体报价"  style="padding:10px;height:100px;width:92%;margin:0 auto;border:1px solid #888;line-height:20px;"> </textarea>
       </view>
     <view class="form_input_label">
       <text class="labelname">报名截止时间</text>
@@ -107,25 +106,30 @@
         <button class="edit_button" wx:else @tap="delplatinfo">重置</button>    
     </view>
   </form>
+   <mp-tabbar current="{{1}}" style="position:fixed;bottom:0;width:100%;left:0;right:0;" list="{{otherlist}}"></mp-tabbar>
    </view>
   </view>
 </template>
 <script>
   import wepy from 'wepy'
   import { FILTER_CONDITION } from '../data/filter'
+  import { tabbarlist } from '../data/tabbarList'
   import AreaPicker from "../components/common/wepy-area-picker"
   import jump from "../components/common/jump"
   import { postRequest } from "../utils/request"
   export default class AddPlatformPage extends wepy.page {
     config = {
       enablePullDownRefresh: false,
+      "usingComponents": {
+        "mp-tabbar": '../../custom-tab-bar/tabbar/tabbar'
+      }
     }
     components = {
       AreaPicker,
       jump
     }
     data = {
-      placeholder: '1.推广时间，2.报名要求，3.具体报价',
+      otherlist: tabbarlist.otherlist,
       province: '',
       city: '',
       area: '',
@@ -133,6 +137,7 @@
       needNUmb: '',
       endTime: '',
       date: '',
+      goodsName: '',
       fansubmit: null,
       index: 0,
       array: ['1', '2', '3', '4', '5', '6'],
@@ -215,17 +220,22 @@
         data.needNumb = parseInt(announcevalue.needNumb)
         data.salary = parseInt(announcevalue.salary)
         console.log(data)
+        var that = this
         postRequest({ url: '/bms/announce/add' }, data).then(res => {
           console.log(res)
           if (res.data.code === 200) {
-            console.log(res.data)
             wepy.showToast({
               title: '上传成功',
-              icon: 'success',
-              duration: 2000,
-              mask: true,
-              success: res => {}
+              icon: 'success'
             })
+            that.filter_condition.platform = ''
+            that.filter_condition.fans_num = ''
+            that.filter_condition.contentType = ''
+            that.goodsName = ''
+            that.needNumb = ''
+            that.salary = ''
+            that.announceDetail = ''
+            that.date = ''
           } else {
             wepy.showToast({
               title: '系统出现异常',
@@ -296,7 +306,7 @@
       console.log(this.$parent.globalData.wxinfo, '用户的信息')
     }
     onShow() {
-      var verify = this.$parent.globalData.verify
+      var verify = wx.getStorageSync('verify')
       if (verify === 1) {
         console.log('这是红人界面')
         this.verify = true
