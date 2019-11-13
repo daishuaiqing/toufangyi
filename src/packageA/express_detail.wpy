@@ -113,13 +113,26 @@
   .bottomButton{
     width:100%;
     position: absolute;
-    bottom: 0;
+    bottom: 2px;
   }
   .buttonItem{
     width: 45%;
     margin:0 2%;
     display: inline-block;
   }
+  .messagecenter{
+  width: 200px;
+  margin:200px auto;
+  text-align: center;
+}
+.messlogin{
+   font-size: 14px;
+  border:1px solid #00a982;
+  color:white;
+  padding:8px 15px;
+  background: #00a982;
+  margin-top: 15px;
+}
 </style>
 <template>
   <view class="container">
@@ -197,7 +210,7 @@
     <!-- 生成分享图 -->
     <view class="mask" wx:if="{{showShare}}">
       <view class='canvas-box'>
-      <image class="shareImg" src="{{prurl}}" />
+      <image class="shareImg" mode="aspectFit" src="{{prurl}}" />
       <view class="bottomButton">
          <button type='mini' class="buttonItem" bindtap='save'>保存分享图</button>
          <button type='mini' class="buttonItem" bindtap='cancelsave'>取消</button>
@@ -213,15 +226,19 @@
       <view class="operation-item">
         <button id="detail_share_button" open-type="share">分享</button>
       </view>
-       <view class="{{applied?'apply-active':'operation-item'}}">
-        <text @tap="applyJob">{{applied?'已申请':'申请工作'}}</text>
+      <view class="operation-item">
+       <!-- <view class="{{applied?'apply-active':'operation-item'}}"> -->
+        <!-- <text @tap="applyJob">{{applied?'已申请':'微信联系'}}</text> -->
+        <text @tap="applyJob">微信联系</text>
+      <!-- </view> -->
       </view>
     </view>
   </view>
 </template>
 <script>
   import wepy from 'wepy'
-  import { getRequest } from "../utils/request"
+  import { getRequest, postRequest } from "../utils/request"
+  import {check_token} from '../utils/login_util'
   export default class ExpressDetailPage extends wepy.page {
     config = {
       navigationBarTitleText: '通告详情',
@@ -230,6 +247,7 @@
     components = {
     }
     data = {
+      visible: null,
       announce_detail: {},
       announceUser: {},
       showShare: false,
@@ -268,6 +286,7 @@
       },
       // 点击复制微信号
       copy(e) {
+        this.apply()
         var copy = e.currentTarget.dataset.copy
         wepy.setClipboardData({
           data: copy,
@@ -300,6 +319,19 @@
       //     }
       //   })
       // }
+    }
+    // 点击复制对我感兴趣
+    async apply() {
+      var that = this
+      var data = {
+        "announceId": that.announceID,
+        "celebrityId": 0,
+        "id": 0
+      }
+      await postRequest({ url: '/bms/celebrity/announce/add' }, data).then(res => {
+        console.log(res, '3473843784364326')
+      })
+      that.$apply()
     }
     // 获取通告详情
     async getannounceDetail() {
@@ -343,10 +375,9 @@
         ctx.setFillStyle('white')
         ctx.fillRect(0, 0, 300, 600)
         // ctx.drawImage(, 100, 180, 100, 80)
-   
         ctx.setFontSize(10)
         ctx.setFillStyle('#000')
-        ctx.fillText('扫描图中二维码查看', 90, 280)
+        ctx.fillText('扫描图中二维码查看', 110, 280)
 
         ctx.setFontSize(10)
         ctx.fillText(that.announce_detail.announceName, 70, 100)
@@ -358,12 +389,14 @@
         ctx.setFontSize(12)
         ctx.fillText(that.announceUser.nick, 80, 45)
         ctx.fillText('邀请你一起参加活动，快来报名吧~', 80, 65)
+
         var avatarurl_width = 40
         var avatarurl_height = 40
         var avatarurl_x = 30
         var avatarurl_y = 30
         ctx.save()
         ctx.beginPath()
+        ctx.setStrokeStyle('white')
         ctx.arc(avatarurl_width / 2 + avatarurl_x, avatarurl_height / 2 + avatarurl_y, avatarurl_width / 2, 0, 2 * Math.PI)
         ctx.clip()
         ctx.drawImage(res1[1].path, avatarurl_x, avatarurl_y, avatarurl_width, avatarurl_height)
@@ -384,6 +417,14 @@
           }
         })
       }, 500)
+    }
+    onShow() {
+      const token = wx.getStorageSync('token')
+      if (token && token.length) {
+        console.log('token存在')
+      } else {
+        wx.redirectTo({ url: '/packageA/nologin' })
+      }
     }
     onLoad(option) {
       var announceID = option.announceId

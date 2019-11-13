@@ -1,13 +1,15 @@
-const baseURL = "http://212.64.59.35:8999"
-
+import CONST from '../data/appconst'
 import wepy from 'wepy'
+
+let baseURL = CONST.HTTP_BASE_URL
 // get
-function getRequest(obj) {
+function getRequest(obj, data) {
     return new Promise((resolve, reject) => {
         var token = wepy.getStorageSync('token')
         wx.request({
           url: baseURL + obj.url,
           method: 'GET',
+          data: data,
           header: {
             'token': token
           },

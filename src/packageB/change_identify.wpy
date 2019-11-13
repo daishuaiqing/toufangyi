@@ -27,7 +27,6 @@
           <view class="choose_select" wx:if="{{show}}" @tap='changeverify'>切换身份为金主</view>
           <view class="choose_select" wx:else @tap='changeuser'>切换身份为红人</view>
       </view>
-      <view class="choose_select" @tap="backtomine">返回</view>
   </view>
 </template>
 
@@ -53,9 +52,6 @@
     //   }
     // }
     methods = {
-      backtomine() {
-        wepy.switchTab({ url: '/pages/express_area' })
-      },
       // 为2的则为金主角色
       changeverify() {
         this.verify = 2
@@ -63,6 +59,7 @@
         this.show = false
         // this.$parent.globalData.verify = 2
         wepy.setStorageSync('verify', this.verify)
+        wepy.switchTab({ url: '/pages/express_area' })
       },
       changeuser() {
         // verify为1则为红人，
@@ -71,6 +68,7 @@
         console.log('当前身份为红人')
         // this.$parent.globalData.verify = 1
         wepy.setStorageSync('verify', this.verify)
+        wepy.switchTab({ url: '/pages/express_area' })
       }
     }
     async onLoad() {

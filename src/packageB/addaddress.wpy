@@ -85,7 +85,7 @@ input{
       detailaddress(e) {
         this.detailaddress = e.detail.value
       },
-      formSubmit(e) {
+      async formSubmit(e) {
         var data = {
           "address": this.detailaddress,
           "area": this.area,
@@ -95,19 +95,23 @@ input{
           "mobile": this.mobileNO,
           "name": this.name,
           "province": this.province,
-          "userId": 1
+          "userId": 0
         }
-        postRequest({ url: '/ums/address/add' }, data).then(res => {
+        await postRequest({ url: '/ums/address/add' }, data).then(res => {
+          console.log(res)
           if (res.data.code === 200) {
             wepy.showToast({
               title: '成功提交',
               icon: 'success',
             })
-            wepy.navigateBack({
-              delta: 1
-            })
+            setTimeout(function() {
+              wepy.navigateBack({
+                delta: 1
+              })
+            }, 1000)
           }
         })
+        this.$apply()
       }
     }
     onLoad(options) {

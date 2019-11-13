@@ -51,6 +51,7 @@
   background: rgb(143, 123, 123);
   box-shadow: 2px 2px 2px #dedede;
 }
+
 </style>
 <template>
   <view class="container">
@@ -59,34 +60,36 @@
         <view class="edit_title">{{isaddplatform === true?'添加我的平台信息': '编辑平台信息'}}</view>
        <view class="edit_item"  style="margin-top:20px;">
            <text class="labelname">平台类型</text>
-            <picker name="appName" class="filter_button {{ filter_condition.platform ?  'filtered' : '' }}" @change="clickFilterByPlatform" value="{{filter_condition.platformIndex}}" range="{{platform_name_data}}">
-             <text>{{filter_platform_text}} ▾</text>
-            </picker>
+            <picker name="appName" class="filter_button" @change="clickFilterByPlatform" value="{{platformIndex}}" range="{{platform_data}}">
+        <text >{{platformIndex==-1?'请选择':platform_data[platformIndex]}} ▾</text>
+        </picker>
         </view> 
         <view class="edit_item">
           <text class="labelname">类别:</text>
-            <picker name="category" class="filter_button {{ filter_condition.contentType ?  'filtered' : '' }}" @change="clickFilterByContentType" value="{{filter_condition.contentTypeIndex}}" range="{{contentType_text_data}}">
-            <text>{{filter_contentType_text}} ▾</text>
-           </picker>
-        </view>
-         <view class="edit_item">
-            <text class="labelname"> 粉丝数量:</text>
-            <picker name="fansNumb" class="filter_button" @change="clickFilterByFansNum" value="{{filter_condition.fansNumIndex}}" range="{{fans_num_name_data}}">
-             <text>{{filter_fans_num_text}} ▾</text>
-           </picker>
+            <picker name="announceCategory" class="filter_button right_content" @change="clickFilterByContentType" value="{{categoryIndex}}" range="{{contentType_data}}">
+             <text>{{categoryIndex== -1?'请选择':contentType_data[categoryIndex]}} ▾</text>
+            </picker>
         </view>
         <view class="edit_item">
             <text class="labelname">ID：</text>
-            <input name="appNicknam" class="input_edit" type="text"  placeholder="请输入您的ID名" @input="platformUserIdInputChanged"/>
+            <input name="appNicknam" class="input_edit" type="text"  placeholder="{{IdInput}}" @input="platformUserIdInputChanged"/>
+        </view>
+         <view class="edit_item">
+            <text class="labelname"> 粉丝数量:</text>
+            <input name="fansNum" class="input_edit" type="number"  placeholder="{{fansInput}}" @input="inputfansNum"/>
+        </view>
+        <view class="edit_item">
+            <text class="labelname">报价</text>
+            <input name="" class="input_edit" type="text"  placeholder="请填写您的期望报价" @input="platformUserIdInputChanged"/>
         </view>
         <view class="edit_item">
             <text class="labelname">链接分享:</text>
-            <input name="appLink" class="input_edit" type="text" @change="LinkInputChanged" placeholder="请输入您的链接"/>
+            <input name="appLink" class="input_edit" type="text" @change="LinkInputChanged" placeholder="{{linkInput}}"/>
         </view>
         <view class="button_all">
-            <button class="edit_button" wx:if ="{{isaddplatform}}" formType="submit">保存</button>
-            <button class="edit_button" wx:else formType="submit">确认修改</button>
-            <button class="edit_button" hidden="{{isaddplatform}}" data-id="{{1}}" @tap="delplatinfo">删除</button>  
+            <button class="edit_button" wx:if ="{{isaddplatform}}" @tap="platformsubmit" formType="submit">保存</button>
+            <button class="edit_button" wx:else formType="submit" @tap='changeplarformDetail'>确认修改</button>
+            <button class="edit_button" hidden="{{isaddplatform}}"  @tap="delplatinfo">删除</button>  
         </view>
       </view>
     </form>
@@ -104,70 +107,40 @@
     components = {
     }
     data = {
+      editDetail: '',
       platformID: null, // 平台ID
       isaddplatform: null, // 是否是添加平台
+      fansNum: null,
       platformArray: [],
       platformUserId: '',
       platformUserLink: '',
-      ptext: '',
       tempFilePaths: [],
-      filter_condition: {
-        platform: '',
-        platformIndex: 0,
-        fans_num: '',
-        fansNumIndex: 0,
-        payment: '',
-        paymentIndex: 0,
-        contentType: '',
-        contentTypeIndex: 0,
-      },
-      contentType_data: FILTER_CONDITION.contentType_data,
-      platform_data: FILTER_CONDITION.platform_data,
-      fans_num_data: FILTER_CONDITION.fans_num_data,
-      "paymentMap": FILTER_CONDITION["paymentMap"]
-    }
-    computed = {
-      // 期望薪资
-      filter_payment_text() {
-        return this.filter_condition.payment ? this.filter_condition.payment.value : '请选择'
-      },
-    //   类别
-      filter_contentType_text() {
-        return this.filter_condition.contentType ? this.filter_condition.contentType.displayText : '请选择'
-      },
-      contentType_text_data() {
-        return this.contentType_data.map((item) => {
-          return item.displayText
-        })
-      },
-      // 平台信息
-      filter_platform_text() {
-        return this.filter_condition.platform ? this.filter_condition.platform.displayText : '请选择'
-      },
-      platform_name_data() {
-        return this.platform_data.map((item) => {
-          return item.displayText
-        })
-      },
-    //   粉丝数量
-      filter_fans_num_text() {
-        return this.filter_condition.fans_num ? this.filter_condition.fans_num.displayText : '请选择'
-      },
-      fans_num_name_data() {
-        return this.fans_num_data.map((item) => {
-          return item.displayText
-        })
-      },
-      payment_text_data() {
-        return this.paymentMap.map((item) => {
-          return item.value
-        })
-      },
+      contentType_data: FILTER_CONDITION.contentType,
+      platform_data: FILTER_CONDITION.platform,
+      categoryIndex: -1, // 类型index
+      platformIndex: -1, // 平台index
+      fansInput: '请输入您的粉丝数量',
+      IdInput: '请输入您的ID',
+      linkInput: '请输入您的链接'
     }
     methods = {
+      // 删除平台
       delplatinfo() {
         this.delplatform()
+      },
+      // 确认保存修改
+      changeplarformDetail() {
+        this.confirsave()
+      },
+      // 添加平台点击保存
+      platformsubmit(e) {
+        this.saveplatform()
       }
+    }
+     // 输入粉丝数量
+    inputfansNum(e) {
+      var value = e.detail.value
+      this.fansNumb = value
     }
     // 输入平台链接时候
     LinkInputChanged(e) {
@@ -177,46 +150,30 @@
     //   输入ID时候
     platformUserIdInputChanged(ev) {
       let value = ev.detail.value
-      if (value.length > 11) {
-        return false
-      }
       this.platformUserId = value
     }
-     // 类别
-    clickFilterByContentType(ev) {
-      let value = ev.detail.value
-      this.filter_condition.contentTypeIndex = value
-      let plt = this.contentType_data[value]
-      this.filter_condition.contentType = plt && plt.contentTypeId ? plt : ''
+    // 平台类型
+    clickFilterByPlatform(e) {
+      var index = e.detail.value
+      this.platformIndex = index
     }
-    // 平台
-    clickFilterByPlatform(ev) {
-      let value = ev.detail.value
-      this.filter_condition.platformIndex = value
-      let plt = this.platform_data[value]
-      this.filter_condition.platform = plt && plt.platformId ? plt : ''
+    // 类别
+    clickFilterByContentType(e) {
+      var index = e.detail.value
+      this.categoryIndex = index
     }
-    //   粉丝数量选择
-    clickFilterByFansNum(ev) {
-      let value = ev.detail.value
-      this.filter_condition.fansNumIndex = value
-      let fnd = this.fans_num_data[value]
-      this.filter_condition.fans_num = fnd && fnd.beginNum ? fnd : ''
-    }
-    // 提交表单
-    formSubmit(e) {
-      var fans = this.filter_condition.fans_num.beginNum / 1000
+    async saveplatform() {
       var data = {
         "appLink": this.appLink,
-        "appName": this.filter_condition.platform.displayText,
+        "appName": this.platform_data[this.platformIndex],
         "appNickname": this.platformUserId,
-        "category": this.filter_condition.contentType.displayText,
+        "category": this.contentType_data[this.categoryIndex],
         "celebrityId": '',
-        "fansNumb": fans,
+        "fansNumb": this.fansNumb,
         "id": ''
       }
       console.log(data, '提交名片信息')
-      postRequest({url: '/ums/celebrity/card/add'}, data).then(res => {
+      await postRequest({url: '/ums/celebrity/card/add'}, data).then(res => {
         console.log(res)
         if (res.data.code === 200) {
           wepy.showToast({
@@ -232,34 +189,34 @@
       })
     }
     // 编辑中的删除平台信息
-    delplatform() {
-      getRequest({ url: '/ums/celebrity/card/delete/1' }).then(res => {
+    async delplatform() {
+      var id = this.editDetail.platform.id
+      await getRequest({ url: '/ums/celebrity/card/delete/' + id }).then(res => {
         console.log(res, '点击删除返回的信息')
-        // if (res.data.code === 200) {
-        //   wepy.showToast({
-        //     title: '成功删除',
-        //     icon: 'success',
-        //   })
-        //   setTimeout(function() {
-        //     wx.navigateBack({delta: 1})
-        //   }, 3000)
-        // }
+        if (res.data.code === 200) {
+          wepy.showToast({
+            title: '成功删除',
+            icon: 'success',
+          })
+          setTimeout(function() {
+            wx.navigateBack({delta: 1})
+          }, 3000)
+        }
       })
     }
     // 编辑中的确认修改
-    changeplarformDetail() {
-      var fans = this.filter_condition.fans_num.beginNum / 1000
+    async confirsave() {
+      var id = this.editDetail.platform.id
       var data = {
         "appLink": this.appLink,
-        "appName": this.filter_condition.platform.displayText,
+        "appName": this.platform_data[this.platformIndex],
         "appNickname": this.platformUserId,
-        "category": this.filter_condition.contentType.displayText,
+        "category": this.contentType_data[this.categoryIndex],
         "celebrityId": '',
-        "fansNumb": fans,
+        "fansNumb": this.fansNumb,
         "id": ''
       }
-      console.log(data, '提交名片信息')
-      postRequest({url: '/ums/celebrity/card/modify/1'}, data).then(res => {
+      await postRequest({url: '/ums/celebrity/card/modify/' + id}, data).then(res => {
         console.log(res)
         if (res.data.code === 200) {
           wepy.showToast({
@@ -273,31 +230,44 @@
           console.log('提交表单错误')
         }
       })
-
-    }
-    // 保存平台信息
-    saveplatformDetail() {}
-    // 获取平台信息 点击编辑平台信息时候显示当前的平台信息
-    getplatformDetail() {
-      getRequest({ url: '/bms_announce/find/all' }).then(res => {
-        var code = res.data.code
-        if (code === 200) {
-          this.announce_data = res.data.data
-          console.log(this.announce_data, '通告列表')
-        }
-      })
     }
     onLoad(options) {
-      console.log(options)
       // 添加平台
       if (options.addplatform === "true") {
         this.isaddplatform = true
         wepy.setNavigationBarTitle({ title: '添加平台' })
       } else {
+        this.editDetail = JSON.parse(options.platformDetail)
+  
         wepy.setNavigationBarTitle({ title: '编辑我的平台' })
-        this.isaddplatform = false
-        var platformID = options.platformID
-        this.platformID = platformID
+      }
+    }
+    editplat() {
+      console.log(this.editDetail.platform)
+      var editDetail = this.editDetail.platform
+      this.appLink = editDetail.appLink
+      this.platformUserId = editDetail.appNickname
+      this.fansNumb = editDetail.fansNumb
+      this.fansInput = editDetail.fansNumb
+      this.IdInput = editDetail.appNickname
+      this.linkInput = editDetail.appLink
+      // picker选择器
+      var that = this
+      for (let i = 0; i < this.platform_data.length; i++) {
+        if (this.platform_data[i] === editDetail.appName) {
+          console.log(i)
+          that.platformIndex = i
+        }
+      }
+      for (let i = 0; i < this.platform_data.length; i++) {
+        if (this.contentType_data[i] === editDetail.category) {
+          that.categoryIndex = i
+        }
+      }
+    }
+    onShow() {
+      if (this.isaddplatform !== "true") {
+        this.editplat()
       }
     }
   }

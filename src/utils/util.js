@@ -18,18 +18,17 @@ const formatDate = date => {
     return [year,month,day].map(formatNumber).join('-')
 }
 
-const calcTimeHeader = () => {
-    let date = new Date(),
-      year = date.getUTCFullYear(),
-      month = date.getUTCMonth(),
-      day = date.getDate(),
-      hour = date.getHours(),
-      minute = date.getUTCMinutes()
+const calcTimeHeader = (date) => {
+  const year = date.getFullYear()
+  const month = date.getMonth()+ 1
+  const day = date.getDate()
+  const hour = date.getHours()
+  const minute = date.getMinutes()
     // 获取当前时间
-    let currentDate = new Date(),
-      currentYear = date.getUTCFullYear(),
-      currentMonth = date.getUTCMonth(),
-      currentDay = currentDate.getDate()
+  let currentDate = new Date(),
+    currentYear = currentDate.getFullYear(),
+    currentMonth = currentDate.getMonth()+ 1,
+    currentDay = currentDate.getDate()
     // 计算是否是同一天
     if (currentYear == year && currentMonth == month && currentDay == day) {//同一天直接返回
       if (hour > 12) {

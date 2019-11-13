@@ -1,6 +1,7 @@
 <style lang="less">
 .form_container{
   width:90vw;
+  padding-bottom: 60px;
   margin:10px auto;
   min-height: 100vh;
   font-size: 14px;
@@ -20,7 +21,7 @@
  font-size: 14px;
   flex: 1;
   padding-right: 20px;
-  color:#837f7f;
+  // color:#837f7f;
   height: 100%;
   display: flex;
   align-items: center;
@@ -31,7 +32,7 @@
   height: 100%;
   flex: 1;
   text-align: right;
-  color:black;
+  // color:black;
   font-size: 13px;
   padding-right: 20px;
 }
@@ -62,20 +63,20 @@
       </view>
       <view class="form_input_label">
         <text class="labelname">平台类型</text>
-         <picker name="appName" class="filter_button" @change="clickFilterByPlatform" value="{{filter_condition.platformIndex}}" range="{{platform_name_data}}">
-        <text>{{filter_platform_text}} ▾</text>
+         <picker name="appName" class="filter_button" @change="clickFilterByPlatform" value="{{platformIndex}}" range="{{platform_data}}">
+        <text >{{platformIndex==-1?'请选择':platform_data[platformIndex]}} ▾</text>
         </picker>
       </view>
        <view class="form_input_label">
         <text class="labelname">类别</text>
-         <picker name="announceCategory" class="filter_button right_content" @change="clickFilterByContentType" value="{{filter_condition.contentTypeIndex}}" range="{{contentType_text_data}}">
-        <text>{{filter_contentType_text}} ▾</text>
+         <picker name="announceCategory" class="filter_button right_content" @change="clickFilterByContentType" value="{{categoryIndex}}" range="{{contentType_data}}">
+        <text>{{categoryIndex== -1?'请选择':contentType_data[categoryIndex]}} ▾</text>
       </picker>
       </view> 
       <view class="form_input_label">
         <text class="labelname">粉丝数</text>
-         <picker  name="fansNumb" class="filter_button" @change="clickFilterByFansNum" value="{{filter_condition.fansNumIndex}}" range="{{fans_num_name_data}}">
-        <text>{{filter_fans_num_text}} ▾</text>
+         <picker  name="fansStr" class="filter_button" @change="clickFilterByFansNum"  range="{{fansArray}}">
+        <text>{{fansNumIndex==-1?'请选择':fansStr }} ▾</text>
       </picker>
       </view>
       <view class="form_input_label">
@@ -103,7 +104,7 @@
     <view class="button_all">
         <button class="edit_button" formType="submit">提交</button>
         <button class="edit_button" wx:if="{{fromPersonPage}}" @tap="delplatinfo">删除</button> 
-        <button class="edit_button" wx:else @tap="delplatinfo">重置</button>    
+        <button class="edit_button" wx:else  formType="reset">重置</button>    
     </view>
   </form>
    <mp-tabbar current="{{1}}" style="position:fixed;bottom:0;width:100%;left:0;right:0;" list="{{otherlist}}"></mp-tabbar>
@@ -129,10 +130,19 @@
       jump
     }
     data = {
-      otherlist: tabbarlist.otherlist,
-      province: '',
-      city: '',
-      area: '',
+      contentType_data: FILTER_CONDITION.contentType_data, // 类别
+      platform_data: FILTER_CONDITION.platform_data, // 平台
+      fans_data: FILTER_CONDITION.fans_data, // 粉丝数量
+      otherlist: tabbarlist.otherlist, // tabbar列表
+      categoryIndex: -1, // 类型index
+      platformIndex: -1, // 平台index
+      fansNumIndex: -1, // 粉丝数量index
+      fansArray: [],
+      fansStr: null,
+      fansLevel: null,
+      province: '', // 省
+      city: '', // 市
+      area: '', // 区
       salary: '',
       needNUmb: '',
       endTime: '',
@@ -140,50 +150,9 @@
       goodsName: '',
       fansubmit: null,
       index: 0,
-      array: ['1', '2', '3', '4', '5', '6'],
       verify: false,
-      platformUserId: '',
       announceDetail: '',
       tempFilePaths: [],
-      filter_condition: {
-        platform: '',
-        platformIndex: 0,
-        fans_num: '',
-        fansNumIndex: 0,
-        contentType: '',
-        contentTypeIndex: 0,
-      },
-      contentType_data: FILTER_CONDITION.contentType_data, // 类别
-      platform_data: FILTER_CONDITION.platform_data, // 平台
-      fans_num_data: FILTER_CONDITION.fans_num_data // 粉丝数量
-    }
-    computed = {
-      submitReady() {
-      },
-      filter_platform_text() {
-        return this.filter_condition.platform ? this.filter_condition.platform.displayText : '请选择'
-      },
-      filter_fans_num_text() {
-        return this.filter_condition.fans_num ? this.filter_condition.fans_num.displayText : '请选择'
-      },
-      filter_contentType_text() {
-        return this.filter_condition.contentType ? this.filter_condition.contentType.displayText : '请选择'
-      },
-      platform_name_data() {
-        return this.platform_data.map((item) => {
-          return item.displayText
-        })
-      },
-      fans_num_name_data() {
-        return this.fans_num_data.map((item) => {
-          return item.displayText
-        })
-      },
-      contentType_text_data() {
-        return this.contentType_data.map((item) => {
-          return item.displayText
-        })
-      }
     }
     events = {
       'areaArray': (...args) => {
@@ -206,39 +175,34 @@
       this.date = e.detail.value
     }
     methods = {
-      formSubmit(e) {
-        var announcevalue = e.detail.value
+      async formSubmit(e) {
+        var value = e.detail.value
+        console.log(value)
         var data = {
           "address": '',
-          "announceCategory": this.filter_condition.platform.displayText,
-          "announceName": announcevalue.announceName,
-          "appName": this.filter_condition.contentType.displayText,
-          "detail": announcevalue.detail,
-          "endTime": this.date + ' 23:59:59'
+          "announceCategory": this.contentType_data[value.announceCategory],
+          "announceName": value.announceName,
+          "appName": this.platform_data[value.appName],
+          "detail": value.detail,
+          "endTime": value.endTime + ' 23:59:59',
+          "fansStr": this.fansStr
         }
-        data.fansNumb = this.fansubmit
-        data.needNumb = parseInt(announcevalue.needNumb)
-        data.salary = parseInt(announcevalue.salary)
+        data.fansLevel = parseInt(this.fansLevel)
+        data.needNUmb = parseInt(value.needNumb)
+        data.salary = parseInt(value.salary)
         console.log(data)
         var that = this
-        postRequest({ url: '/bms/announce/add' }, data).then(res => {
+        await postRequest({ url: '/bms/announce/add' }, data).then(res => {
           console.log(res)
           if (res.data.code === 200) {
             wepy.showToast({
               title: '上传成功',
               icon: 'success'
             })
-            that.filter_condition.platform = ''
-            that.filter_condition.fans_num = ''
-            that.filter_condition.contentType = ''
-            that.goodsName = ''
-            that.needNumb = ''
-            that.salary = ''
-            that.announceDetail = ''
-            that.date = ''
+            that.clearall()
           } else {
             wepy.showToast({
-              title: '系统出现异常',
+              title: '请正确填写',
               icon: 'none',
               duration: 2000,
               mask: true,
@@ -248,11 +212,10 @@
         })
       },
       formReset() {
-        console.log('form发生了reset事件')
+        this.clearall()
       },
       // 输入通告详情
       inputCase(e) {
-        this.placeholder = ''
         this.announceDetail = e.detail.value
       },
       // 输入商品名称
@@ -260,52 +223,47 @@
         this.goodsName = e.detail.value
       },
       // 平台类型
-      clickFilterByPlatform(ev) {
-        let value = ev.detail.value
-        this.filter_condition.platformIndex = value
-        let plt = this.platform_data[value]
-        this.filter_condition.platform = plt && plt.platformId ? plt : ''
-        console.log(this.filter_condition.platform.displayText)
+      clickFilterByPlatform(e) {
+        var index = e.detail.value
+        this.platformIndex = index
       },
       // 粉丝数量
-      clickFilterByFansNum(ev) {
-        let value = ev.detail.value
-        this.filter_condition.fansNumIndex = value
-        let fnd = this.fans_num_data[value]
-        console.log(fnd.beginNum, '2222')
-        var fansubmit = fnd.beginNum / 1000
-        this.fansubmit = fansubmit
-        console.log(fansubmit, '22222222222222')
-        this.filter_condition.fans_num = fnd && fnd.beginNum ? fnd : ''
+      clickFilterByFansNum(e) {
+        var index = e.detail.value
+        this.fansNumIndex = index
+        this.fansStr = this.fans_data[this.fansNumIndex].displayText
+        console.log(this.fansStr)
+        var fansLevel = this.fans_data[this.fansNumIndex].level
+        this.fansLevel = fansLevel.split('L')[1]
       },
       // 类别
-      clickFilterByContentType(ev) {
-        let value = ev.detail.value
-        this.filter_condition.contentTypeIndex = value
-        let plt = this.contentType_data[value]
-        this.filter_condition.contentType = plt && plt.contentTypeId ? plt : ''
-        console.log(this.filter_condition.contentType.displayText)
+      clickFilterByContentType(e) {
+        var index = e.detail.value
+        this.categoryIndex = index
       }
     }
-    onShareAppMessage() {
-      return {
-        desc: '发布通告',
-        path: '/pages/add_announce',
-        success: function (res) {
-          // 转发成功
-//          mta.Event.stat('share_transportation_hire', {})
-          console.log(res)
-        },
-        fail: function (res) {
-          // 转发失败
-          console.log(res)
-        }
-      }
+      // 重置以及发布之后的清空
+    clearall() {
+      this.goodsName = ''
+      this.platformIndex = -1
+      this.categoryIndex = -1
+      this.fansNumIndex = -1
+      this.needNumb = ''
+      this.salary = ''
+      this.announceDetail = ''
+      this.date = ''
     }
     onLoad(options) {
-      console.log(this.$parent.globalData.wxinfo, '用户的信息')
+      var fans_data = []
+      this.fans_data.forEach(v => {
+        fans_data.push(v.displayText)
+      })
+      this.fansArray = fans_data
     }
     onShow() {
+      wx.hideTabBar({
+        animation: false
+      })
       var verify = wx.getStorageSync('verify')
       if (verify === 1) {
         console.log('这是红人界面')

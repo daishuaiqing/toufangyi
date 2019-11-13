@@ -17,41 +17,39 @@
 </style>
 <template>
 <view>
-  <view wx:if="{{visible}}" style="text-align:center;padding-top:200px;">
-    <view >您当前还未登录，请先去登录...</view>
-  </view>
-  <!-- boss页面 -->
-  <view class="container" wx:if="{{!verify&!visible}}">
-      <!-- 顶部筛选区域-->
+  <!-- 首页红人列表 -->
+  <view class="container" wx:if="{{!verify}}">
       <view id="top-filter-bar">
-        <picker class="filter_button" @change="clickFilterByPlatform" value="{{filter_condition.platformIndex}}" range="{{platform_name_data}}">
-          <text>{{filter_platform_text}} ▾</text>
+         <picker name="appName" class="filter_button" @change="clickFilterByPlatform" value="{{platformIndex}}" range="{{platform_data}}">
+             <text >{{platformIndex==-1?'平台':platform_data[platformIndex]}} ▾</text>
         </picker>
-        <picker class="filter_button" @change="clickFilterByFansNum" value="{{filter_condition.fansNumIndex}}" range="{{fans_num_name_data}}">
-          <text>{{filter_fans_num_text}} ▾</text>
+       <picker  class="filter_button" @change="clickFilterByFansNum"  range="{{fansArray}}">
+          <text>{{fansNumIndex==-1?'粉丝':fansDisplay }} ▾</text>
         </picker>
       </view>
-      <!-- 所有红人-->
       <repeat for="{{allKolList}}" item="item" index="index" key="index">
           <view @tap="clickItem" id = "{{item.umsCelebrityCard.id}}">
-            <ApplyItem :item_data.sync="item"/>
+            <ApplyItem :item_data.sync="item" :updateTime.sync="item.bmsAnnounce.updateTime"/>
           </view>
       </repeat>
+        <view id="bottom-loader-wrapper" style="padding:10px 0;font-size:12px;text-align:center;">
+          <block hidden="{{hasMore}}">
+            <text class="bottom_loader_wrapper_text">{{msg}}</text>
+          </block>
+        </view>
       <mp-tabbar current="{{current}}" style="position:fixed;bottom:0;width:100%;left:0;right:0;" list="{{otherlist}}" bindchange="tabChange"></mp-tabbar>
     </view>
-  <!-- 应聘者通告 -->
-  <block wx:if="{{verify&!visible}}">
+  <!-- 首页通告列表-->
+  <block wx:if="{{verify}}">
     <view class="container">
-        <!-- 顶部筛选区域-->
       <view id="top-filter-bar">
-        <picker class="filter_button {{ filter_condition.platform ?  'filtered' : '' }}" @change="clickFilterByPlatform" value="{{filter_condition.platformIndex}}" range="{{platform_name_data}}">
-          <text>{{filter_platform_text}} ▾</text>
+       <picker name="appName" class="filter_button" @change="clickFilterByPlatform" value="{{platformIndex}}" range="{{platform_data}}">
+          <text >{{platformIndex==-1?'平台':platform_data[platformIndex]}} ▾</text>
         </picker>
-        <picker class="filter_button {{ filter_condition.fans_num ?  'filtered' : '' }}" @change="clickFilterByFansNum" value="{{filter_condition.fansNumIndex}}" range="{{fans_num_name_data}}">
-          <text>{{filter_fans_num_text}} ▾</text>
+        <picker  class="filter_button" @change="clickFilterByFansNum"  range="{{fansArray}}">
+        <text>{{fansNumIndex==-1?'粉丝':fansDisplay }} ▾</text>
         </picker>
       </view>
-      <!-- 内容列表 -->
       <view class="container announce_list">
         <repeat for="{{announce_data}}" item="item" index="index" key="index">
           <view @tap="clickItem" id="{{item.bmsAnnounce.id}}">
@@ -59,17 +57,11 @@
           </view>
         </repeat>
         <view id="bottom-loader-wrapper" style="padding:10px 0;font-size:12px;text-align:center;">
-          <block wx:if="{{ !hasMore }}">
-            <text class="bottom_loader_wrapper_text">没有更多内容了</text>
+          <block hidden="{{hasMore}}">
+            <text class="bottom_loader_wrapper_text">{{msg}}</text>
           </block>
         </view>
       </view>
-      <block wx:if="{{ isRefreshing }}">
-        <view class="page_mask">
-          <bounce_loading/>
-        </view>
-      </block>
-      <!-- 底部tabbar -->
       <mp-tabbar current="{{0}}" style="position:fixed;bottom:0;width:100%;left:0;right:0;" list="{{list}}" bindchange="tabChange"></mp-tabbar>
     </view>
   </block>
@@ -82,13 +74,12 @@
   import ExpressAreaItem from '../components/express_area/express_item'
   import ApplyItem from '../components/express_area/apply_item'
   import BounceLoadingView from '../components/bounce_loading_view'
-  import {check_token} from '../utils/login_util'
   import { getRequest } from "../utils/request"
   export default class ExpressAreaPage extends wepy.page {
     config = {
       navigationBarTitleText: '通告列表',
       enablePullDownRefresh: true,
-      onReachBottomDistance: 100,
+      onReachBottomDistance: 80,
       "usingComponents": {
         "mp-tabbar": '../../custom-tab-bar/tabbar/tabbar'
       }
@@ -99,45 +90,25 @@
       ApplyItem
     }
     data = {
+      msg: '',
+      hasMore: false,
       pageNum: 1,
-      current: 0,
       list: tabbarlist.list,
       otherlist: tabbarlist.otherlist,
       verify: false,
-      current_page_index: 0,
-      filter_condition: {
-        platform: '',
-        platformIndex: 0,
-        fans_num: '',
-        fansNumIndex: 0,
-      },
       announce_data: [],
       allKolList: [],
       platform_data: FILTER_CONDITION.platform_data,
-      fans_num_data: FILTER_CONDITION.fans_num_data
-    }
-    computed = {
-      // 平台
-      filter_platform_text() {
-        return this.filter_condition.platform ? this.filter_condition.platform.displayText : '平台'
-      },
-      // 粉丝数量
-      filter_fans_num_text() {
-        return this.filter_condition.fans_num ? this.filter_condition.fans_num.displayText : '粉丝'
-      },
-      platform_name_data() {
-        return this.platform_data.map((item) => {
-          return item.displayText
-        })
-      },
-      fans_num_name_data() {
-        return this.fans_num_data.map((item) => {
-          return item.displayText
-        })
-      }
+      fans_data: FILTER_CONDITION.fans_data, // 粉丝数量
+      platformIndex: -1, // 平台index
+      fansNumIndex: -1, // 粉丝数量index
+      fansLevel: 0,
+      fansStr: null,
+      fansDisplay: '',
+      fansArray: [],
+      selectPlatform: null
     }
     methods = {
-      // 去详情页面
       clickItem(e) {
         // 通告详情界面
         if (this.verify === true) {
@@ -146,43 +117,40 @@
             url: '../packageA/express_detail?announceId=' + announceid
           })
         } else {
+          // 去红人主页
           var kolId = e.currentTarget.id
-          // 红人个人主页
           wepy.navigateTo({
             url: '../packageA/kol_detail?kolId=' + kolId
           })
         }
       }
     }
-     // 通过平台过滤
-    clickFilterByPlatform(ev) {
-      let value = ev.detail.value
-      this.filter_condition.platformIndex = value
-      let plt = this.platform_data[value]
-      this.filter_condition.platform = plt && plt.platformId ? plt : ''
+    // 平台类型筛选
+    clickFilterByPlatform(e) {
+      var index = e.detail.value
+      this.platformIndex = index
+      this.selectPlatform = this.platform_data[index]
+      if (this.verify === true) {
+        this.conditionList(this.selectPlatform, this.fansStr, this.fansLevel)
+      } else {
+        this.conditionKOL(this.selectPlatform, this.fansStr, this.fansLevel)
+      }
     }
-      // 通过粉丝数量过滤
-    clickFilterByFansNum(ev) {
-      let value = ev.detail.value
-      this.filter_condition.fansNumIndex = value
-      let fnd = this.fans_num_data[value]
-      this.filter_condition.fans_num = fnd && fnd.beginNum ? fnd : ''
-    }
-    events = {
-      'click-call-phone': function (data) {
-        wepy.showModal({
-          title: '是否拨打电话',
-          content: data.user,
-        }).then((res) => {
-          if (res.confirm) {
-            wepy.makePhoneCall({
-              phoneNumber: data.phone
-            })
-            // LoginApi.saveDialHistory(data.dialUserId, data.announceId)
-          } else if (res.cancel) {
-            console.log('用户点击取消')
-          }
-        })
+    // 粉丝数量筛选
+    clickFilterByFansNum(e) {
+      this.fansNumIndex = e.detail.value
+      this.fansDisplay = this.fans_data[this.fansNumIndex].displayText
+      var fansStr = this.fansDisplay.replace(/\s*/g, '')
+      this.fansStr = fansStr
+      console.log(fansStr)
+      var fansLevel = this.fans_data[this.fansNumIndex].level
+      fansLevel = fansLevel.split('L')[1]
+      this.fansLevel = parseInt(fansLevel)
+      console.log(this.fansLev)
+      if (this.verify === true) {
+        this.conditionList(this.selectPlatform, this.fansStr, this.fansLevel)
+      } else {
+        this.conditionKOL(this.selectPlatform, this.fansStr, this.fansLevel)
       }
     }
     // 下拉刷新
@@ -194,6 +162,49 @@
         this.getKolList()
         wepy.stopPullDownRefresh()
       }
+      this.fansNumIndex = -1
+      this.platformIndex = -1
+    }
+    // 筛选通告
+    async conditionList(appName, fansStr, fansLevel) {
+      var that = this
+      var data = {
+        "appName": appName,
+        "fansStr": fansStr,
+        "fansLevel": fansLevel
+      }
+      console.log(data)
+      await getRequest({ url: '/bms/announce/list' }, data).then(res => {
+        console.log(res, '筛选通告列表')
+        if (res.data.code === 200) {
+          that.announce_data = res.data.data
+          console.log(that.announce_data, '通告列表')
+          wepy.hideLoading()
+        } else {
+          wepy.hideLoading()
+          console.log('系统异常')
+        }
+      })
+      that.$apply()
+    }
+    // 筛选红人列表
+    async conditionKOL(appName, fansStr, fansLevel) {
+      var that = this
+      var data = {
+        "appName": appName,
+        "fansStr": fansStr,
+        "fansLevel": fansLevel
+      }
+      await getRequest({ url: '/ums/celebrity/list' }, data).then(res => {
+        var code = res.data.code
+        if (code === 200) {
+          var allKolList = res.data.data
+          this.allKolList = allKolList
+          this.hasMore = false
+          this.msg = '没有数据了'
+        }
+      })
+      that.$apply()
     }
     // 触底加载
     async onReachBottom(e) {
@@ -207,10 +218,11 @@
           if (code === 200) {
             var announce_data = res.data.data
             if (announce_data.length) {
+              that.hasMore = true
               that.announce_data = [...that.announce_data, ...announce_data]
               console.log(that.announce_data, '触底加载下一页通告内容')
             } else {
-              console.log('没有内容了')
+              that.msg = '没有数据'
             }
           }
         })
@@ -220,11 +232,12 @@
           var code = res.data.code
           if (code === 200) {
             var allKolList = res.data.data
-            if (allKolList) {
+            if (allKolList.length) {
               that.allKolList = [...that.allKolList, ...allKolList]
               console.log(that.allKolList, '触底加载下一页红人内容')
+              that.msg = " "
             } else {
-              console.log('没有内容了')
+              that.msg = ""
             }
           }
         })
@@ -233,53 +246,62 @@
     }
     // 获取通告列表
     async getannounceList() {
-      wepy.showLoading({})
+      wepy.showLoading()
       var pageNum = 1
       var that = this
       that.pageNum = pageNum
       await getRequest({ url: '/bms/announce/list?pageNum=' + that.pageNum }).then(res => {
         if (res.data.code === 200) {
-          this.announce_data = res.data.data
-          console.log(that.announce_data, '通告列表')
           wepy.hideLoading()
+          if (res.data.data.length) {
+            that.announce_data = res.data.data
+            console.log(that.announce_data, '通告列表')
+            that.msg = ""
+          } else {
+            that.msg = "没有数据"
+          }
         } else {
           wepy.hideLoading()
-          console.log('显示异常')
+          wepy.showToast({
+            title: '系统异常',
+            icon: 'none',
+          })
         }
       })
       that.$apply()
     }
     // 获取红人列表
     async getKolList() {
+      wepy.showLoading({})
       var pageNum = 1
       var that = this
       that.pageNum = pageNum
       await getRequest({ url: '/ums/celebrity/card/list?pageNum=' + that.pageNum }).then(res => {
         var code = res.data.code
         if (code === 200) {
-          var allKolList = res.data.data
-          this.allKolList = allKolList
-          console.log(allKolList, '所有红人')
+          wepy.hideLoading()
+          if (res.data.data.length) {
+            that.allKolList = res.data.data
+            console.log(that.allKolList, '所有红人')
+          }
+        } else {
+          wepy.showToast({
+            title: '系统异常',
+            icon: 'none',
+          })
         }
         that.$apply()
       })
     }
     async onLoad(option) {
-      const token = wx.getStorageSync('token')
-      if (token && token.length) {
-        check_token()
-        let logged = wepy.getStorageSync('logged')
-        if (logged === true) {
-          this.visible = true
-        } else {
-          this.visible = false
-        }
-      } else {
-        console.log('没有token,是首次登录')
-        wepy.redirectTo({ url: '/packageB/choose_identify' })
-      }
+      var fans_data = []
+      this.fans_data.forEach(v => {
+        fans_data.push(v.displayText)
+      })
+      this.fansArray = fans_data
     }
     onShow() {
+      wepy.hideTabBar({animation: false})
       var verify = wx.getStorageSync('verify')
       if (verify === 1) {
         console.log(verify, '这是红人身份')
@@ -291,6 +313,7 @@
         this.getKolList()
       } else {
         console.log('当前是首次登录，还没有选择身份')
+        wepy.redirectTo({ url: '/packageB/choose_identify' })
       }
     }
     onReady() {

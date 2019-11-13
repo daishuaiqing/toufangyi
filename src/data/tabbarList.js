@@ -25,12 +25,6 @@ export const tabbarlist = {
         path: '/pages/express_area'
       },
       {
-        text: "发布",
-        iconPath: "/images/time.png",
-        selectedIconPath: "/images/message.png",
-        path: '/pages/add_platform'
-      },
-      {
         text: "消息",
         iconPath: "/images/weibiaoti-.png",
         selectedIconPath: "/images/wpde.png",

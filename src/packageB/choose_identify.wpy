@@ -60,9 +60,7 @@
         // this.$parent.globalData.verify = 2
         console.log('选择身份为金主')
         wepy.setStorageSync('verify', this.verify)
-        wepy.navigateTo({
-          url: '/packageB/bind_phone'
-        })
+        wepy.switchTab({ url: '/pages/express_area' })
       },
       changeuser() {
          // verify为1则为红人
@@ -70,9 +68,7 @@
         // this.$parent.globalData.verify = 1
         console.log('选择身份为红人')
         wepy.setStorageSync('verify', this.verify)
-        wepy.navigateTo({
-          url: '/packageB/bind_phone'
-        })
+        wepy.switchTab({ url: '/pages/express_area' })
       }
     }
   }

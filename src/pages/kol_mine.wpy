@@ -130,6 +130,12 @@
   font-size:15px;
   padding-left: 20px;
 }
+.loginbutton{
+  font-size: 12px;
+  border:1px solid #00a982;
+  color:white;
+  background: #00a982;
+}
 </style>
 <template>
 <view>
@@ -141,15 +147,17 @@
         <image class="avatar-image" src="{{userInfo?userInfo.avatarUrl:'/images/default.png'}}"/>
         <view style="display:flex;flex-direction:column;margin-left:25px;">
           <text class="user-name">{{userInfo?userInfo.nickName:'未登录用户'}}</text>
-           <view class="box" hidden="{{!promise}}">
-            {{userPhone}}
-          </view>
+           <view class="box" wx:if="{{promise}}">{{userPhone}}</view>
+           <view class="box" wx:if="{{!promise}}">
+               <button class='loginbutton' @tap="tologin">
+                 立即登录
+                </button>
+            </view>
         </view>
         <view  class="identify-mask">
           <block wx:if="{{userInfo}}">
             <view class="iconfont" style="color:#5dd5c8;margin-right:8px;">&#xe937;</view>
             <text>红人</text>
-            <!-- <text class="identify-name">{{userInfo.identityStr}}</text> -->
           </block> 
         </view>
       </view>
@@ -180,12 +188,6 @@
             <text style="flex:1">切换身份</text>
             <view class="iconfont" style="color:#999;">&#xe683;</view>
         </view>
-        <!-- <view style="display:flex;justify-content:space-between;border-bottom:1px solid #dedede;background:white;padding:15px;font-size:15px;padding-left: 20px;margin-top:10px;" @tap="setting">
-            <view class="iconfont" style="font-size:20px;margin-right:10px;" >&#xe6a7;</view>
-            <text style="flex:1">设置</text>
-            <view class="iconfont" style="color:#999;">&#xe683;</view>
-        </view> -->
-            <!-- <button open-type="getUserInfo" lang="zh_CN" bindgetuserinfo="onGotUserInfo">获取用户信息</button> -->
      </view>
            <mp-tabbar current="{{2}}" style="position:fixed;bottom:0;width:100%;left:0;right:0;" list="{{list}}"></mp-tabbar>
     </view>
@@ -197,15 +199,17 @@
         <image class="avatar-image" src="{{userInfo?userInfo.avatarUrl:'/images/default.png'}}"/>
         <view style="display:flex;flex-direction:column;margin-left:25px;">
           <text class="user-name">{{userInfo?userInfo.nickName:'未登录用户'}}</text>
-           <view class="box" hidden="{{!promise}}">
-            {{userPhone}}
-          </view>
+          <view class="box" wx:if="{{promise}}">{{userPhone}}</view>
+           <view class="box" wx:if="{{!promise}}">
+               <button class='loginbutton' @tap="tologin">
+                 立即登录
+                </button>
+           </view>
         </view>
         <view  class="identify-mask">
           <block wx:if="{{userInfo}}">
             <view class="iconfont" style="color:green;margin-right:8px;">&#xe937;</view>
             <text>金主</text>
-            <!-- <text class="identify-name">{{userInfo.identityStr}}</text> -->
           </block>
         </view>
       </view>
@@ -237,13 +241,8 @@
             <text style="flex:1">切换身份</text>
             <view class="iconfont" style="color:#999;">&#xe683;</view>
             </view>
-             <!-- <view style="display:flex;justify-content:space-between;border-bottom:1px solid #dedede;background:white;padding:15px;font-size:15px;padding-left: 20px;" @tap="setting">
-             <view class="iconfont" style="font-size:20px;margin-right:10px;" @tap="setting">&#xe6a7;</view>
-              <text style="flex:1" @tap="setting">设置</text>
-              <view class="iconfont" style="color:#999;">&#xe683;</view>
-            </view> -->
            </view>  
-           <mp-tabbar current="{{3}}" style="position:fixed;bottom:0;width:100%;left:0;right:0;" list="{{otherlist}}"></mp-tabbar> 
+           <mp-tabbar current="{{2}}" style="position:fixed;bottom:0;width:100%;left:0;right:0;" list="{{otherlist}}"></mp-tabbar> 
     </view>
   </view>
 </view> 
@@ -265,6 +264,7 @@
       platform_item: PlatformItem
     }
     data = {
+      canIUse: wx.canIUse('button.open-type.getUserInfo'),
       promise: null,
       userPhone: '',
       userInfo: '',
@@ -274,9 +274,12 @@
       verify: false
     }
     methods = {
+      tologin() {
+        wepy.redirectTo({ url: '/packageA/authorize' })
+      },
       // 切换身份
       tochangeidentify() {
-        wepy.redirectTo({ url: '/packageB/change_identify' })
+        wepy.navigateTo({ url: '/packageB/change_identify' })
       },
       tomypage() {
         wepy.navigateTo({ url: '/packageB/jinzhupage' })
@@ -312,12 +315,16 @@
     async onLoad(options) {
       var userPhone = wx.getStorageSync('referUserPhoneNo')
       this.userPhone = userPhone
-      wepy.showShareMenu({
-        withShareTicket: true // 要求小程序返回分享目标信息
-      })
-      mta.Page.init()
+    }
+    watch = {
+      promise (newvalue, oldValue) {
+        console.log(newvalue, 'promise')
+      }
     }
     onShow() {
+      wx.hideTabBar({
+        animation: false
+      })
       // 判断用户是否授权
       var scopeu = this.$parent.globalData.scopeu
       if (scopeu === true) {

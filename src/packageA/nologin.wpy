@@ -1,0 +1,44 @@
+<style lang="less">
+  .messagecenter{
+  width: 200px;
+  margin:200px auto;
+  text-align: center;
+}
+.messlogin{
+   font-size: 14px;
+  border:1px solid #00a982;
+  color:white;
+  padding:8px 15px;
+  background: #00a982;
+  margin-top: 15px;
+}
+</style>
+<template>
+  <view class="container" style="min-height: 100vh; background-color: white">
+      <view  wx:if="{{!visible}}">
+       <view class="messagecenter">
+        <view>登录后查看</view>
+        <view class="messlogin" @tap="tologin">立即登录</view>
+      </view>
+     </view>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  export default class nologin extends wepy.page {
+    config = {
+      navigationBarTitleText: '',
+      enablePullDownRefresh: false
+    }
+    components = {
+    }
+    data = {
+    }
+    methods = {
+      tologin() {
+        wepy.redirectTo({ url: '/packageA/authorize' })
+      }
+    }
+    onLoad(options) {}
+  }
+</script>

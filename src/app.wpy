@@ -6,6 +6,8 @@ import wepy from 'wepy'
 import 'wepy-async-function'
 import { setStore } from 'wepy-redux'
 import configStore from './store'
+import CONST from './data/appconst'
+let baseURL = CONST.HTTP_BASE_URL
 import { postRequest } from "./utils/request"
 const store = configStore()
 setStore(store)
@@ -25,7 +27,9 @@ export default class extends wepy.app {
         'kol_detail',
         'express_detail',
         'addmyInfo',
-        'authorize'
+        'authorize',
+        'getphone',
+        'nologin'
       ]
     }, {
       root: "packageB",
@@ -41,7 +45,7 @@ export default class extends wepy.app {
       ]
     }],
     "tabBar": {
-      custom: true,
+      // custom: true,
       color: '#333',
       selectedColor: '#1296db',
       backgroundColor: '#f2f2f2',
@@ -53,12 +57,6 @@ export default class extends wepy.app {
           iconPath: 'images/hezi.png',
           pagePath: 'pages/express_area',
           text: '红人'
-        },
-        {
-          selectedIconPath: 'images/fabu.png',
-          iconPath: 'images/fabu (1).png',
-          pagePath: 'pages/add_platform',
-          text: '发布'
         },
         {
           selectedIconPath: 'images/message.png',
@@ -99,8 +97,9 @@ export default class extends wepy.app {
     verify: null,
     wxinfo: null,
     scopeu: false,
-    baseURL: 'http://212.64.59.35:8999',
-    scopeuInfo: ''
+    baseURL: baseURL,
+    scopeuInfo: '',
+    code: ''
   }
   constructor() {
     super()
@@ -126,7 +125,7 @@ export default class extends wepy.app {
         console.log(that.globalData.scopeu, '是否授权')
         wx.getUserInfo({
           success(res) {
-            console.log(res, '已授权，获取的用户的信息')
+            // console.log(res, '已授权，获取的用户的信息')
             that.globalData.wxinfo = res.userInfo
             that.globalData.scopeuInfo = res
             that.wxcheckSession()
@@ -136,7 +135,6 @@ export default class extends wepy.app {
         that.globalData.scopeu = false
         console.log(that.globalData.scopeu, '登录状态，未授权')
         wx.removeStorageSync('userInfo')
-        wx.redirectTo({ url: '/packageA/authorize' })
       }
     }
     })
@@ -188,9 +186,9 @@ export default class extends wepy.app {
           var encryptedData = that.globalData.scopeuInfo.encryptedData
           var iv = that.globalData.scopeuInfo.iv
           var phoneNumb = wx.getStorageSync('referUserPhoneNo')
+          // var wxNumb = wx.getStorageSync('wechat')
           var rawData = that.globalData.scopeuInfo.rawData
           var signature = that.globalData.scopeuInfo.signature
-          var wxNumb = wx.getStorageSync('wechatNum')
           var data = {
             code: code,
             encryptedData: encryptedData,
@@ -198,12 +196,13 @@ export default class extends wepy.app {
             phoneNumb: phoneNumb,
             rawData: rawData,
             signature: signature,
-            wxNumb: wxNumb
+            wxNumb: "5348574385"
           }
           console.log(data)
           postRequest({url: '/ums/user/login'}, data).then(res => {
             console.log("res_data", res)
             if (res.data.data) {
+              wepy.setStorageSync('logged', true)
               console.log(res.data.data.token, '22222')
               wx.setStorageSync('token', res.data.data.token)
             } else {

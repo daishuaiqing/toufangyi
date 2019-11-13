@@ -99,7 +99,6 @@
       var that = this
       that.pageNum = pageNum
       await getRequest({ url: '/bms/financier/announce/list?pageNum=' + pageNum }).then(res => {
-        console.log(res, '金主的所有通告')
         if (res.data.data) {
           var myAllAnnounce = res.data.data.content
           that.myAllAnnounce = myAllAnnounce
@@ -112,26 +111,39 @@
       })
       that.$apply()
     }
-    onReachBottom() {
+    async onReachBottom() {
       var that = this
+      wepy.showLoading({
+        title: 'Loading...'
+      })
       that.pageNum = that.pageNum + 1
-      getRequest({ url: '/bms/financier/announce/list?pageNum=' + this.pageNum }).then(res => {
+      await getRequest({ url: '/bms/financier/announce/list?pageNum=' + this.pageNum }).then(res => {
         var nextPageContent = res.data.data.content
         if (nextPageContent.length) {
           that.myAllAnnounce = [...that.myAllAnnounce, ...nextPageContent]
-          console.log(that.myAllAnnounce)
-          wepy.startPullDownRefresh({ success: res => {} })
+          console.log(that.myAllAnnounce, '触底加载下一页')
+          wx.hideLoading()
         } else {
           wx.hideLoading()
           that.msg = '没有更多内容了'
         }
       })
+      that.$apply()
     }
-    onPullDownRefresh(e) {
+    async onPullDownRefresh(e) {
       this.getmyAllAnnounce()
+      wepy.stopPullDownRefresh()
+      this.$apply()
     }
-    onLoad(option) {
+    async onLoad(option) {
+      const token = wx.getStorageSync('token')
+      if (token && token.length) {
+        console.log('token存在')
+      } else {
+        wx.redirectTo({ url: '/packageA/nologin' })
+      }
       this.getmyAllAnnounce()
+      this.$apply()
     }
   }
 </script>

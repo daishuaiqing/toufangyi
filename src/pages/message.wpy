@@ -23,27 +23,37 @@
     align-items: center;
     height: 80px;
 }
+.messagecenter{
+  width: 200px;
+  margin:200px auto;
+  text-align: center;
+}
+.messlogin{
+   font-size: 14px;
+  border:1px solid #00a982;
+  color:white;
+  padding:8px 15px;
+  background: #00a982;
+  margin-top: 15px;
+}
 </style>
 <template>
 <view>
     <!-- 求职者界面 -->
     <block wx:if="{{verify}}">
+        <block wx:if="{{!visible}}">
+       <view class="messagecenter">
+        <view>登录后查看</view>
+        <view class="messlogin" @tap="tologin">立即登录</view>
+      </view>
+     </block>
+     <block wx:if="{{visible}}">
         <view class="container" style="min-height: 100vh; background-color: white">
       <view class="react">
-        <view class="{{num==0?'react-item':'select'}}" @tap="change(0)">对我感兴趣</view>
-        <view class="{{num==1?'react-item':'select'}}" @tap="change(1)">我申请过的</view>
+        <view class="react-item">我申请过的</view>
       </view>
-      <!-- <swiper>
-        <swiper-item></swiper-item>
-      </swiper> -->
-      <!-- 对我感兴趣界面 -->
-      <block wx:if="{{num == 0}}">
-        <repeat for="{{allemployers}}" key="index">
-          <SimpleItem :item_data.sync="item"/>
-        </repeat> 
-      </block>
       <!-- 我关注的界面 -->
-    <block wx:if="{{num == 1}}">
+    <block>
       <repeat for="{{applyedArray}}">
         <swipeout  i-class="i-swipeout-demo-item" style="height:100%;"  @change="delItem">
         <view slot="content"  @tap="clickItem" id="{{item.bmsAnnounce.id}}">
@@ -52,22 +62,30 @@
         </swipeout>
       </repeat>
     </block>
-    <mp-tabbar current="{{1}}" style="position:fixed;bottom:0;width:100%;left:0;right:0;" list="{{list}}" bindchange="tabChange"></mp-tabbar>
-  </view>
+    </view>
+  </block>
+  <mp-tabbar current="{{1}}" style="position:fixed;bottom:0;width:100%;left:0;right:0;" list="{{list}}" bindchange="tabChange"></mp-tabbar>
 </block>
     <!-- boss界面 -->
  <block wx:if="{{!verify}}">
+    <view wx:if="{{!visible}}">
+       <view class="messagecenter">
+        <view>登录后查看</view>
+        <view class="messlogin" @tap="tologin">立即登录</view>
+      </view>
+     </view>
+   <view wx:if="{{visible}}">
       <view class="container" style="min-height: 100vh; background-color: white">
       <view class="react">
         <view class="react-item">对我感兴趣</view>
       </view>
       <!-- 申请过工作界面 -->
         <view class="content-item">
-        <repeat for="{{array}}" key="{{index}}">
+        <repeat for="{{kolArray}}" key="{{index}}">
             <view class="interest">
-                <image style="width:50px;height:50px;border-radius:50%;margin-right:10px;" src="https://up.enterdesk.com/edpic_source/ad/d7/2d/add72da3d716f887c941c8b880b405fb.jpg"/>
+                <image style="width:50px;height:50px;border-radius:50%;margin-right:10px;" src="{{item.avatar}}"/>
                 <view style="flex:1;border-bottom:1px solid #cccccc;height:100%;">     
-                    <view style="font-size:14px;margin-top:8px;">姓名</view>
+                    <view style="font-size:14px;margin-top:8px;">{{item.nick}}</view>
                      <view style="display:flex;font-size:13px;align-items:center;">
                         <view style="flex:1;">类别：美妆</view>
                         <view style="border:1px solid orange;color:orange;padding:5px;border-radius:5px;">去看看</view>
@@ -78,7 +96,8 @@
         </repeat>
       </view>
   </view>
-  <mp-tabbar current="{{2}}" style="position:fixed;bottom:0;width:100%;left:0;right:0;" list="{{otherlist}}" bindchange="tabChange"></mp-tabbar>
+  </view>
+  <mp-tabbar current="{{1}}" style="position:fixed;bottom:0;width:100%;left:0;right:0;" list="{{otherlist}}" bindchange="tabChange"></mp-tabbar>
 </block>
 </view>
 </template>
@@ -101,15 +120,18 @@
       SimpleItem
     }
     data = {
+      visible: null,
       allemployers: [],
       applyedArray: [],
       list: tabbarlist.list,
       otherlist: tabbarlist.otherlist,
       verify: null,
-      num: 0,
-      array: 5
+      kolArray: []
     }
     methods = {
+      tologin() {
+        wepy.redirectTo({ url: '/packageA/authorize' })
+      },
       clickItem(e) {
         var announceid = e.currentTarget.id
         // 应聘者申请过的
@@ -127,48 +149,28 @@
       todetail() {
         wepy.navigateTo({ url: '/packageA/express_detail' })
       },
-      tabChange(e) {
-        if (e.detail.index === 0) {
-          wepy.switchTab({ url: '/pages/express_area' })
-        }
-        if (e.detail.index === 1) {
-          wepy.switchTab({ url: '/pages/message' })
-        }
-        if (e.detail.index === 2) {
-          wepy.switchTab({ url: '/pages/kol_mine' })
-        }
-      },
       change(e) {
         this.num = e
       },
     }
     async onLoad(options) {
-
-    }
-    // 对我感兴趣的金主的列表
-    async getinterseList() {
-      await getRequest({ url: '/bms/financier/celebrity/log/list?pageNum=1' }).then(res => {
-        if (res.data.code === 200) {
-          var allemployers = res.data.data
-          this.allemployers = allemployers
-          console.log(this.allemployers, '对我感兴趣的所有金主的列表')
-        }
-      })
-      this.$apply()
     }
     // 对我感兴趣的红人的列表
     async getKolList() {
       await getRequest({ url: '/bms/celebrity/financier/log/list?pageNum=1' }).then(res => {
-        console.log(res, '对我感兴趣红人的列表')
+        // console.log(res, '申请过工作的红人的列表')
         if (res.data.code === 200) {
-
+          var kolArray = []
+          kolArray = res.data.data
+          this.kolArray = kolArray
+          console.log(this.kolArray, '申请过工作的红人的列表')
         }
         this.$apply()
       })
     }
     // 我申请过的
     async haveapplyed() {
-      getRequest({ url: '/bms/celebrity/announce/list?pageNum=1' }).then(res => {
+      await getRequest({ url: '/bms/celebrity/announce/list?pageNum=1' }).then(res => {
         console.log(res, '对我申请过通告列表')
         if (res.data.code === 200) {
           var applyedArray = res.data.data
@@ -176,14 +178,30 @@
           this.applyedArray = applyedArray
         }
       })
+      this.$apply()
+    }
+    watch = {
+      visible(newvalue, oldvalue) {
+        console.log(newvalue, 'visible')
+      }
     }
     onShow() {
+      var that = this
+      const token = wx.getStorageSync('token')
+      if (token && token.length) {
+        this.visible = true
+      } else {
+        console.log('没有token,是首次登录')
+        that.visible = false
+      }
+      wx.hideTabBar({
+        animation: false
+      })
       var verify = wx.getStorageSync('verify')
       if (verify === 1) {
         console.log('这是红人界面')
         this.verify = true
         this.haveapplyed()
-        this.getinterseList()
         wepy.setNavigationBarTitle({
           title: "与我有关"
         })

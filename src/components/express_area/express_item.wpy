@@ -8,20 +8,17 @@
     margin-top: 8px;
     box-shadow: 0 1px 1px #dedede;
   }
-
   .avatar-image {
     width: 26px;
     height: 26px;
     border-radius: 50%;
   }
-
   .user-name {
     overflow: hidden;
     text-overflow:ellipsis;
     white-space: nowrap;
     word-break:keep-all;
   }
-
 </style>
 <template>
   <view class="express-item-wrapper">
@@ -38,11 +35,8 @@
           </block>
              <text class="item_main_atrr_text">{{item_data.bmsAnnounce.fansNumb }}粉丝</text>
              <text style="margin-left: 6px;"></text>
+             <text class="item_right_corner_text">￥</text>
              <text class="item_right_corner_text">{{item_data.bmsAnnounce.salary }}</text>
-          <block>
-              <text class="item_right_corner_text">/</text>
-              <text class="item_right_corner_text">篇</text>
-          </block>
       </view>
     </view>
     <view class="item_row_container" style="font-size:12px;flex-wrap: wrap; width: 90vw; margin-top: 8px;">
@@ -57,18 +51,9 @@
         <image class="avatar-image" src="{{ item_data.umsUser.avatar}}"/>
         <text class="user-name" style="margin-left: 6px;font-size:12px">{{item_data.umsUser.nick}}</text>
         <text class="user-name" style="margin-left: 6px;font-size:12px">{{item_data.umsUser.position}}</text>
-        <text class="item_foot_text" style="flex:1;position:absolute;right:10px;color:#ccc;font-size:10px;">{{item_data.umsUser.updateTime}}</text>
+        <text class="item_foot_text" style="flex:1;position:absolute;right:10px;color:#ccc;font-size:10px;">{{item_data.bmsAnnounce.updateTime}}</text>
       </view>
     </view>
-    <block wx:if="{{ !item_data.owner.isMySelf }}">
-      <image style="align-self: flex-end; margin-top: -64px; margin-bottom: 32px; width: 32px; height: 32px;"
-             src="/images/express-list-call.png" @tap.stop="onClickCall"
-             data-phone="{{item_data.owner.mobileNo}}"/>
-    </block>
-    <block wx:if="{{ item_data.owner.isMySelf }}">
-      <image style="align-self: flex-end; margin-top: -64px; margin-bottom: 32px; width: 32px; height: 32px;"
-             src="{{ item_data.checked ? '/images/selected.png' : '/images/unselected.png' }}"/>
-    </block>
   </view>
 </template>
 <script>
@@ -80,11 +65,6 @@
     onLoad() {
     }
     methods = {
-      onClickCall(ev) {
-        const { announceID } = this.item_data
-        const { userName, mobileNo, userID } = this.item_data.owner
-        this.$emit('click-call-phone', { user: userName, phone: mobileNo, announceId: announceID, dialUserId: userID })
-      }
     }
   }
 </script>

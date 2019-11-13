@@ -19,13 +19,14 @@
 
 .i-swipeout-button-right-group {
   position: absolute;
+  display:flex;
+  align-items: center;
+  justify-content: center;
   right: -100%;
   top: 0;
   background: #f00;
   height: 100%;
   color:white;
-  text-align: center;
-  line-height: 150px;
   z-index: 1;
   width: 100%;
 }

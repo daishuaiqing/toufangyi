@@ -15,7 +15,8 @@
               <view class="iconfont" style="color:#999;">&#xe683;</view>
             </view> -->
             <repeat for="{{myaddress}}" key="index">
-             <view style="display:flex;justify-content:space-between;align-items:center;background:white;border-bottom:1px solid #dedede;padding:15px;font-size:15px;padding-left: 20px;" @tap="addaddress">
+              <swipeout i-class="i-swipeout-demo-item" style="height:100%;"  @change="deladdress" id="{{item.id}}">
+             <view slot="content" style="display:flex;justify-content:space-between;align-items:center;background:white;border-bottom:1px solid #dedede;padding:15px;font-size:15px;padding-left: 20px;">
             <view class="iconfont" style="font-size:20px;margin-right:10px;">&#xe623;</view>
              <view class="address_one">
                <view style="margin-bottom:5px;">{{item.name}}</view>
@@ -23,6 +24,7 @@
              </view>
              <view class="iconfont" style="color:#999;">&#xe64b;</view>
              </view>
+             </swipeout>
              </repeat>
               <view style="display:flex;justify-content:space-between;background:white;border-bottom:1px solid #dedede;padding:15px;font-size:15px;padding-left: 20px;" @tap="addaddress">
             <view class="iconfont" style="font-size:20px;margin-right:10px;">&#xe67b;</view>
@@ -38,8 +40,10 @@
   import { getRequest } from "../utils/request"
   export default class addaddress extends wepy.page {
     config = {
-      navigationBarTitleText: '我的收货地址地址',
-      enablePullDownRefresh: false,
+      navigationBarTitleText: '我的收货地址',
+      "usingComponents": {
+        "swipeout": '../../iview/swipeout/index'
+      }
     }
     components = {
     }
@@ -50,6 +54,21 @@
       addaddress() {
         wepy.navigateTo({ url: './addaddress' })
       }
+    }
+    async deladdress(e) {
+      var that = this
+      var id = e.currentTarget.id
+      await getRequest({ url: '/ums/address/delete/' + id }).then(res => {
+        console.log(res)
+        if (res.data.code === 200) {
+          wepy.showToast({
+            title: '成功删除',
+            icon: 'success'
+          })
+          that.onShow()
+        }
+      })
+      that.$apply()
     }
     async getmyaddress() {
       var pageNum = 1
@@ -63,6 +82,8 @@
       this.$apply()
     }
     onLoad(options) {
+    }
+    onShow() {
       this.getmyaddress()
     }
   }

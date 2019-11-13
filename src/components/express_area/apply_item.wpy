@@ -41,23 +41,12 @@
         </view>
       </view>
        <view class="item_row_container" style="margin:5px 0;font-size:16px;flex:1 1 auto; width: 80vw; align-items: center;">
-        <text>{{ item_data.umsCelebrityCard.fansNumb }}K+ 粉丝</text> 
+        <text>{{ item_data.umsCelebrityCard.fansNumb }}粉丝</text> 
       </view>
       <view class="item_row_container" style="margin-bottom:10px;font-size:16px;flex:1 1 auto; width: 80vw; align-items: center;">
         <text>{{item_data.umsCelebrityCard.appLink}}</text>
       </view>
     </view>
-    <block wx:if="{{ !item_data.owner.isMySelf }}">
-      <image style="align-self: flex-end; margin-top: -64px; margin-bottom: 32px;margin-right:10px; width: 32px; height: 32px;"
-             src="/images/express-list-call.png" @tap.stop="onClickCall"
-             data-phone="{{item_data.owner.mobileNo}}"/>
-    </block>
-     <!-- 城市 -->
-    <block wx:if="{{ item_data.city }}">
-      <view class="item_row_container" style="flex-wrap: wrap; width: 90vw; margin-top: 8px;font-size:12px;">
-        <text class="item_main_atrr_text">{{ item_data.city }}</text>
-      </view>
-    </block>
   </view>
 </template>
 <script>
@@ -70,11 +59,6 @@
     }
 
     methods = {
-      onClickCall(ev) {
-        const { announceID } = this.item_data
-        const { userName, mobileNo, userID } = this.item_data.owner
-        this.$emit('click-call-phone', { user: userName, phone: mobileNo, announceId: announceID, dialUserId: userID })
-      }
     }
 
   }

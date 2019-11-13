@@ -19,11 +19,12 @@
 		}
 	},
 	"compileType": "miniprogram",
-	"appid": "wx83385be55dba1c62",
+	"appid": "wx6b5fda6e62ccee63",
 	"projectname": "my-project",
 	"miniprogramRoot": "dist/",
 	"simulatorType": "wechat",
 	"simulatorPluginLibVersion": {},
+	"libVersion": "2.5.0",
 	"condition": {
 		"search": {
 			"current": -1,
@@ -41,7 +42,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 51,
+			"current": 56,
 			"list": [
 				{
 					"id": -1,
@@ -404,6 +405,41 @@
 					"id": -1,
 					"name": "packageA/kol_detail",
 					"pathName": "packageA/kol_detail",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageA/kol_detail",
+					"pathName": "packageA/kol_detail",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/edit_myplatform",
+					"pathName": "packageB/edit_myplatform",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageA/getphone",
+					"pathName": "packageA/getphone",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageA/nologin",
+					"pathName": "packageA/nologin",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageA/nologin",
+					"pathName": "packageA/nologin",
 					"scene": null
 				}
 			]
