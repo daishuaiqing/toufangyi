@@ -8,7 +8,7 @@ import { setStore } from 'wepy-redux'
 import configStore from './store'
 import CONST from './data/appconst'
 let baseURL = CONST.HTTP_BASE_URL
-import { postRequest } from "./utils/request"
+import { postRequest, getRequest } from "./utils/request"
 const store = configStore()
 setStore(store)
 
@@ -168,6 +168,14 @@ export default class extends wepy.app {
     wx.getStorage({
       key: 'token',
       success(res) {
+        getRequest({url: '/ums/user/check/token'}).then(res => {
+          if (res.data.code === 200) {
+            console.log('token有效')
+          } else {
+            console.log('token无效')
+            wx.removeStorageSync('token')
+          }
+        })
         // session_key 未过期，并且在本生命周期一直有效
         that.globalData.token = res.token
       },

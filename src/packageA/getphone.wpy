@@ -33,7 +33,7 @@
 <view class="box_author">
   <view class="iconfont promise">&#xe653;</view>
      <view style="margin:20px auto;">申请获取你的微信绑定的手机号</view>
-    <button open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">获取手机号</button>
+    <button open-type="getPhoneNumber" class='bottom_promise' bindgetphonenumber="getPhoneNumber">获取手机号</button>
 </view>
   </view>
 </template>

@@ -1,51 +1,98 @@
 <style lang="less">
-  .express-item-wrapper {
+  .express-item{
     display: flex;
-    flex-direction: column;
-    padding: 8px 20px;
+    justify-content: space-between;
+    align-items: center;
     background-color: white;
     font-size: 14px;
-    margin-top: 8px;
-    box-shadow: 0 1px 1px #dedede;
+    border-bottom: 1px solid #dedede;
+    // border-radius: 8px;
+    margin: 8px 15px;
+    padding: 15px 0;
   }
-  .avatar-image {
-    margin-right: 15px;
-    width: 26px;
-    height: 26px;
+  .express-item .KOlimage{
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
+    margin:0 15px;
   }
-  .user-name {
-    overflow: hidden;
-    text-overflow:ellipsis;
-    white-space: nowrap;
-    word-break:keep-all;
+  .express-item .centercontent{
+    flex:1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
-
+  .express-item .centercontent .namecontent{
+    .kolnick{
+      font-weight: 600;
+      font-size: 18px;
+    }
+    .kolappname{
+      border-radius: 8px;
+      // border: 1px solid green;
+      padding: 3px 5px;
+      // background: rgb(195, 211, 195);
+      color:#888;
+      font-size: 14px;
+    }
+    .kolfanse{
+      font-size: 14px;
+      color:#888;
+    }
+  }
+  .express-item .centercontent .kolsalary{
+    height: 100%;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    .salafynum{
+      font-weight: 550;
+      font-size: 18px;
+    }
+    .salarytext{
+      color:#999;
+      font-size: 12px;
+      margin-top: 10px;
+    }
+  }
+  .rightto{
+    margin-left: 15px;
+    margin-right: 5px;
+  }
 </style>
 <template>
-  <view class="express-item-wrapper">
-    <view class="item_row_container">
-      <!-- 红人头像以及名字 -->
-      <view class="item_row_container" style="font-weight:550;margin-bottom:10px;font-size:16px;flex:1 1 auto; width: 80vw; align-items: center;">
-        <image class="avatar-image" src="{{item_data.umsUser.avatar}}"/>
-        <text>{{item_data.umsUser.nick}}</text>
+  <view >
+    <view class="express-item">
+      <view class="">
+        <image class="KOlimage" src="{{item_data.umsUser.avatar}}"/>
       </view>
-      <!-- 平台以及粉丝数-->
-      <view class="item_row_container" style="flex:0 0 auto;font-size:13px; margin-top: 3px;display:flex;">
-        <view>
-        <block wx:if="{{ item_data.umsCelebrityCard.appName}}">
-        <text class="item_main_atrr_text">{{ item_data.umsCelebrityCard.appName}} </text>
-        <text style="margin-left: 12px;"></text>
-        </block>
-         <text class="item_main_atrr_text">( {{item_data.umsCelebrityCard.category}} )</text>
+      <view class="centercontent">
+        <view class="namecontent">
+          <view class="kolnick">{{item_data.umsUser.nick}}</view>
+          <view class="kolappname">{{ item_data.umsCelebrityCard.appName}} ( {{item_data.umsCelebrityCard.category}} )</view>
+          <view class="kolfanse">粉丝: {{ item_data.umsCelebrityCard.fansNumb }}</view>
+        </view>
+        <view class="kolsalary">
+          <view class="salafynum">21</view>
+          <view class="salarytext">报价</view>
         </view>
       </view>
-       <view class="item_row_container" style="margin:5px 0;font-size:16px;flex:1 1 auto; width: 80vw; align-items: center;">
+      <view class="iconfont rightto">&#xe683;</view>
+      <!-- 平台以及粉丝数-->
+      <!-- <view>
+        <view>
+          <text>{{item_data.umsUser.nick}}</text>
+        <block wx:if="{{ item_data.umsCelebrityCard.appName}}">
+        <text >{{ item_data.umsCelebrityCard.appName}} </text>
+        <text ></text>
+        </block>
+         <text>( {{item_data.umsCelebrityCard.category}} )</text>
+        </view>
+      </view>
+       <view>
         <text>{{ item_data.umsCelebrityCard.fansNumb }}粉丝</text> 
-      </view>
-      <view class="item_row_container" style="margin-bottom:10px;font-size:16px;flex:1 1 auto; width: 80vw; align-items: center;">
-        <text>{{item_data.umsCelebrityCard.appLink}}</text>
-      </view>
+      </view> -->
     </view>
   </view>
 </template>
@@ -53,7 +100,6 @@
   import wepy from 'wepy'
 // 通告列表
   export default class ApplyAreaItem extends wepy.component {
-
     props = {
       item_data: {}
     }

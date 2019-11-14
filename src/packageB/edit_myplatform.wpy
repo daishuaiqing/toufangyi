@@ -121,7 +121,8 @@
       platformIndex: -1, // 平台index
       fansInput: '请输入您的粉丝数量',
       IdInput: '请输入您的ID',
-      linkInput: '请输入您的链接'
+      linkInput: '请输入您的链接',
+      appLink: ''
     }
     methods = {
       // 删除平台

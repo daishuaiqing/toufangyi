@@ -107,23 +107,18 @@
         <button class="edit_button" wx:else  formType="reset">重置</button>    
     </view>
   </form>
-   <mp-tabbar current="{{1}}" style="position:fixed;bottom:0;width:100%;left:0;right:0;" list="{{otherlist}}"></mp-tabbar>
    </view>
   </view>
 </template>
 <script>
   import wepy from 'wepy'
   import { FILTER_CONDITION } from '../data/filter'
-  import { tabbarlist } from '../data/tabbarList'
   import AreaPicker from "../components/common/wepy-area-picker"
   import jump from "../components/common/jump"
   import { postRequest } from "../utils/request"
   export default class AddPlatformPage extends wepy.page {
     config = {
-      enablePullDownRefresh: false,
-      "usingComponents": {
-        "mp-tabbar": '../../custom-tab-bar/tabbar/tabbar'
-      }
+      enablePullDownRefresh: false
     }
     components = {
       AreaPicker,
@@ -133,7 +128,6 @@
       contentType_data: FILTER_CONDITION.contentType_data, // 类别
       platform_data: FILTER_CONDITION.platform_data, // 平台
       fans_data: FILTER_CONDITION.fans_data, // 粉丝数量
-      otherlist: tabbarlist.otherlist, // tabbar列表
       categoryIndex: -1, // 类型index
       platformIndex: -1, // 平台index
       fansNumIndex: -1, // 粉丝数量index
@@ -261,9 +255,6 @@
       this.fansArray = fans_data
     }
     onShow() {
-      wx.hideTabBar({
-        animation: false
-      })
       var verify = wx.getStorageSync('verify')
       if (verify === 1) {
         console.log('这是红人界面')
