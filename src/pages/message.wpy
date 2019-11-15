@@ -158,12 +158,11 @@
     // 对我感兴趣的红人的列表
     async getKolList() {
       await getRequest({ url: '/bms/celebrity/financier/log/list?pageNum=1' }).then(res => {
-        // console.log(res, '申请过工作的红人的列表')
+        console.log(res, '申请过工作的红人的列表')
         if (res.data.code === 200) {
           var kolArray = []
-          kolArray = res.data.data
+          kolArray = res.data.data.content
           this.kolArray = kolArray
-          console.log(this.kolArray, '申请过工作的红人的列表')
         }
         this.$apply()
       })

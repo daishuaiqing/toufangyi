@@ -74,13 +74,17 @@
             <text class="labelname">ID：</text>
             <input name="appNicknam" class="input_edit" type="text"  placeholder="{{IdInput}}" @input="platformUserIdInputChanged"/>
         </view>
+        <view class="edit_item">
+            <text class="labelname">报价</text>
+            <input name="salary" class="input_edit" type="text"  placeholder="请填写您的期望报价" @input="inputsalary"/>
+        </view>
          <view class="edit_item">
             <text class="labelname"> 粉丝数量:</text>
             <input name="fansNum" class="input_edit" type="number"  placeholder="{{fansInput}}" @input="inputfansNum"/>
         </view>
         <view class="edit_item">
-            <text class="labelname">报价</text>
-            <input name="" class="input_edit" type="text"  placeholder="请填写您的期望报价" @input="platformUserIdInputChanged"/>
+            <text class="labelname">微信号</text>
+            <input name="phoneNum" class="input_edit" type="number"  placeholder="请填写您的手机号" @input="inputwechatNumb"/>
         </view>
         <view class="edit_item">
             <text class="labelname">链接分享:</text>
@@ -122,7 +126,9 @@
       fansInput: '请输入您的粉丝数量',
       IdInput: '请输入您的ID',
       linkInput: '请输入您的链接',
-      appLink: ''
+      appLink: '',
+      salary: '',
+      wechat: ''
     }
     methods = {
       // 删除平台
@@ -153,6 +159,15 @@
       let value = ev.detail.value
       this.platformUserId = value
     }
+    // 输入报价
+    inputsalary(e) {
+      this.salary = e.detail.value
+      console.log(this.salary)
+    }
+    inputwechatNumb(e) {
+      this.wechat = e.detail.value
+      console.log(this.wechat)
+    }
     // 平台类型
     clickFilterByPlatform(e) {
       var index = e.detail.value
@@ -171,7 +186,9 @@
         "category": this.contentType_data[this.categoryIndex],
         "celebrityId": '',
         "fansNumb": this.fansNumb,
-        "id": ''
+        "id": '',
+        "offer": this.salary,
+        "wechatNumb": this.wechat
       }
       console.log(data, '提交名片信息')
       await postRequest({url: '/ums/celebrity/card/add'}, data).then(res => {
@@ -215,7 +232,9 @@
         "category": this.contentType_data[this.categoryIndex],
         "celebrityId": '',
         "fansNumb": this.fansNumb,
-        "id": ''
+        "id": '',
+        "offer": this.salary,
+        "wechatNumb": this.wechat
       }
       await postRequest({url: '/ums/celebrity/card/modify/' + id}, data).then(res => {
         console.log(res)
@@ -251,7 +270,9 @@
       this.fansNumb = editDetail.fansNumb
       this.fansInput = editDetail.fansNumb
       this.IdInput = editDetail.appNickname
-      this.linkInput = editDetail.appLink
+      // this.linkInput = editDetail.appLink
+      this.wechat = editDetail.wechat
+      this.salary = editDetail.salary
       // picker选择器
       var that = this
       for (let i = 0; i < this.platform_data.length; i++) {

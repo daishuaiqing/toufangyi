@@ -109,19 +109,20 @@ export default class PicturePage extends wepy.page {
     })
   }
   methods = {
-        // 点击上传图片
+        // 点击上传按钮
     uploadImg() {
       var that = this
       wx.chooseImage({
-        count: 3,
+        count: 1,
         success(res) {
           let tempFilePaths = res.tempFilePaths
           if (that.tempFilePaths.length === 2) {
             that.tempFilePaths = [...that.tempFilePaths, tempFilePaths[0]]
+            that.$apply()
           } else {
             that.tempFilePaths = [...that.tempFilePaths, ...tempFilePaths]
+            that.$apply()
           }
-          wepy.startPullDownRefresh({ success: res => {} })
         }
       })
     },

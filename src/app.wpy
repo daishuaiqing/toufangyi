@@ -41,7 +41,8 @@ export default class extends wepy.app {
         'addaddress',
         'addpicture',
         'jinzhupage',
-        'change_identify'
+        'change_identify',
+        'inputInfo'
       ]
     }],
     "tabBar": {
@@ -76,11 +77,11 @@ export default class extends wepy.app {
       "mp-tabbar": './custom-tab-bar/tabbar/tabbar'
     },
     window: {
-      backgroundColor: '#FFFFFF',
+      backgroundColor: '#eeeeee',
       backgroundTextStyle: 'dark',
-      navigationBarBackgroundColor: '#5dd5c8',
-      navigationBarTitleText: '投放易',
-      navigationBarTextStyle: 'white',
+      navigationBarBackgroundColor: '#dedede',
+      navigationBarTitleText: '投放达人',
+      navigationBarTextStyle: 'black',
       enablePullDownRefresh: true
     },
     permission: {
@@ -204,7 +205,7 @@ export default class extends wepy.app {
             phoneNumb: phoneNumb,
             rawData: rawData,
             signature: signature,
-            wxNumb: "5348574385"
+            wxNumb: ""
           }
           console.log(data)
           postRequest({url: '/ums/user/login'}, data).then(res => {

@@ -112,7 +112,7 @@
                         phoneNumb: phoneNumb,
                         rawData: rawData,
                         signature: signature,
-                        wxNumb: wxNumb
+                        wxNumb: ""
                       }
                       postRequest({url: '/ums/user/login'}, data).then(res => {
                         console.log("登录接口返回的信息", res)

@@ -3,8 +3,17 @@
   padding-bottom: 25px;
   box-sizing: border-box;
 }
+.conditiontop{
+  position: fixed;
+  top:0;
+  background: white;
+  width: 100vw;
+  border-top: 1px solid #dedede;
+
+}
 // 顶部筛选
 #top-filter-bar{
+  width: 100%;
   display: flex;
   font-size: 14px;
   padding:10px 15px;
@@ -13,9 +22,11 @@
 }
 .announce_list{
   padding-bottom:30px;
+  margin-top: 50px;
 }
 .kolList{
   padding-bottom: 30px;
+  margin-top: 50px;
 }
 .button_add{
   width: 60px;
@@ -24,7 +35,7 @@
   position:fixed;
   right: 20px;
   bottom:80px;
-  background: orange;
+  background: rgb(140, 182, 140);
   color:white;
   display: flex;
   align-items: center;
@@ -35,6 +46,7 @@
 <view>
   <!-- 首页红人列表 -->
   <view class="container" wx:if="{{!verify}}">
+    <view class="conditiontop">
       <view id="top-filter-bar">
          <picker name="appName" class="filter_button" @change="clickFilterByPlatform" value="{{platformIndex}}" range="{{platform_data}}">
              <text >{{platformIndex==-1?'平台':platform_data[platformIndex]}} ▾</text>
@@ -43,11 +55,13 @@
           <text>{{fansNumIndex==-1?'粉丝':fansDisplay }} ▾</text>
         </picker>
       </view>
+    </view>
+      
       <view class="button_add" @tap="addannounce">发布</view>
       <view class="kolList">
         <repeat for="{{allKolList}}" item="item" index="index" key="index">
           <view @tap="clickItem" id = "{{item.umsCelebrityCard.id}}">
-            <ApplyItem :item_data.sync="item" :updateTime.sync="item.bmsAnnounce.updateTime"/>
+            <ApplyItem :item_data.sync="item"/>
           </view>
       </repeat>
       <view id="bottom-loader-wrapper" style="padding:10px 0;font-size:12px;text-align:center;">
@@ -61,14 +75,16 @@
   <!-- 首页通告列表-->
   <block wx:if="{{verify}}">
     <view class="container">
+      <view class="conditiontop">
       <view id="top-filter-bar">
-       <picker name="appName" class="filter_button" @change="clickFilterByPlatform" value="{{platformIndex}}" range="{{platform_data}}">
-          <text >{{platformIndex==-1?'平台':platform_data[platformIndex]}} ▾</text>
+         <picker name="appName" class="filter_button" @change="clickFilterByPlatform" value="{{platformIndex}}" range="{{platform_data}}">
+             <text >{{platformIndex==-1?'平台':platform_data[platformIndex]}} ▾</text>
         </picker>
-        <picker  class="filter_button" @change="clickFilterByFansNum"  range="{{fansArray}}">
-        <text>{{fansNumIndex==-1?'粉丝':fansDisplay }} ▾</text>
+       <picker  class="filter_button" @change="clickFilterByFansNum"  range="{{fansArray}}">
+          <text>{{fansNumIndex==-1?'粉丝':fansDisplay }} ▾</text>
         </picker>
       </view>
+    </view>
       <view class="announce_list">
         <repeat for="{{announce_data}}" item="item" index="index" key="index">
           <view @tap="clickItem" id="{{item.bmsAnnounce.id}}">
@@ -130,9 +146,9 @@
     }
     methods = {
       addannounce() {
-         wepy.navigateTo({
-            url: '../pages/add_platform'
-          })
+        wepy.navigateTo({
+          url: '../pages/add_platform'
+        })
       },
       clickItem(e) {
         // 通告详情界面
@@ -155,6 +171,7 @@
       var index = e.detail.value
       this.platformIndex = index
       this.selectPlatform = this.platform_data[index]
+      console.log(this.selectPlatform, '999999999999999')
       if (this.verify === true) {
         this.conditionList(this.selectPlatform, this.fansStr, this.fansLevel)
       } else {
@@ -171,8 +188,8 @@
       console.log(fansStr)
       var fansLevel = this.fans_data[this.fansNumIndex].level
       fansLevel = fansLevel.split('L')[1]
-      this.fansLevel = parseInt(fansLevel)
-      console.log(this.fansLev)
+      this.fansLevel = fansLevel
+      console.log(this.fansLevel, '88888888888')
       if (this.verify === true) {
         this.conditionList(this.selectPlatform, this.fansStr, this.fansLevel)
       } else {
@@ -182,11 +199,13 @@
     }
     // 下拉刷新
     onPullDownRefresh(e) {
+      var that = this
+      that.pageNum = 1
       if (this.verify === true) {
-        this.getannounceList()
+        this.getannounceList(that.pageNum)
         wepy.stopPullDownRefresh()
       } else {
-        this.getKolList()
+        this.getKolList(that.pageNum)
         wepy.stopPullDownRefresh()
       }
       this.fansNumIndex = -1
@@ -203,7 +222,7 @@
       await getRequest({ url: '/bms/announce/list' }, data).then(res => {
         console.log(res, '筛选通告列表')
         if (res.data.code === 200) {
-          that.announce_data = res.data.data
+          that.announce_data = res.data.data.content
           console.log(that.announce_data, '通告列表')
           wepy.hideLoading()
         } else {
@@ -222,9 +241,10 @@
         "fansLevel": fansLevel
       }
       await getRequest({ url: '/ums/celebrity/list' }, data).then(res => {
+        console.log(res, '77777777777777777777')
         var code = res.data.code
         if (code === 200) {
-          var allKolList = res.data.data
+          var allKolList = res.data.data.content
           this.allKolList = allKolList
           this.hasMore = false
         }
@@ -250,15 +270,18 @@
       var that = this
       wepy.showLoading()
       await getRequest({ url: '/bms/announce/list?pageNum=' + pageNum }).then(res => {
+        console.log(res, '00000000')
         if (res.data.code === 200) {
           wepy.hideLoading()
-          if (res.data.data.length) {
-            var data = res.data.data
+          if (res.data.data.content.length) {
+            var data = res.data.data.content
             that.announce_data = [...that.announce_data, ...data]
             console.log(that.announce_data, '通告列表')
+            that.$apply()
           } else {
             // that.msg = "没有数据"
             console.log('没有数据了')
+            that.$apply()
           }
         } else {
           wepy.hideLoading()
@@ -268,23 +291,25 @@
           })
         }
       })
-      that.$apply()
     }
     // 获取红人列表
     async getKolList(pageNum) {
       var that = this
       wepy.showLoading({})
       await getRequest({ url: '/ums/celebrity/card/list?pageNum=' + pageNum }).then(res => {
+        console.log(res)
         var code = res.data.code
         if (code === 200) {
           wepy.hideLoading()
-          if (res.data.data.length) {
-            var data = res.data.data
+          var data = res.data.data.content
+          if (data.length) {
+            data = res.data.data.content
             that.allKolList = [...that.allKolList, ...data]
             console.log(that.allKolList, '所有红人')
+            that.$apply()
           } else {
-            // that.msg = "没有数据"
             console.log('没有数据了')
+            that.$apply()
           }
         } else {
           wx.hideLoading()
@@ -293,7 +318,7 @@
             icon: 'none',
           })
         }
-        that.$apply()
+        // that.$apply()
       })
     }
     async onLoad(option) {

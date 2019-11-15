@@ -1,0 +1,100 @@
+<style lang="less">
+.mypageitem {
+  display: flex;
+  width: 90%;
+  padding:0 1%;
+  margin:5px 3%;
+  height: 50px;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  border-bottom: 1px solid #dedede;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+.mypageitem .rightitem{
+    height:100%;
+    flex:1;
+    display:flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-right: 10px;
+}
+.input_jinzhu{
+  height: 100%;
+  flex:1;
+  text-align: right;
+}
+.subInfo{
+    margin-top: 20px;
+    width: 80px;
+}
+</style>
+<template>
+  <view class="container" style="min-height: 100vh; background-color: white">
+    <form bindsubmit="formSubmit" bindreset="formReset">
+      <view class="mypageitem">
+        <text>姓名：</text>
+        <input class="input_jinzhu"  placeholder="请输入姓名" @input="inputName" value="{{name}}" name="name"/>
+     </view>
+    <view class="mypageitem">
+        <text>所属公司</text>
+        <input class="input_jinzhu" placeholder="请输入公司" @input="inputCompany" value="{{company}}" name="company"/>
+    </view>
+    <view class="mypageitem">
+        <text style="flex:1">我的职务</text>
+        <input class="input_jinzhu" placeholder="请输入职位" @input="inputJob" value="{{job}}" name="job"/>
+    </view>
+    <view class="mypageitem">
+        <text style="flex:1">微信</text>
+        <input class="input_jinzhu"  placeholder="请输入微信" @input="inputwechat" value="{{wechat}}" name="wechat"/>
+    </view>
+    <button class="subInfo" formType="submit">提交</button>
+  </form>
+ </view>
+</template>
+<script>
+import wepy from 'wepy'
+import { postRequest } from "../utils/request"
+export default class InputInfo extends wepy.page {
+  config = {
+    navigationBarTitleText: '我的主页',
+    enablePullDownRefresh: false
+  }
+  components = {}
+  data = {
+    name: '',
+    company: '',
+    job: '',
+    myphone: '',
+    mywechat: '',
+    issave: true,
+    wechat: ''
+  }
+  methods = {
+    async formSubmit(e) {
+      var that = this
+      var data = e.detail.value
+      console.log(data)
+      data = {
+        "company": data.company,
+        "name": data.name,
+        "position": data.job,
+        "wechatNumb": data.wechat
+      }
+      await postRequest({ url: '/ums/financier/modify/info' }, data).then(res => {
+        console.log(res, '金主填写的自己的信息')
+        if (res.data.code === 200) {
+          this.issave = false
+          wepy.showToast({
+            title: '保存成功',
+          })
+          that.$apply()
+        }
+      })
+    }
+  }
+  onLoad(options) {
+  }
+}
+</script>

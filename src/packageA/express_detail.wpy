@@ -212,7 +212,7 @@
         <view class="layercontent">
       <text style="font-size:15px;font-weight:500;flex:1;margin-top:30px;">金主的微信号为</text>
       <text style="font-size:12px;color:#999;margin:5px 0;">点击复制微信号</text>
-      <view class="wechat" @tap='copy' data-copy='{{value}}'>{{value}}</view>
+      <view class="wechat" @tap='copy' data-copy='{{wechatNum}}'>{{wechatNum}}</view>
     </view>
     </view> 
     
@@ -260,7 +260,7 @@
       announceUser: {},
       showShare: false,
       prurl: '',
-      value: 'b222889564',
+      wechatNum: '',
       applied: false,
       isShow: false,
       canvasHidden: true, // 设置画板的显示与隐藏
@@ -269,8 +269,16 @@
     methods = {
       // 点击生成分享图
       shareImage() {
+        wepy.showLoading()
         var that = this
-        that.showShare = true
+        var showImg = setInterval(() => {
+          if (that.prurl) {
+            that.showShare = true
+            that.$apply()
+            clearInterval(showImg)
+            wepy.hideLoading()
+          }
+        }, 2000)  
       },
       // 保存分享图
       save() {
@@ -351,11 +359,12 @@
           that.announce_detail = res.data.data.bmsAnnounce
           console.log(that.announce_detail, '通告详情')
           that.announceUser = res.data.data.umsUser
+          that.wechatNum = that.announceUser.wechatNumb
           console.log(that.announceUser, '金主信息')
           this.getshareImage()
+          that.$apply()
         }
       })
-      this.$apply()
     }
     getshareImage() {
       var that = this
@@ -421,6 +430,7 @@
           success(res) {
             var tempFilePath = res.tempFilePath
             that.prurl = tempFilePath
+            that.$apply()
             if (that.prurl) {
               clearInterval(produceImg)
               console.log(that.prurl)

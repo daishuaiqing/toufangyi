@@ -6,6 +6,7 @@ let baseURL = CONST.HTTP_BASE_URL
 function getRequest(obj, data) {
     return new Promise((resolve, reject) => {
         var token = wepy.getStorageSync('token')
+        // var token = 'bff0f884-0269-45c8-add3-8665db186549'
         wx.request({
           url: baseURL + obj.url,
           method: 'GET',
@@ -30,6 +31,7 @@ function getRequest(obj, data) {
 function postRequest(obj, data) {
     return new Promise((resolve, reject) => {
         var token = wepy.getStorageSync('token')
+        // var token = 'bff0f884-0269-45c8-add3-8665db186549'
         wx.request({
           url: baseURL + obj.url,
           data: data,

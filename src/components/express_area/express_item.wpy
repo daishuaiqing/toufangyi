@@ -30,7 +30,7 @@
       <!-- 篇数 以及粉丝数-->
       <view class="item_row_container" style="flex:0 0 auto;font-size:13px; margin-top: 3px;display:flex;">
            <block>
-             <text class="item_main_atrr_text">{{item_data.bmsAnnounce.announceCategory}}</text>
+             <text class="item_main_atrr_text">{{item_data.bmsAnnounce.appName}}</text>
              <text style="margin-left: 6px;"></text>
           </block>
              <text class="item_main_atrr_text">{{item_data.bmsAnnounce.fansStr }}粉丝</text>
@@ -63,6 +63,7 @@
       item_data: {}
     }
     onLoad() {
+      console.log('222222222222222', this.props)
     }
     methods = {
     }

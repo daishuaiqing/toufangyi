@@ -29,10 +29,11 @@
     }
     .kolappname{
       border-radius: 8px;
-      // border: 1px solid green;
+      border: 1px solid green;
+      background: rgb(140, 182, 140);
       padding: 3px 5px;
       // background: rgb(195, 211, 195);
-      color:#888;
+      color:white;
       font-size: 14px;
     }
     .kolfanse{
@@ -74,7 +75,7 @@
           <view class="kolfanse">粉丝: {{ item_data.umsCelebrityCard.fansNumb }}</view>
         </view>
         <view class="kolsalary">
-          <view class="salafynum">21</view>
+          <view class="salafynum">{{item_data.umsCelebrityCard.offer}}</view>
           <view class="salarytext">报价</view>
         </view>
       </view>

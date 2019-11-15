@@ -12,64 +12,111 @@
   font-size: 15px;
   box-sizing: border-box;
 }
- .mypageitem .myimg{
-    width: 40px;
-    height: 40px;
-}
-.input_jinzhu{
-  flex:1;
-  text-align: right;
-  height: 100%;
-}
 .mypageitem .rightitem{
     height:100%;
     flex:1;
     display:flex;
     align-items: center;
     justify-content: flex-end;
+    margin-right: 10px;
 }
 .input_jinzhu{
   height: 100%;
   flex:1;
   text-align: right;
 }
+.topimg{
+  background: skyblue;
+  padding:30px;
+  height: 150px;
+  display: flex;
+  justify-content: space-between;
+  color:white;
+  font-size: 20px;
+}
+.myimg{
+  width:60px;
+  height: 60px;
+  border:2px solid white;
+  border-radius: 50%;
+  .img{
+    width:60px;
+    height: 60px;
+    border-radius: 50%;
+  }
+}
+.centercomplete{
+  position: relative;
+  width: 95%;
+  margin: 0 auto;
+  height: 80px;
+  background: white;
+  border-radius: 10px;
+  top: -40px;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 2px 2px 1px #dedede;
+}
+.tocomplete{
+  border-radius: 8px;
+  background-color:skyblue;
+  color:white;
+  padding: 3px 5px;
+  width: 80px;
+  font-size: 16px;
+  display: flex;
+  justify-content:center;
+  align-items: center;
+}
 </style>
 <template>
   <view class="container" style="min-height: 100vh; background-color: white">
-     <form bindsubmit="formSubmit" bindreset="formReset">
-          <view class="mypageitem">
-             <text>头像</text>
-             <view class="rightitem">
-                <view class="myimg">
-                    <open-data type="userAvatarUrl" class="img" ></open-data>
-                </view>
-             </view>
-          </view>
-             <view class="mypageitem">
+    <view class="topimg">
+      <view>
+        <view style="font-weight:600">{{myInfo.nick}}</view>
+        <view style="font-size:15px;margin-top:10px;">{{myInfo.mobile}}</view>
+      </view>
+      <view class="myimg">
+        <image class="img" src="{{myInfo.avatar}}"/>
+        <!-- <view>{{myInfo.avatar}}</view> -->
+      </view>
+    </view>
+    <view class="centercomplete">
+      <view class="">正确填写您的身份是发布通告的第一步哦</view>
+      <view class="tocomplete" @tap="toaddmyInfo">立即完善</view>
+    </view>
+    <view style="position:relative;top:-15px;">
+      <view class="mypageitem">
                 <text>姓名：</text>
                 <input class="input_jinzhu" wx:if="{{showinput}}" placeholder="请输入姓名" @input="inputName" value="{{name}}" name="name"/>
                 <view wx:else class="rightitem">{{name}}</view>
-             </view>
-            <view class="mypageitem">
+                <view class="iconfont">&#xe683;</view>
+           </view>
+          <view class="mypageitem">
               <text>所属公司</text>
               <input class="input_jinzhu" wx:if="{{showinput}}" placeholder="请输入您的公司" @input="inputCompany" value="{{company}}" name="company"/>
               <view wx:else class="rightitem">{{company}}</view>
+              <view class="iconfont">&#xe683;</view>
             </view>
              <view class="mypageitem">
                 <text style="flex:1">我的职务</text>
                 <input class="input_jinzhu" wx:if="{{showinput}}" placeholder="请输入您的职位" @input="inputJob" value="{{job}}" name="job"/>
                 <view wx:else class="rightitem">{{job}}</view>
+                <view class="iconfont">&#xe683;</view>
              </view>
              <view class="mypageitem">
                 <text style="flex:1">我的手机号</text>
                 <view class="rightitem">{{myphone}}</view>
+                <view class="iconfont">&#xe683;</view>
              </view>
              <view class="mypageitem">
                 <text style="flex:1">微信</text>
                 <view class="rightitem">{{mywechat}}</view>
+                <view class="iconfont">&#xe683;</view>
              </view>
-              <button formType="submit" wx:if="{{issave}}" style="margin-top:20px;width:80px;height:40px;font-size:16px;line-height:40px;">保存</button>  
-      </form>
+    </view>
   </view>
 </template>
 <script>
@@ -89,17 +136,19 @@ export default class NamePage extends wepy.page {
     mywechat: '',
     issave: true,
     showinput: null,
+    myInfo: ''
   }
   methods = {
+    toaddmyInfo() {
+      wepy.navigateTo({ url: '/packageB/inputInfo' })
+    },
     formSubmit(e) {
       var data = e.detail.value
       console.log(data)
       data = {
         "company": data.company,
-        //  "id": 0,
         "name": data.name,
         "position": data.job,
-        //  "userId": 0
       }
       postRequest({ url: '/ums/financier/find/info' }, data).then(res => {
         console.log(res, '金主填写的自己的信息')
@@ -129,6 +178,7 @@ export default class NamePage extends wepy.page {
       console.log(res)
       if (res.data.code === 200) {
         var data = res.data.data
+        this.myInfo = res.data.data
         console.log(data, '金主获取到的自己的信息')
         this.company = data.company
         this.name = data.name
