@@ -3,7 +3,7 @@
     display: flex;
     align-items: center;
     border:1px solid white;
-    background-color: #5dd5c8;
+    background-color: #8dc63f;
     flex: 1;
     justify-content: center;
   }
@@ -156,29 +156,25 @@
         </block>
       </view>
         <view class="item_row_container" style="flex:0 0 auto;font-size:13px; margin-top: 8px;display:flex;">
-        <view>
+        <view wx:if="{{announce_detail.salary!==0}}">
           <text class="item_right_corner_text">报酬： </text>
            <text class="item_right_corner_text">{{ announce_detail.salary }}</text>
         </view>
+         <view wx:if="{{announce_detail.salary==0}}">
+          <text class="item_right_corner_text">无费置换 </text>
+        </view>
         <view style="margin-left:10px;">
            <block wx:if="{{ announce_detail.fansNumb }}">
-        <text class="item_main_atrr_text">{{ announce_detail.fansNumb}}K+</text>
+        <text class="item_main_atrr_text">{{ announce_detail.fansNumb}}</text>
         <text style="margin-left: 6px;"></text>
       </block>
-      <text class="item_main_atrr_text">{{ announce_detail.fansNumb }}粉丝</text>
+      <text class="item_main_atrr_text">{{ announce_detail.fansStr}}粉</text>
         </view>
       </view>
     </view>
-      <block wx:if="{{announce_detail.city}}">
-        <view class="item_row_container" style="flex-wrap: wrap; width: 90vw; margin-top: 8px;">
-          <text class="item_main_atrr_text">{{announce_detail.city}}</text>
-        </view>
-      </block>
       <view class="item_row_container" style="font-size:12px;flex-wrap: wrap; width: 90vw; margin-top: 8px;">
       <text class="item_foot_text">需求人数: </text>
       <text class="item_foot_text" style="margin-left: 6px;color: #eea932">{{announce_detail.needNumb}}</text>
-      <text class="item_foot_text" style="margin-left: 6px;">报名人数: </text>
-      <text class="item_foot_text" style="margin-left: 6px; color: #eea932">{{announce_detail.needNumb}}</text>
     </view>
     </view>
     <view class="express-item-wrapper">
@@ -229,7 +225,7 @@
     <canvas style="width:300px; height:300px;" canvas-id="shareImg"/>
          <!-- 底部固定操作栏 -->
     <view style="display: flex; height: 50px; position: fixed; bottom: 0; left: 0; width: 100vw;">
-      <view class="operation-item" @tap="shareImage" style="background-color: #5dd5c8">
+      <view class="operation-item" @tap="shareImage" style="background-color:#8dc63f">
         <text>生成分享图</text>
       </view>
       <view class="operation-item">
@@ -278,7 +274,7 @@
             clearInterval(showImg)
             wepy.hideLoading()
           }
-        }, 2000)  
+        }, 2000)
       },
       // 保存分享图
       save() {
@@ -317,24 +313,7 @@
       applyJob() {
         this.applied = true
         this.isShow = true
-      },
-      // callPhone(ev) {
-      //   const { announceID } = this.item_data
-      //   const { userName, mobileNo, userID } = this.item_data.owner
-      //   wepy.showModal({
-      //     title: '是否拨打电话',
-      //     content: userName,
-      //   }).then(function (res) {
-      //     if (res.confirm) {
-      //       wepy.makePhoneCall({
-      //         phoneNumber: mobileNo
-      //       })
-      //       // LoginApi.saveDialHistory(userID, announceID)
-      //     } else if (res.cancel) {
-      //       console.log('用户点击取消')
-      //     }
-      //   })
-      // }
+      }
     }
     // 点击复制对我感兴趣
     async apply() {
@@ -345,7 +324,9 @@
         "id": 0
       }
       await postRequest({ url: '/bms/celebrity/announce/add' }, data).then(res => {
-        console.log(res, '3473843784364326')
+        if (res.data.code === 200) {
+          console.log('申请成功')
+        }
       })
       that.$apply()
     }
@@ -440,6 +421,14 @@
       }, 2000)
     }
     onShow() {
+      var card = wx.getStorageSync('mycard')
+      if (card) {
+        wepy.showToast({
+          title: '您还没有添加名片!',
+          icon: 'none'
+        })
+        wepy.navigateTo({ url: '/packageA/kol_detail' })
+      }
       const token = wx.getStorageSync('token')
       if (token && token.length) {
         console.log('token存在')

@@ -33,11 +33,11 @@
         .weui-tabbar__item.weui-bar__item_on .weui-tabbar__icon,
         .weui-tabbar__item.weui-bar__item_on .weui-tabbar__icon>i,
         .weui-tabbar__item.weui-bar__item_on .weui-tabbar__label{
-            color:#1296db
+            color:#1afa29
     }
     .weui-tabbar__icon{
         display:inline-block;
-        width:28px;
+        width:30px;
         height:28px;
         margin-bottom:2px
     }i.weui-tabbar__icon,

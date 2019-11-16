@@ -5,7 +5,7 @@
     padding: 8px 20px;
     background-color: white;
     font-size: 14px;
-    margin-top: 8px;
+    margin-top: 3px;
     box-shadow: 0 1px 1px #dedede;
   }
   .avatar-image {
@@ -19,39 +19,62 @@
     white-space: nowrap;
     word-break:keep-all;
   }
+  .content_item{
+    display: flex;
+    justify-content: space-between;
+    padding: 8px;
+    align-items: center;
+  }
+  .salaryIf{
+    flex: 1;
+    height: 100%;
+    text-align: right;
+    margin-right: 10px;
+  }
+  .titleapp{
+    font-weight: 550;
+    font-size: 18px;
+  }
 </style>
 <template>
   <view class="express-item-wrapper">
     <view class="item_row_container">
       <!-- 名称 -->
-      <view class="item_row_container" style="font-weight:550;font-size:16px;flex:1 1 auto; width: 80vw; align-items: flex-end;">
-        <text class="item_title_text">{{item_data.bmsAnnounce.announceName}}</text>
-      </view>
+     <view class="content_item">
+      <view>
+          <!-- <view class="item_row_container" style="font-weight:550;font-size:16px;flex:1 1 auto; width: 80vw; align-items: flex-end;"> -->
+            <text class="titleapp">{{item_data.bmsAnnounce.announceName}}</text>
+         
       <!-- 篇数 以及粉丝数-->
-      <view class="item_row_container" style="flex:0 0 auto;font-size:13px; margin-top: 3px;display:flex;">
-           <block>
+       <view class="item_row_container">
+           <view style="margin-top:5px;">
              <text class="item_main_atrr_text">{{item_data.bmsAnnounce.appName}}</text>
-             <text style="margin-left: 6px;"></text>
-          </block>
+             <text style="margin-left: 6px;">( {{item_data.bmsAnnounce.announceCategory}} )</text>
+          </view>
+          <view style="margin-top:5px;">
              <text class="item_main_atrr_text">{{item_data.bmsAnnounce.fansStr }}粉丝</text>
              <text style="margin-left: 6px;"></text>
-             <text class="item_right_corner_text">￥</text>
-             <text class="item_right_corner_text">{{item_data.bmsAnnounce.salary }}</text>
+          </view>
+       </view>
+      </view>
+      <view class="salaryIf" wx:if="{{item_data.bmsAnnounce.salary !== 0}}">
+          <view>{{item_data.bmsAnnounce.salary }}</view>
+          <view style="margin-top:8px;">薪酬</view>
+      </view>
+      <view class="salaryIf" wx:if="{{item_data.bmsAnnounce.salary == 0}}">
+          <!-- <view>{{item_data.bmsAnnounce.salary }}</view> -->
+          <view style="margin-top:8px;">无费置换</view>
       </view>
     </view>
-    <view class="item_row_container" style="font-size:12px;flex-wrap: wrap; width: 90vw; margin-top: 8px;">
-      <text class="item_foot_text">需求人数: </text>
-      <text class="item_foot_text" style="margin-left: 6px;color: #eea932">{{item_data.bmsAnnounce.needNumb }}</text>
-      <text class="item_foot_text" style="margin-left: 6px;">报名人数: </text>
-      <text class="item_foot_text" style="margin-left: 6px; color: #eea932">{{ item_data.bmsAnnounce.appliedNum }}</text>
-    </view>
+    
+     </view>
     <!-- 头像以及公司和最后更新时间 -->
     <view class="item_row_container" style="margin-top: 8px;">
       <view class="item_row_container" style="flex:1 1 auto;display:flex; width: 50vw; padding: 0; align-items: center;">
         <image class="avatar-image" src="{{ item_data.umsUser.avatar}}"/>
         <text class="user-name" style="margin-left: 6px;font-size:12px">{{item_data.umsUser.nick}}</text>
         <text class="user-name" style="margin-left: 6px;font-size:12px">{{item_data.umsUser.position}}</text>
-        <text class="item_foot_text" style="flex:1;position:absolute;right:10px;color:#ccc;font-size:10px;">{{item_data.bmsAnnounce.updateTime}}</text>
+        <text class="item_foot_text" style="flex:1;position:absolute;right:20px;font-size:10px;">{{item_data.msg}}</text>
       </view>
     </view>
   </view>
@@ -63,7 +86,6 @@
       item_data: {}
     }
     onLoad() {
-      console.log('222222222222222', this.props)
     }
     methods = {
     }

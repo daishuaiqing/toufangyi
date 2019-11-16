@@ -9,9 +9,9 @@
     border-bottom: 1px solid #cccccc;
 }
 .react-item{
-    color:orange;
+    color: #39b54a;
     margin: 8px 15px;
-    border-bottom: 1px solid orange;
+    border-bottom: 1px solid  #39b54a;
 }
 .content-item{
     width:100vw;
@@ -30,11 +30,21 @@
 }
 .messlogin{
    font-size: 14px;
-  border:1px solid #00a982;
+  border:1px solid  #39b54a;
   color:white;
   padding:8px 15px;
-  background: #00a982;
+  background:  #39b54a;
   margin-top: 15px;
+}
+.nokolList {
+  width: 90%;
+  height: 200px;
+  margin:50px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border-radius: 8px;
 }
 </style>
 <template>
@@ -55,11 +65,11 @@
       <!-- 我关注的界面 -->
     <block>
       <repeat for="{{applyedArray}}">
-        <swipeout  i-class="i-swipeout-demo-item" style="height:100%;"  @change="delItem">
+        <!-- <swipeout  i-class="i-swipeout-demo-item" style="height:100%;"  @change="delItem"> -->
         <view slot="content"  @tap="clickItem" id="{{item.bmsAnnounce.id}}">
          <express :item_data="item"/>
         </view>
-        </swipeout>
+        <!-- </swipeout> -->
       </repeat>
     </block>
     </view>
@@ -80,7 +90,7 @@
         <view class="react-item">对我感兴趣</view>
       </view>
       <!-- 申请过工作界面 -->
-        <view class="content-item">
+        <view class="content-item" wx:if="{{false}}">
         <repeat for="{{kolArray}}" key="{{index}}">
             <view class="interest">
                 <image style="width:50px;height:50px;border-radius:50%;margin-right:10px;" src="{{item.avatar}}"/>
@@ -94,6 +104,11 @@
                 </view>
             </view>
         </repeat>
+      </view>
+       <view class="nokolList " wx:else>
+        <view class="iconfont" style="font-size:100px;margin-bottom:10px;">&#xe600;</view>
+        <!-- <view><image class="homelogo" src="/images/logo.jpg"/></view> -->
+        <view>当前没有列表</view>
       </view>
   </view>
   </view>
@@ -110,6 +125,8 @@
   export default class message extends wepy.page {
     config = {
       navigationBarTitleText: '消息',
+      onReachBottomDistance: 80,
+      enablePullDownRefresh: false,
       "usingComponents": {
         "mp-tabbar": '../../custom-tab-bar/tabbar/tabbar',
         "swipeout": '../../iview/swipeout/index'
@@ -146,45 +163,47 @@
           })
         }
       },
-      todetail() {
-        wepy.navigateTo({ url: '/packageA/express_detail' })
-      },
-      change(e) {
-        this.num = e
-      },
+      // todetail() {
+      //   wepy.navigateTo({ url: '/packageA/express_detail' })
+      // }
+    }
+    onReachBottom(e) {
+      var that = this
+      that.pageNum = that.pageNum + 1
+      if (that.verify === true) {
+        that.haveapplyed(that.pageNum)
+      } else {
+        that.getKolList(that.pageNum)
+      }
     }
     async onLoad(options) {
     }
     // 对我感兴趣的红人的列表
-    async getKolList() {
-      await getRequest({ url: '/bms/celebrity/financier/log/list?pageNum=1' }).then(res => {
+    async getKolList(pageNum) {
+      await getRequest({ url: '/bms/celebrity/financier/log/list?pageNum=' + pageNum }).then(res => {
         console.log(res, '申请过工作的红人的列表')
         if (res.data.code === 200) {
           var kolArray = []
           kolArray = res.data.data.content
-          this.kolArray = kolArray
+          this.kolArray = [...this.kolArray, ...kolArray]
+          this.$apply()
         }
-        this.$apply()
       })
     }
     // 我申请过的
-    async haveapplyed() {
-      await getRequest({ url: '/bms/celebrity/announce/list?pageNum=1' }).then(res => {
-        console.log(res, '对我申请过通告列表')
+    async haveapplyed(pageNum) {
+      await getRequest({ url: '/bms/celebrity/announce/applied?pageNum=' + pageNum }).then(res => {
         if (res.data.code === 200) {
-          var applyedArray = res.data.data
-          console.log(applyedArray, '我申请多的通告列表')
-          this.applyedArray = applyedArray
+          var applyedArray = res.data.data.content
+          console.log(applyedArray, '我申请过的通告列表')
+          this.applyedArray = [...this.applyedArray, ...applyedArray]
         }
       })
       this.$apply()
     }
-    watch = {
-      visible(newvalue, oldvalue) {
-        console.log(newvalue, 'visible')
-      }
-    }
     onShow() {
+      this.applyedArray = ''
+      this.kolArray = ''
       var that = this
       const token = wx.getStorageSync('token')
       if (token && token.length) {
@@ -196,17 +215,19 @@
       wx.hideTabBar({
         animation: false
       })
+      var pageNum = 1
+      this.pageNum = pageNum
       var verify = wx.getStorageSync('verify')
       if (verify === 1) {
         console.log('这是红人界面')
         this.verify = true
-        this.haveapplyed()
+        this.haveapplyed(this.pageNum)
         wepy.setNavigationBarTitle({
           title: "与我有关"
         })
       } else {
         console.log('这是金主界面')
-        this.getKolList()
+        this.getKolList(this.pageNum)
         this.verify = false
         wepy.setNavigationBarTitle({
           title: "消息"

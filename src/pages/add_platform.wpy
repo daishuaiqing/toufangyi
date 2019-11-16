@@ -1,10 +1,13 @@
 <style lang="less">
 .form_container{
-  width:90vw;
-  padding-bottom: 60px;
-  margin:10px auto;
+  width:100vw;
+  margin:0 auto;
   min-height: 100vh;
   font-size: 14px;
+  padding-bottom: 20px;
+  padding:0 20px;
+  box-sizing: border-box;
+  background: white;
 }
 .form_input_label{
   display: flex;
@@ -32,7 +35,6 @@
   height: 100%;
   flex: 1;
   text-align: right;
-  // color:black;
   font-size: 13px;
   padding-right: 20px;
 }
@@ -43,17 +45,34 @@
 }
 .edit_button{
   font-size: 14px;
-  width: 30%;
-  margin-top: 25px;
+  width: 45%;
   border:none;
   color:white;
-  border-radius: 10px;
+  border-radius: 5px;
   background: rgb(187, 180, 180);
   box-shadow: 2px 2px 2px #dedede;
 }
+.radio-group{
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  display: flex;
+  justify-content: space-around;
+}
+.nochoose{
+  color:#999;
+}
+#textarea{
+  background-color: rgb(240, 238, 238);
+  padding:10px;
+  height:100px;
+  width:92%;
+  margin:0 auto;
+  line-height:20px;
+}
 </style>
 <template>
-<view>
+<view class="container">
   <!-- boss发布公告页面 -->
   <view class="form_container" wx:if="{{!verify}}">
      <form bindsubmit="formSubmit" bindreset="formReset">
@@ -63,19 +82,19 @@
       </view>
       <view class="form_input_label">
         <text class="labelname">平台类型</text>
-         <picker name="appName" class="filter_button" @change="clickFilterByPlatform" value="{{platformIndex}}" range="{{platform_data}}">
+         <picker name="appName" class="filter_button {{platformIndex==-1?'nochoose':''}}" @change="clickFilterByPlatform" value="{{platformIndex}}" range="{{platform_data}}">
         <text >{{platformIndex==-1?'请选择':platform_data[platformIndex]}} ▾</text>
         </picker>
       </view>
        <view class="form_input_label">
         <text class="labelname">类别</text>
-         <picker name="announceCategory" class="filter_button right_content" @change="clickFilterByContentType" value="{{categoryIndex}}" range="{{contentType_data}}">
+         <picker name="announceCategory" class="filter_button {{platformIndex==-1?'nochoose':''}}" @change="clickFilterByContentType" value="{{categoryIndex}}" range="{{contentType_data}}">
         <text>{{categoryIndex== -1?'请选择':contentType_data[categoryIndex]}} ▾</text>
       </picker>
       </view> 
       <view class="form_input_label">
         <text class="labelname">粉丝数</text>
-         <picker  name="fansStr" class="filter_button" @change="clickFilterByFansNum"  range="{{fansArray}}">
+         <picker  name="fansStr" class="filter_button {{platformIndex==-1?'nochoose':''}}" @change="clickFilterByFansNum"  range="{{fansArray}}">
         <text>{{fansNumIndex==-1?'请选择':fansStr }} ▾</text>
       </picker>
       </view>
@@ -83,7 +102,13 @@
         <text class="labelname">需求人数</text>
          <input class="input_edit" name="needNumb" type="number" @input="needNumb" placeholder="请输入需求人数" value="{{needNumb}}"/>
       </view>
-       <view class="form_input_label">
+      <view class="form_input_label">
+           <radio-group class="radio-group" bindchange="radioChange">
+             <view><radio class="radio" value="salary">赏金投放</radio></view>
+             <view><radio class="radio" value="nosalary">无费置换</radio></view>
+            </radio-group>
+      </view>
+       <view class="form_input_label" wx:if="{{issalary}}">
         <text class="labelname">报酬</text>
          <input class="input_edit" name="salary" @input="salaryinput" type="number" placeholder="请输入报酬" value="{{salary}}"/>
       </view>
@@ -91,20 +116,19 @@
         <text class="labelname">通告详情</text>
       </view>
       <view class="txt_input_container">
-           <textarea value="{{announceDetail}}" name="detail" id="" placeholder="1.推广时间，2.报名要求，3.具体报价"  style="padding:10px;height:100px;width:92%;margin:0 auto;border:1px solid #888;line-height:20px;"> </textarea>
+           <textarea id="textarea" value="{{announceDetail}}" name="detail" placeholder="1.推广时间，2.报名要求，3.具体报价" > </textarea>
       </view>
     <view class="form_input_label">
       <text class="labelname">报名截止时间</text>
        <picker  mode="date" value="{{date}}"  start="2019-10-01" end="2030-12-31" bindchange="bindDateChange" name="endTime">
           <view class="filter_button" >
-           {{date? date: '年 - 月 - 日'}}
+           {{date? date: '请选择'}}
           </view>
         </picker>
     </view>
     <view class="button_all">
-        <button class="edit_button" formType="submit">提交</button>
-        <button class="edit_button" wx:if="{{fromPersonPage}}" @tap="delplatinfo">删除</button> 
-        <button class="edit_button" wx:else  formType="reset">重置</button>    
+        <button class="edit_button" formType="submit" style="background:{{state?'green':''}}">提交</button>
+        <button class="edit_button"  formType="reset">重置</button>    
     </view>
   </form>
    </view>
@@ -125,6 +149,7 @@
       jump
     }
     data = {
+      issalary: false,
       contentType_data: FILTER_CONDITION.contentType_data, // 类别
       platform_data: FILTER_CONDITION.platform_data, // 平台
       fans_data: FILTER_CONDITION.fans_data, // 粉丝数量
@@ -147,6 +172,7 @@
       verify: false,
       announceDetail: '',
       tempFilePaths: [],
+      state: false
     }
     events = {
       'areaArray': (...args) => {
@@ -170,6 +196,7 @@
     }
     methods = {
       async formSubmit(e) {
+        this.state = true
         var value = e.detail.value
         console.log(value)
         var data = {
@@ -182,8 +209,12 @@
           "fansStr": this.fansStr
         }
         data.fansLevel = parseInt(this.fansLevel)
-        data.needNUmb = parseInt(value.needNumb)
-        data.salary = parseInt(value.salary)
+        data.needNumb = parseInt(value.needNumb)
+        if (this.issalary === false) {
+          data.salary = 0
+        } else {
+          data.salary = parseInt(value.salary)
+        }
         console.log(data)
         var that = this
         await postRequest({ url: '/bms/announce/add' }, data).then(res => {
@@ -207,6 +238,17 @@
       },
       formReset() {
         this.clearall()
+      },
+      radioChange(e) {
+        var salary = e.detail.value
+        console.log(salary)
+        if (salary === "salary") {
+          this.issalary = true
+          this.$apply()
+        } else {
+          this.issalary = false
+          this.$apply()
+        }
       },
       // 输入通告详情
       inputCase(e) {
@@ -246,6 +288,7 @@
       this.salary = ''
       this.announceDetail = ''
       this.date = ''
+      this.state = false
     }
     onLoad(options) {
       var fans_data = []
@@ -255,6 +298,16 @@
       this.fansArray = fans_data
     }
     onShow() {
+      var employerInfo = wx.getStorageSync('employerInfo')
+      if (!employerInfo) {
+        wepy.showToast({
+          title: '请先完善您的个人信息!',
+          icon: 'none',
+        })
+        setTimeout(function() {
+          wepy.navigateTo({ url: '/packageB/jinzhupage' })
+        }, 2000)
+      }
       var verify = wx.getStorageSync('verify')
       if (verify === 1) {
         console.log('这是红人界面')

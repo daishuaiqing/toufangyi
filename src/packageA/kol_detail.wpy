@@ -1,67 +1,100 @@
 <style lang="less">
-.container{
-  background: #dedede;
-  width: 100vw;
-  min-height: 100vh;
-}
 .container_koldetail{
-  display: flex;
-  flex-direction:column; 
-  flex: 1; 
   width: 100vw; 
-  min-height: 100vh;
-  background: white; 
-}
-// 内容显示
-.content_show{
-  display: flex; 
-  width: 100%;
-  flex-direction: column; 
-  margin-bottom: 8px;
+  height: 95vh;
+  box-sizing: border-box;
+  background: #F0F0F0;
+  display: flex;
+  flex-direction: column;
 }
 // 摩卡展示
 .kolimgarea{
   display:flex;
   justify-content:space-between;
-  height:28px;
+  height:30px;
   align-items:center;
-  box-shadow: 0 1px 2px rgb(233, 223, 223);
 }
-  .pictures{
-    height: 160px;
-    margin-top:5px;
-    box-shadow: 0 1px 2px rgb(233, 223, 223);
-    margin-bottom:5px;
-  }
-  .img_user{
-    display:flex;
-    justify-content: center;
-    width: 100%;
-    height: 160px;
-  }
-  .noImg{
-    width: 100%;
-    height: 160px;
-    text-align: center;
-  }
-  .toupimg{
+.cardContent{
+  width: 100vw;
+  flex:1;
+  background: white;
+}
+.pictures{
+  box-sizing: content-box;
+  width: 100vw;
+  background-color: white;
+}
+.img_user{
+  width: 90%;
+  margin:0 auto;
+  height: 180px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.swiperImg{
+  width: 100%;
+  height: 160px;
+  box-shadow: 0 2px 2px #dedede;
+}
+.kolImage{
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+}
+.noImg{
+  width: 94%;
+  margin:0 auto;
+}
+.noImgtext{
+  height: 30px;
+  line-height: 30px;
+  font-size: 14px;
+  color:#999;
+}
+.noImgview{
+  width: 100%;
+  height: 160px;
+  display: flex;
+  background: #F0F0F0;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+}
+.Imgview{
+  width: 100%;
+  height: 160px;
+  display: flex;
+  background: white;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+}
+.toupimg{
     width:120px;
     font-size: 14px;
-    margin:20px auto;
     height: 40px;
-    border:1px solid #dedede;
+    color:#999;
     border-radius: 8px;
-    line-height: 40px;
-    color:white;
-    background: #5dd5c8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+  // 平台
+  .platformList {
+    display: flex; 
+    flex-direction: column;
+    justify-content: space-between;
+    padding-bottom: 50px;
   }
+  // 底部操作
   .operation-item {
     display: flex;
     width:100%;
-    border: 1px solid red;
     align-items: center;
     border:1px solid white;
-    background-color: #5dd5c8;
+    background-color: #8dc63f;
     flex: 1;
     justify-content: center;
   }
@@ -114,39 +147,37 @@
     bottom: 0;
     height: 45px;
     text-align: center;
-    background: rgb(207, 196, 196);
+    background: rgb(140, 182, 140);
     font-size: 14px;
   }
-  .platformList {
-    display: flex; 
-    flex-direction: column;
-    justify-content: space-between;
-    padding-bottom: 50px;
-  }
+ 
 </style>
 <template>
   <view class="container">
     <view class="container_koldetail" >
-      <view class="content_show">
         <view class="kolimgarea">
           <text style="font-size: 13px;margin-left:10px;">摩卡展示</text>
           <view wx:if="{{isFromMine&&KolImage}}" style="font-size: 13px;margin-right:10px;" data-images={{KolImage}} @tap="editmyPhoto">编辑</view>
         </view>
-        <view class="pictures">
+        <view class="cardContent">
+           <view class="pictures">
           <!-- 当前没有照片 -->
-          <view  wx:if="{{isFromMine&&!showImg}}" class= "noImg">
-            <view style="margin-top:15px;">当前您的摩卡库中还没有图片哦</view>
-            <view class="toupimg" @tap="toupimg">点击上传图片</view>
+            <view class= "noImg" wx:if="{{isFromMine&&!showImg}}">
+              <view class="noImgtext">当前您的摩卡库中还没有图片哦~</view>
+              <view class="noImgview" @tap="toupimg">
+                <text class="iconfont" style="color:#999;margin-right:-10px;">&#xe67b;</text>
+                <view class="toupimg">点击上传图片</view>
+              </view>
           </view>
-          <view  wx:if="{{!isFromMine&&!showImg}}" class= "noImg">
+          <view  wx:if="{{!isFromMine&&!showImg}}" class="Imgview">
             <view style="margin-top:15px;">红人当前还没有图片集</view>
           </view>
           <!-- 用户上传了照片 -->
           <view  class="img_user" wx:if="{{showImg}}">
-           <swiper style="width:100%;height:100%;" indicator-dots = "true" autoplay="{{true}}" interval="{{3000}}" duration="{{5000}} " circular indicator-color='white'>
+           <swiper class="swiperImg" indicator-dots = "true" autoplay="{{true}}" interval="{{3000}}" duration="{{5000}} " circular indicator-color='white'>
             <repeat for="{{KolImage}}" item ="item" index = "index" key="index">
              <swiper-item>           
-                 <image style="width:100%;height:100%;" src="{{item}}" mode="aspectFit" lazy-load/>
+                 <image class="kolImage" src="{{item}}" mode="aspectFit" lazy-load/>
              </swiper-item>
              </repeat>
            </swiper>
@@ -160,7 +191,7 @@
             </view>
           </repeat>
         </view>
-       <view class="platformList" wx:else>
+       <view class="platformList" wx:if="{{!isFromMine}}">
           <repeat for="{{KolDetail}}" item ="item" index = "index" key="index">
             <view>
               <platform_item :item_data="item"/>
@@ -171,16 +202,16 @@
         <!-- 是否展示微信号 -->
         <view wx:if="{{isShow}}" class="wechatlayer">
           <view class="layercontent">
-            <text style="font-size:15px;font-weight:500;flex:1;margin-top:30px;">金主的微信号为</text>
+            <text style="font-size:15px;font-weight:500;flex:1;margin-top:30px;">红人的微信号为</text>
             <text style="font-size:12px;color:#999;margin:5px 0;">点击复制微信号</text>
             <view class="wechat" @tap='copy' data-copy='{{wechatNumb}}'>{{wechatNumb}}</view>
           </view>
         </view>
         <!-- 底部导航 -->
         <view style="display: flex;height: 50px;position: fixed; bottom: 0; left: 0; width: 100vw;" wx:if="{{!isFromMine}}">
-           <view class="operation-item" @tap="callPhone" style="background-color: #5dd5c8">
+           <!-- <view class="operation-item" @tap="callPhone" style="background-color: #5dd5c8">
              <text>电话联系</text>
-           </view>
+           </view> -->
            <view class="operation-item">
              <button id="detail_share_button" open-type="share">分享</button>
            </view>
@@ -188,8 +219,8 @@
              <text @tap="applyJob">微信联系</text>
            </view>
         </view>
-      </view>
-    </view> 
+        </view>
+    </view>
   </view>
 </template>
 <script>
@@ -228,7 +259,6 @@
       },
       // 点击编辑按钮
       editmyPhoto(e) {
-        console.log(e.currentTarget.dataset.images)
         var Images = e.currentTarget.dataset.images
         var images = {
           images: Images
@@ -287,7 +317,6 @@
           var KolImage = res.data.data.urls
           if (KolImage) {
             KolImage = JSON.parse(KolImage)
-            console.log(KolImage, '00000000000000000000000')
             this.KolImage = KolImage
             this.showImg = true
             that.$apply()
@@ -297,6 +326,7 @@
           }
           this.KolDetail = KolDetail
           console.log(this.KolDetail, '红人的详细信息')
+          // wx.setStorageSync('card', this.KolDetail)
           that.$apply()
         }
       })
@@ -310,10 +340,11 @@
           var KolcardArray = []
           KolcardArray.push(KolDetail)
           this.KolDetail = KolcardArray
-          console.log(this.KolDetail, '红人的名片')
-          var KolImage = res.data.data.umsCelebrity.showUrls
-          if (KolImage) {
-            KolImage = JSON.parse(KolImage)
+          this.wechatNumb = this.KolDetail[0].wechatNumb
+          this.$apply()
+          var KolImage = res.data.data.umsCelebrity
+          if (KolImage.showUrls) {
+            KolImage = JSON.parse(KolImage.showUrls)
             this.KolImage = KolImage
             this.showImg = true
             console.log(this.KolImage, '红人的照片')
@@ -322,9 +353,6 @@
             this.showImg = false
             this.$apply()
           }
-          var KolInfo = res.data.data.umsUser
-          this.KolPhone = KolInfo.mobile
-          this.wechatNumb = KolInfo.wechatNumb
           this.$apply()
         }
       })

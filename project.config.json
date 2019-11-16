@@ -19,7 +19,7 @@
 		}
 	},
 	"compileType": "miniprogram",
-	"appid": "wx6b5fda6e62ccee63",
+	"appid": "wx83385be55dba1c62",
 	"projectname": "my-project",
 	"miniprogramRoot": "dist/",
 	"simulatorType": "wechat",
@@ -42,7 +42,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 62,
+			"current": 73,
 			"list": [
 				{
 					"id": -1,
@@ -482,6 +482,83 @@
 					"id": -1,
 					"name": "packageB/inputInfo",
 					"pathName": "packageB/inputInfo",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/add_platform",
+					"pathName": "pages/add_platform",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/add_platform",
+					"pathName": "pages/add_platform",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/add_platform",
+					"pathName": "pages/add_platform",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/add_platform",
+					"pathName": "pages/add_platform",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageA/kol_detail",
+					"pathName": "packageA/kol_detail",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageA/kol_detail",
+					"pathName": "packageA/kol_detail",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageA/kol_detail",
+					"pathName": "packageA/kol_detail",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/express_area",
+					"pathName": "pages/express_area",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageB/change_identify",
+					"pathName": "packageB/change_identify",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageA/authorize",
+					"pathName": "packageA/authorize",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageA/person_announces",
+					"pathName": "packageA/person_announces",
 					"scene": null
 				}
 			]

@@ -6,7 +6,6 @@
  min-height: 100vh;
  font-size: 16px;
  width: 100vw;
- background-color:rgb(233, 231, 231);
 }
 // 顶部资料
 .header-info{
@@ -37,7 +36,7 @@
   flex:1;
   justify-content: center;
   padding:5px;
-  margin-right: 20px;
+  margin-right: 10px;
   align-items: center;
 }
 .verified{
@@ -94,9 +93,8 @@
   }
 
   .share_button:active {
-    background-color: #00a982;
+    background-color: #1afa29;
   }
-
   .share_button text {
     font-size: 12px;
     color: white;
@@ -132,9 +130,14 @@
 }
 .loginbutton{
   font-size: 12px;
-  border:1px solid #00a982;
+  border:1px solid rgb(140, 182, 140);
   color:white;
-  background: #00a982;
+  background: linear-gradient(45deg, #39b54a, #8dc63f);
+}
+.icontheader{
+  font-size:20px;
+  margin-right:10px;
+  color: #39b54a;
 }
 </style>
 <template>
@@ -147,7 +150,7 @@
         <image class="avatar-image" src="{{userInfo?userInfo.avatarUrl:'/images/default.png'}}"/>
         <view style="display:flex;flex-direction:column;margin-left:25px;">
           <text class="user-name">{{userInfo?userInfo.nickName:'未登录用户'}}</text>
-           <view class="box" wx:if="{{promise}}">{{userPhone}}</view>
+           <!-- <view class="box" wx:if="{{promise}}">{{userPhone}}</view> -->
            <view class="box" wx:if="{{!promise}}">
                <button class='loginbutton' @tap="tologin">
                  立即登录
@@ -156,35 +159,30 @@
         </view>
         <view  class="identify-mask">
           <block wx:if="{{userInfo}}">
-            <view class="iconfont" style="color:#5dd5c8;margin-right:8px;">&#xe937;</view>
+            <view class="iconfont" style="color: #39b54a;margin-right:8px;">&#xe937;</view>
             <text>红人</text>
           </block> 
         </view>
       </view>
     <!-- 其余设置 -->
-      <view style="margin-top:20px;">
+      <view style="margin-top:1px;">
         <view class="myinfoItem"  @tap="tomyInfo">
-            <view class="iconfont" style="font-size:20px;margin-right:10px;" >&#xe79a;</view>
+            <view class="iconfont icontheader" >&#xe79a;</view>
             <text style="flex:1">个人资料</text>
             <view class="iconfont" style="color:#999;">&#xe683;</view>
         </view>
         <view class="myinfoItem" @tap="tomyaddress">
-            <view class="iconfont" style="font-size:20px;margin-right:10px;" >&#xe64b;</view>
+            <view class="iconfont icontheader" >&#xe64b;</view>
             <text style="flex:1">收货地址</text>
             <view class="iconfont" style="color:#999;">&#xe683;</view>
         </view>
-        <view class="myinfoItem" style="margin-top:10px;">
-             <view class="iconfont" style="font-size:20px;margin-right:10px;">&#xe655;</view>
-             <text style="flex:1">关于我们</text>
-             <view class="iconfont" style="color:#999;">&#xe683;</view>
-        </view>
-        <view class="myinfoItem" @tap="clickContactService">
-            <view class="iconfont" style="font-size:20px;margin-right:10px;">&#xe6b7;</view>
+        <view class="myinfoItem" @tap="clickContactService" style="margin-top:10px">
+            <view class="iconfont icontheader">&#xe6b7;</view>
             <text style="flex:1">联系客服</text>
             <view class="iconfont" style="color:#999;">&#xe683;</view>
         </view>
          <view class="myinfoItem" @tap="tochangeidentify">
-            <view class="iconfont" style="font-size:20px;margin-right:10px;" >&#xe6a7;</view>
+            <view class="iconfont icontheader">&#xe6a7;</view>
             <text style="flex:1">切换身份</text>
             <view class="iconfont" style="color:#999;">&#xe683;</view>
         </view>
@@ -199,7 +197,7 @@
         <image class="avatar-image" src="{{userInfo?userInfo.avatarUrl:'/images/default.png'}}"/>
         <view style="display:flex;flex-direction:column;margin-left:25px;">
           <text class="user-name">{{userInfo?userInfo.nickName:'未登录用户'}}</text>
-          <view class="box" wx:if="{{promise}}">{{userPhone}}</view>
+          <!-- <view class="box" wx:if="{{promise}}">{{userPhone}}</view> -->
            <view class="box" wx:if="{{!promise}}">
                <button class='loginbutton' @tap="tologin">
                  立即登录
@@ -208,36 +206,31 @@
         </view>
         <view  class="identify-mask">
           <block wx:if="{{userInfo}}">
-            <view class="iconfont" style="color:green;margin-right:8px;">&#xe937;</view>
+            <view class="iconfont" style="color: #39b54a;margin-right:8px;">&#xe937;</view>
             <text>金主</text>
           </block>
         </view>
       </view>
     <!-- 通告维护 -->
       <view class="myinfoItem"  @tap="gotoMineAnnouncePage">
-      <view class="iconfont" style="font-size:20px;margin-right:10px;">&#xe62c;</view>
+      <view class="iconfont icontheader">&#xe62c;</view>
             <text style="flex:1">我的通告列表</text>
             <view class="iconfont" style="color:#999;">&#xe683;</view>
       </view>
       <view class="myinfoItem"  @tap="tomypage">
-      <view class="iconfont" style="font-size:20px;margin-right:10px;">&#xe641;</view>
+      <view class="iconfont icontheader">&#xe641;</view>
             <text style="flex:1">我的资料</text>
             <view class="iconfont" style="color:#999;">&#xe683;</view>
       </view>
       <!-- 其余设置 -->
     <view style="margin-top:10px;"> 
-             <view class="myinfoItem">
-            <view class="iconfont" style="font-size:20px;margin-right:10px;">&#xe655;</view>
-             <text style="flex:1">关于我们</text>
-             <view class="iconfont" style="color:#999;">&#xe683;</view>
-             </view>
              <view class="myinfoItem" @tap="clickContactService">
-            <view class="iconfont" style="font-size:20px;margin-right:10px;">&#xe6b7;</view>
+            <view class="iconfont icontheader">&#xe6b7;</view>
              <text style="flex:1">拨打客服电话</text>
              <view class="iconfont" style="color:#999;">&#xe683;</view>
              </view>
               <view class="myinfoItem" @tap="tochangeidentify">
-            <view class="iconfont" style="font-size:20px;margin-right:10px;" >&#xe6a7;</view>
+            <view class="iconfont icontheader">&#xe6a7;</view>
             <text style="flex:1">切换身份</text>
             <view class="iconfont" style="color:#999;">&#xe683;</view>
             </view>
@@ -251,7 +244,6 @@
   import wepy from 'wepy'
   import { tabbarlist } from '../data/tabbarList'
   import PlatformItem from '../components/kol/platform'
-  import mta from '../utils/mta_analysis'
   export default class KOLMinePage extends wepy.page {
     config = {
       navigationBarTitleText: '个人主页',
@@ -300,11 +292,11 @@
       clickContactService(ev) {
         wepy.showModal({
           title: '是否拨打客服电话',
-          content: '4006090168',
+          content: '17737892144',
         }).then(function (res) {
           if (res.confirm) {
             wepy.makePhoneCall({
-              phoneNumber: '4006090168'
+              phoneNumber: '17737892144'
             })
           } else if (res.cancel) {
             console.log('用户点击取消')

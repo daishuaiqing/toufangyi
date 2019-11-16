@@ -28,12 +28,15 @@
       font-size: 18px;
     }
     .kolappname{
+      margin-top:5px;
+      margin-bottom: 5px;
       border-radius: 8px;
-      border: 1px solid green;
-      background: rgb(140, 182, 140);
-      padding: 3px 5px;
+      // border: 1px solid rgb(140, 182, 140);
+      // background: rgba(140, 182, 140, 0.3);
+      // background: #D8E7C8;
+      // padding: 3px 5px;
       // background: rgb(195, 211, 195);
-      color:white;
+      color:#999;
       font-size: 14px;
     }
     .kolfanse{

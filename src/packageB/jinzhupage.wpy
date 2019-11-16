@@ -26,29 +26,20 @@
   text-align: right;
 }
 .topimg{
-  background: skyblue;
+  background: linear-gradient(45deg, #39b54a, #8dc63f);
   padding:30px;
   height: 150px;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   color:white;
   font-size: 20px;
 }
-.myimg{
-  width:60px;
-  height: 60px;
-  border:2px solid white;
-  border-radius: 50%;
-  .img{
-    width:60px;
-    height: 60px;
-    border-radius: 50%;
-  }
-}
 .centercomplete{
   position: relative;
-  width: 95%;
+  width: 90%;
   margin: 0 auto;
+  padding:10px;
+  box-sizing: border-box;
   height: 80px;
   background: white;
   border-radius: 10px;
@@ -61,7 +52,7 @@
 }
 .tocomplete{
   border-radius: 8px;
-  background-color:skyblue;
+  background-color:#8dc63f;
   color:white;
   padding: 3px 5px;
   width: 80px;
@@ -70,50 +61,64 @@
   justify-content:center;
   align-items: center;
 }
+.textInfo{
+  width: 200px;
+  word-wrap: break-word;
+}
+.img_header{
+  text-align: center;
+}
+.jinzhuimg{
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  #img{
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+  }
+}
 </style>
 <template>
   <view class="container" style="min-height: 100vh; background-color: white">
     <view class="topimg">
-      <view>
-        <view style="font-weight:600">{{myInfo.nick}}</view>
-        <view style="font-size:15px;margin-top:10px;">{{myInfo.mobile}}</view>
+      <view class="img_header">
+        <view class="jinzhuimg"><open-data id="img" type="userAvatarUrl"></open-data></view>
+        <view style="font-weight:600;margin-top:10px;">{{myInfo.name}}</view>
+        <!-- <view style="font-size:15px;margin-top:10px;">{{myInfo.mobile}}</view> -->
       </view>
-      <view class="myimg">
+      <!-- <view class="myimg" wx:if="{{myInfo.avatar}}">
         <image class="img" src="{{myInfo.avatar}}"/>
-        <!-- <view>{{myInfo.avatar}}</view> -->
-      </view>
+      </view> -->
     </view>
     <view class="centercomplete">
-      <view class="">正确填写您的身份是发布通告的第一步哦</view>
+      <view class="textInfo">正确填写您的身份是发布通告的第一步哦</view>
       <view class="tocomplete" @tap="toaddmyInfo">立即完善</view>
     </view>
     <view style="position:relative;top:-15px;">
-      <view class="mypageitem">
+      <view class="mypageitem" wx:if="{{myInfo}}">
                 <text>姓名：</text>
-                <input class="input_jinzhu" wx:if="{{showinput}}" placeholder="请输入姓名" @input="inputName" value="{{name}}" name="name"/>
-                <view wx:else class="rightitem">{{name}}</view>
+                <view class="rightitem">{{myInfo.name}}</view>
                 <view class="iconfont">&#xe683;</view>
            </view>
           <view class="mypageitem">
               <text>所属公司</text>
-              <input class="input_jinzhu" wx:if="{{showinput}}" placeholder="请输入您的公司" @input="inputCompany" value="{{company}}" name="company"/>
-              <view wx:else class="rightitem">{{company}}</view>
+              <view  class="rightitem">{{myInfo.company}}</view>
               <view class="iconfont">&#xe683;</view>
             </view>
              <view class="mypageitem">
                 <text style="flex:1">我的职务</text>
-                <input class="input_jinzhu" wx:if="{{showinput}}" placeholder="请输入您的职位" @input="inputJob" value="{{job}}" name="job"/>
-                <view wx:else class="rightitem">{{job}}</view>
+                <view class="rightitem">{{myInfo.position}}</view>
                 <view class="iconfont">&#xe683;</view>
              </view>
-             <view class="mypageitem">
+             <!-- <view class="mypageitem">
                 <text style="flex:1">我的手机号</text>
-                <view class="rightitem">{{myphone}}</view>
+                <view class="rightitem">{{myInfo.mobile}}</view>
                 <view class="iconfont">&#xe683;</view>
-             </view>
+             </view> -->
              <view class="mypageitem">
                 <text style="flex:1">微信</text>
-                <view class="rightitem">{{mywechat}}</view>
+                <view class="rightitem">{{myInfo.wechatNumb}}</view>
                 <view class="iconfont">&#xe683;</view>
              </view>
     </view>
@@ -121,7 +126,7 @@
 </template>
 <script>
 import wepy from 'wepy'
-import { postRequest, getRequest } from "../utils/request"
+import { getRequest } from "../utils/request"
 export default class NamePage extends wepy.page {
   config = {
     navigationBarTitleText: '我的主页',
@@ -130,74 +135,36 @@ export default class NamePage extends wepy.page {
   components = {}
   data = {
     name: '',
-    company: '',
-    job: '',
-    myphone: '',
-    mywechat: '',
-    issave: true,
-    showinput: null,
     myInfo: ''
   }
   methods = {
     toaddmyInfo() {
       wepy.navigateTo({ url: '/packageB/inputInfo' })
-    },
-    formSubmit(e) {
-      var data = e.detail.value
-      console.log(data)
-      data = {
-        "company": data.company,
-        "name": data.name,
-        "position": data.job,
-      }
-      postRequest({ url: '/ums/financier/find/info' }, data).then(res => {
-        console.log(res, '金主填写的自己的信息')
-        if (res.data.code === 200) {
-          this.issave = false
-          wepy.showToast({
-            title: '保存成功',
-          })
-        }
-      })
-    },
-    inputName(e) {
-      var name = e.detail.value
-      this.name = name
-    },
-    inputCompany(e) {
-      var company = e.detail.value
-      this.company = company
-    },
-    inputJob(e) {
-      var job = e.detail.value
-      this.job = job
+    }
+  }
+  onShow() {
+    this.onLoad()
+    const token = wx.getStorageSync('token')
+    if (token && token.length) {
+      console.log('token存在')
+    } else {
+      wx.redirectTo({ url: '/packageA/nologin' })
     }
   }
   async getmyInfo() {
-    await getRequest({ url: '/ums/user/find/my' }).then(res => {
+    await getRequest({ url: '/ums/financier/find/my' }).then(res => {
       console.log(res)
       if (res.data.code === 200) {
         var data = res.data.data
         this.myInfo = res.data.data
-        console.log(data, '金主获取到的自己的信息')
-        this.company = data.company
-        this.name = data.name
-        this.job = data.position
-        this.issave = false
-        this.showinput = false
-      } else {
-        this.showinput = true
-        this.issave = true
+        console.log(this.myInfo, '金主获取到的自己的信息')
+        wx.setStorageSync('employerInfo', data)
       }
     })
     this.$apply()
   }
   onLoad(options) {
     this.getmyInfo()
-    var userPhone = wx.getStorageSync('referUserPhoneNo')
-    this.myphone = userPhone
-    var wechatNum = wx.getStorageSync('wechatNum')
-    this.mywechat = wechatNum
   }
 }
 </script>

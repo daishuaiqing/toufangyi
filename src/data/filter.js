@@ -20,5 +20,6 @@ export const FILTER_CONDITION = {
       {displayText: '10 - 40 万', level: "L30"},
       {displayText: '50 - 99 千', level: "L40"},
       {displayText: '100 万以上', level: "L50"}
-    ]
+    ],
+    salary: ['1 千以下', '1 - 9 千', '1 万以上']
 }

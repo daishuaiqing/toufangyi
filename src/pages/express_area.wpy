@@ -1,15 +1,10 @@
 <style lang="less">
-.container{
-  padding-bottom: 25px;
-  box-sizing: border-box;
-}
 .conditiontop{
   position: fixed;
   top:0;
   background: white;
   width: 100vw;
   border-top: 1px solid #dedede;
-
 }
 // 顶部筛选
 #top-filter-bar{
@@ -22,30 +17,57 @@
 }
 .announce_list{
   padding-bottom:30px;
-  margin-top: 50px;
+  margin-top: 30px;
+}
+// 红人列表
+.kollist{
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background:white;
 }
 .kolList{
   padding-bottom: 30px;
-  margin-top: 50px;
+  margin-top: 30px; 
+  flex: 1;
+}
+.nokolList {
+  width: 90%;
+  height: 200px;
+  margin:50px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border-radius: 8px;
+}
+.homelogo{
+  margin-bottom: 20px;
+  display: block;
+  width:100px;
+  height: 100px;
 }
 .button_add{
   width: 60px;
   height: 60px;
-  border-radius: 50px;
+  border-radius: 50%;
   position:fixed;
   right: 20px;
-  bottom:80px;
-  background: rgb(140, 182, 140);
+  bottom:140px;
+  background: #39b54a;
   color:white;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 </style>
 <template>
 <view>
   <!-- 首页红人列表 -->
-  <view class="container" wx:if="{{!verify}}">
+  <view class="container kollist" wx:if="{{!verify}}">
     <view class="conditiontop">
       <view id="top-filter-bar">
          <picker name="appName" class="filter_button" @change="clickFilterByPlatform" value="{{platformIndex}}" range="{{platform_data}}">
@@ -54,11 +76,16 @@
        <picker  class="filter_button" @change="clickFilterByFansNum"  range="{{fansArray}}">
           <text>{{fansNumIndex==-1?'粉丝':fansDisplay }} ▾</text>
         </picker>
+        <picker  class="filter_button" @change="clickFilterBysalary"  range="{{salary_data}}">
+          <text>{{salaryIndex==-1?'报价':salary_data[salaryIndex] }} ▾</text>
+        </picker>
       </view>
     </view>
-      
-      <view class="button_add" @tap="addannounce">发布</view>
-      <view class="kolList">
+      <view class="button_add" @tap="addannounce">
+        <view>发布</view>
+        <view>通告</view>
+      </view>
+      <view class="kolList" wx:if="{{allKolList}}">
         <repeat for="{{allKolList}}" item="item" index="index" key="index">
           <view @tap="clickItem" id = "{{item.umsCelebrityCard.id}}">
             <ApplyItem :item_data.sync="item"/>
@@ -69,7 +96,11 @@
             <text class="bottom_loader_wrapper_text">{{msg}}</text>
           </block>
         </view>
-      </view>      
+      </view>
+      <view class="kolList nokolList " wx:else>
+        <view class="iconfont" style="font-size:100px;margin-bottom:10px;">&#xe600;</view>
+        <view>当前没有红人哦~</view>
+      </view>   
       <mp-tabbar current="{{current}}" style="position:fixed;bottom:0;width:100%;left:0;right:0;" list="{{otherlist}}" bindchange="tabChange"></mp-tabbar>
     </view>
   <!-- 首页通告列表-->
@@ -85,7 +116,7 @@
         </picker>
       </view>
     </view>
-      <view class="announce_list">
+      <view class="announce_list" wx:if="{{announce_data}}">
         <repeat for="{{announce_data}}" item="item" index="index" key="index">
           <view @tap="clickItem" id="{{item.bmsAnnounce.id}}">
             <ExpressAreaItem :item_data.sync="item"/>
@@ -96,6 +127,11 @@
             <text class="bottom_loader_wrapper_text">{{msg}}</text>
           </block>
         </view>
+      </view>
+       <view class="kolList nokolList " wx:else>
+        <view class="iconfont" style="font-size:100px;margin-bottom:10px;">&#xe600;</view>
+        <!-- <view><image class="homelogo" src="/images/logo.jpg"/></view> -->
+        <view>当前没有通告哦~</view>
       </view>
       <mp-tabbar current="{{0}}" style="position:fixed;bottom:0;width:100%;left:0;right:0;" list="{{list}}" bindchange="tabChange"></mp-tabbar>
     </view>
@@ -135,8 +171,10 @@
       allKolList: [],
       platform_data: FILTER_CONDITION.platform_data,
       fans_data: FILTER_CONDITION.fans_data, // 粉丝数量
+      salary_data: FILTER_CONDITION.salary,
       platformIndex: -1, // 平台index
       fansNumIndex: -1, // 粉丝数量index
+      salaryIndex: -1, // 报价index
       fansLevel: 0,
       fansStr: null,
       fansDisplay: '',
@@ -168,16 +206,27 @@
     }
     // 平台类型筛选
     clickFilterByPlatform(e) {
-      var index = e.detail.value
-      this.platformIndex = index
-      this.selectPlatform = this.platform_data[index]
-      console.log(this.selectPlatform, '999999999999999')
+      this.platformIndex = e.detail.value
+      this.selectPlatform = this.platform_data[this.platformIndex]
+      var pageNum = 1
+      this.pageNum = pageNum
       if (this.verify === true) {
-        this.conditionList(this.selectPlatform, this.fansStr, this.fansLevel)
+        this.conditionList(this.selectPlatform, this.fansStr, this.fansLevel, this.pageNum)
       } else {
-        this.conditionKOL(this.selectPlatform, this.fansStr, this.fansLevel)
+        this.conditionKOL(this.selectPlatform, this.fansStr, this.fansLevel, this.salary, this.pageNum)
       }
       this.condition = true
+      this.$apply()
+    }
+    // 报价筛选
+    clickFilterBysalary(e) {
+      this.salaryIndex = e.detail.value
+      this.salary = this.salary_data[this.salaryIndex]
+      var pageNum = 1
+      this.pageNum = pageNum
+      this.condition = true
+      this.$apply()
+      this.conditionKOL(this.selectPlatform, this.fansStr, this.fansLevel, this.salary, this.pageNum)
     }
     // 粉丝数量筛选
     clickFilterByFansNum(e) {
@@ -185,45 +234,70 @@
       this.fansDisplay = this.fans_data[this.fansNumIndex].displayText
       var fansStr = this.fansDisplay.replace(/\s*/g, '')
       this.fansStr = fansStr
-      console.log(fansStr)
       var fansLevel = this.fans_data[this.fansNumIndex].level
       fansLevel = fansLevel.split('L')[1]
       this.fansLevel = fansLevel
-      console.log(this.fansLevel, '88888888888')
+      var pageNum = 1
+      this.pageNum = pageNum
       if (this.verify === true) {
-        this.conditionList(this.selectPlatform, this.fansStr, this.fansLevel)
+        this.conditionList(this.selectPlatform, this.fansStr, this.fansLevel, this.pageNum)
       } else {
-        this.conditionKOL(this.selectPlatform, this.fansStr, this.fansLevel)
+        this.conditionKOL(this.selectPlatform, this.fansStr, this.fansLevel, this.salary, this.pageNum)
+        this.$apply()
       }
       this.condition = true
+      this.$apply()
     }
     // 下拉刷新
     onPullDownRefresh(e) {
       var that = this
       that.pageNum = 1
+      that.announce_data = ''
+      that.allKolList = ''
       if (this.verify === true) {
-        this.getannounceList(that.pageNum)
+        that.getannounceList(that.pageNum)
         wepy.stopPullDownRefresh()
       } else {
-        this.getKolList(that.pageNum)
+        that.getKolList(that.pageNum)
         wepy.stopPullDownRefresh()
       }
-      this.fansNumIndex = -1
-      this.platformIndex = -1
+      that.fansNumIndex = -1
+      that.platformIndex = -1
+      that.salaryIndex = -1
     }
     // 筛选通告
-    async conditionList(appName, fansStr, fansLevel) {
+    async conditionList(appName, fansStr, fansLevel, pageNum) {
       var that = this
       var data = {
         "appName": appName,
         "fansStr": fansStr,
         "fansLevel": fansLevel
       }
-      await getRequest({ url: '/bms/announce/list' }, data).then(res => {
-        console.log(res, '筛选通告列表')
+      await getRequest({ url: '/bms/announce/list?pageNum=' + pageNum }, data).then(res => {
         if (res.data.code === 200) {
           that.announce_data = res.data.data.content
-          console.log(that.announce_data, '通告列表')
+          console.log(that.announce_data, '筛选通告列表')
+          wepy.hideLoading()
+        } else {
+          wepy.hideLoading()
+          console.log('系统异常')
+        }
+      })
+      that.$apply()
+    }
+    // 下拉加载下一页筛选通告
+    async nextList(appName, fansStr, fansLevel, pageNum) {
+      var that = this
+      var data = {
+        "appName": appName,
+        "fansStr": fansStr,
+        "fansLevel": fansLevel
+      }
+      await getRequest({ url: '/bms/announce/list?pageNum=' + pageNum }, data).then(res => {
+        if (res.data.code === 200) {
+          var data = res.data.data.content
+          that.addannounce_data = [...that.announce_data, ...data]
+          console.log(that.announce_data, '加载下一页筛选通告列表')
           wepy.hideLoading()
         } else {
           wepy.hideLoading()
@@ -233,15 +307,16 @@
       that.$apply()
     }
     // 筛选红人列表
-    async conditionKOL(appName, fansStr, fansLevel) {
+    async conditionKOL(appName, fansStr, fansLevel, offerStr, pageNum) {
       var that = this
       var data = {
         "appName": appName,
         "fansStr": fansStr,
-        "fansLevel": fansLevel
+        "fansLevel": fansLevel,
+        "offerStr": offerStr
       }
-      await getRequest({ url: '/ums/celebrity/list' }, data).then(res => {
-        console.log(res, '77777777777777777777')
+      console.log(data)
+      await getRequest({ url: '/ums/celebrity/list?pageNum=' + pageNum }, data).then(res => {
         var code = res.data.code
         if (code === 200) {
           var allKolList = res.data.data.content
@@ -251,36 +326,65 @@
       })
       that.$apply()
     }
+    // 下拉加载第二页筛选过的红人列表
+    async nextKOL(appName, fansStr, fansLevel, offerStr, pageNum) {
+      var that = this
+      var data = {
+        "appName": appName,
+        "fansStr": fansStr,
+        "fansLevel": fansLevel,
+        "offerStr": offerStr
+      }
+      await getRequest({ url: '/ums/celebrity/list?pageNum=' + pageNum }, data).then(res => {
+        var code = res.data.code
+        if (code === 200) {
+          var data = res.data.data.content
+          this.allKolList = [...this.allKolList, ...data]
+          this.hasMore = false
+        }
+      })
+      that.$apply()
+    }
     // 触底加载
     async onReachBottom(e) {
-      console.log('加载下一页')
       var that = this
       that.pageNum = that.pageNum + 1
       if (this.verify === true) {
-        this.getannounceList(that.pageNum)
-        // if (this.condition === true) {
-
-        // }
+        if (this.condition === false) {
+          console.log('下拉加载下一页的通告信息')
+          this.getannounceList(that.pageNum)
+        }
       } else {
-        that.getKolList(that.pageNum)
+        console.log('下拉加载下一页的红人信息')
+        if (this.condition === false) {
+          that.getKolList(that.pageNum)
+        }
       }
+      if (this.condition === true) {
+        if (this.verify === true) {
+          console.log('下拉加载下一页筛选通告信息')
+          this.nextList(this.selectPlatform, this.fansStr, this.fansLevel, this.pageNum)
+        } else {
+          console.log('下拉加载下一页红人信息')
+          this.nextKOL(this.selectPlatform, this.fansStr, this.fansLevel, this.pageNum)
+        }
+      }
+      that.$apply()
     }
     // 获取通告列表
     async getannounceList(pageNum) {
       var that = this
       wepy.showLoading()
       await getRequest({ url: '/bms/announce/list?pageNum=' + pageNum }).then(res => {
-        console.log(res, '00000000')
         if (res.data.code === 200) {
           wepy.hideLoading()
-          if (res.data.data.content.length) {
-            var data = res.data.data.content
+          var data = res.data.data.content
+          if (data.length) {
             that.announce_data = [...that.announce_data, ...data]
             console.log(that.announce_data, '通告列表')
             that.$apply()
           } else {
-            // that.msg = "没有数据"
-            console.log('没有数据了')
+            console.log('没有通告数据了')
             that.$apply()
           }
         } else {
@@ -297,28 +401,25 @@
       var that = this
       wepy.showLoading({})
       await getRequest({ url: '/ums/celebrity/card/list?pageNum=' + pageNum }).then(res => {
-        console.log(res)
         var code = res.data.code
         if (code === 200) {
           wepy.hideLoading()
           var data = res.data.data.content
           if (data.length) {
-            data = res.data.data.content
             that.allKolList = [...that.allKolList, ...data]
             console.log(that.allKolList, '所有红人')
             that.$apply()
           } else {
-            console.log('没有数据了')
+            console.log('没有红人数据了')
             that.$apply()
           }
         } else {
           wx.hideLoading()
           wepy.showToast({
             title: '系统异常',
-            icon: 'none',
+            icon: 'none'
           })
         }
-        // that.$apply()
       })
     }
     async onLoad(option) {
@@ -329,24 +430,33 @@
       this.fansArray = fans_data
     }
     onShow() {
-      this.pageNum = 1
-      var that = this
+      this.platformIndex = -1
+      this.salaryIndex = -1
+      this.fansNumIndex = -1
       wepy.hideTabBar({animation: false})
+      var that = this
+      that.pageNum = 1
       var verify = wx.getStorageSync('verify')
       if (verify === 1) {
         console.log(verify, '这是红人身份')
-        this.getannounceList(that.pageNum)
-        this.verify = true
+        that.announce_data = ''
+        that.getannounceList(that.pageNum)
+        that.verify = true
+        wepy.setNavigationBarTitle({
+          title: "通告"
+        })
       } else if (verify === 2) {
         console.log(verify, '这是金主身份')
-        this.verify = false
-        this.getKolList(that.pageNum)
+        that.verify = false
+        that.allKolList = ''
+        that.getKolList(that.pageNum)
+        wepy.setNavigationBarTitle({
+          title: "红人"
+        })
       } else {
         console.log('当前是首次登录，还没有选择身份')
         wepy.redirectTo({ url: '/packageB/choose_identify' })
       }
-    }
-    onReady() {
     }
   }
 </script>

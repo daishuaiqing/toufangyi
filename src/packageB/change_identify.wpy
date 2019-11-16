@@ -2,27 +2,47 @@
     .choose_identify{
         width: 100vw;
         height: 100vh;
+        background: white;
         font-size: 16px;
-        text-align: center;  
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content:center;
     }
     .choose_title{
-       font-size: 20px;
+       font-size: 16px;
        font-weight:500;
         width: 100vw;
-        margin: 170px 0 130px 0;
+        text-align: center;
+        margin: 20px auto;
+    }
+    .choose_area{
+      width:100vw;
     }
     .choose_select{
-      padding: 10px 15px;
+      width: 85%;
+      margin:30px auto;
+      height: 100px;
       border-radius: 10px;
-      background: #5dd5c8;
-      width: 120px;
-      margin: 30px auto;
-       color:white;
+      background: linear-gradient(45deg, #39b54a, #8dc63f);
+      display: flex;
+      align-items: center;
+      color:white;
+      justify-content: center;
+    }
+    .personImg{
+      width: 150px;
+      border-radius: 50%;
+      height: 150px;
     }
 </style>
 <template>
-  <view class="choose_identify">
-      <view class="choose_title">您当前的身份是{{verify==1?'红人':'金主'}}</view>
+  <view class="choose_identify container">
+      <view class="personImg">
+        <image style="width:150px;height:150px;border-radius:50%;" src="/images/default.png"/>
+      </view>
+      <view class="choose_title">您当前的身份是</view>
+      <view>{{verify==1?'红人':'金主'}}</view>
       <view class="choose_area">
           <view class="choose_select" wx:if="{{show}}" @tap='changeverify'>切换身份为金主</view>
           <view class="choose_select" wx:else @tap='changeuser'>切换身份为红人</view>

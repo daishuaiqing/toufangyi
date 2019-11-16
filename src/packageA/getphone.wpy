@@ -50,7 +50,8 @@
     data = {
     }
     getPhoneNumber(e) {
-      wx.setStorageSync('referUserPhoneNo', '222222')
+      // wx.setStorageSync('referUserPhoneNo', '222222')
+      console.log(e)
       this.login()
     }
     async login() {

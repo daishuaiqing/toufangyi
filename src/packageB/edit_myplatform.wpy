@@ -3,6 +3,7 @@
     width: 90vw;
     margin:10px auto;
     padding: 10px;
+    background: white;
 }
 .edit_content .edit_title{
   font-size: 18px;
@@ -76,7 +77,7 @@
         </view>
         <view class="edit_item">
             <text class="labelname">报价</text>
-            <input name="salary" class="input_edit" type="text"  placeholder="请填写您的期望报价" @input="inputsalary"/>
+            <input name="salary" class="input_edit" type="text"  placeholder="{{salaryInput}}" @input="inputsalary"/>
         </view>
          <view class="edit_item">
             <text class="labelname"> 粉丝数量:</text>
@@ -84,7 +85,7 @@
         </view>
         <view class="edit_item">
             <text class="labelname">微信号</text>
-            <input name="phoneNum" class="input_edit" type="number"  placeholder="请填写您的手机号" @input="inputwechatNumb"/>
+            <input name="phoneNum" class="input_edit"  placeholder="{{wechatInput}}" @input="inputwechatNumb"/>
         </view>
         <view class="edit_item">
             <text class="labelname">链接分享:</text>
@@ -126,6 +127,8 @@
       fansInput: '请输入您的粉丝数量',
       IdInput: '请输入您的ID',
       linkInput: '请输入您的链接',
+      salaryInput: '请填写您的期望报价',
+      wechatInput: '请填写您的微信号',
       appLink: '',
       salary: '',
       wechat: ''
@@ -270,9 +273,11 @@
       this.fansNumb = editDetail.fansNumb
       this.fansInput = editDetail.fansNumb
       this.IdInput = editDetail.appNickname
-      // this.linkInput = editDetail.appLink
-      this.wechat = editDetail.wechat
-      this.salary = editDetail.salary
+      this.linkInput = editDetail.appLink
+      this.wechat = editDetail.wechatNumb
+      this.salary = editDetail.offer
+      this.salaryInput = editDetail.offer
+      this.wechatInput = editDetail.wechatNumb
       // picker选择器
       var that = this
       for (let i = 0; i < this.platform_data.length; i++) {
