@@ -26,10 +26,10 @@
     align-items: center;
   }
   .salaryIf{
+    // border: 1px solid #000;
     flex: 1;
     height: 100%;
     text-align: right;
-    margin-right: 10px;
   }
   .titleapp{
     font-weight: 550;

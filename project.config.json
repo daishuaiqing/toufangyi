@@ -42,7 +42,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 73,
+			"current": 74,
 			"list": [
 				{
 					"id": -1,
@@ -559,6 +559,13 @@
 					"id": -1,
 					"name": "packageA/person_announces",
 					"pathName": "packageA/person_announces",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "packageA/express_detail",
+					"pathName": "packageA/express_detail",
 					"scene": null
 				}
 			]

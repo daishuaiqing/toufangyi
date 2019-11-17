@@ -17,6 +17,19 @@
  box-shadow: 0 1px 1px #dedede;
  background: white;
 }
+.userlogin{
+  display: flex;
+  flex-direction: column;
+  font-size: 16px;
+  margin-left: 10px;
+}
+.loginbutton{
+  width: 80px;
+  font-size: 12px;
+  margin-top: 5px;
+  color:white;
+  background: linear-gradient(45deg, #39b54a, #8dc63f);
+}
 .user-name{
   font-size: 16px;
 }
@@ -32,12 +45,13 @@
     margin-top: 2px;
 }
 .identify-mask{
+  position: fixed;
+  right:0;
   display: flex;
-  flex:1;
-  justify-content: center;
+  border: 1px solid #00a982;
   padding:5px;
   margin-right: 10px;
-  align-items: center;
+  border-radius: 8px;
 }
 .verified{
   width: 16px;
@@ -115,10 +129,7 @@
     margin-right: 6px;
    align-self: flex-end;
   }
-.box{
-  margin-top:5px;
-  font-size:13px;
-}
+
 .myinfoItem{
   display:flex;
   justify-content:space-between;
@@ -128,12 +139,7 @@
   font-size:15px;
   padding-left: 20px;
 }
-.loginbutton{
-  font-size: 12px;
-  border:1px solid rgb(140, 182, 140);
-  color:white;
-  background: linear-gradient(45deg, #39b54a, #8dc63f);
-}
+
 .icontheader{
   font-size:20px;
   margin-right:10px;
@@ -147,20 +153,20 @@
     <view  class="container-info">
       <!-- 顶部资料 -->
       <view class="header-info">
-        <image class="avatar-image" src="{{userInfo?userInfo.avatarUrl:'/images/default.png'}}"/>
-        <view style="display:flex;flex-direction:column;margin-left:25px;">
-          <text class="user-name">{{userInfo?userInfo.nickName:'未登录用户'}}</text>
+        <view><image class="avatar-image" src="{{userInfo?userInfo.avatarUrl:'/images/default.png'}}"/></view>
+        <view class="userlogin">
+          <view class="user-name">{{userInfo?userInfo.nickName:'未登录用户'}}</view>
            <!-- <view class="box" wx:if="{{promise}}">{{userPhone}}</view> -->
-           <view class="box" wx:if="{{!promise}}">
+           <view  wx:if="{{!promise}}">
                <button class='loginbutton' @tap="tologin">
                  立即登录
                 </button>
             </view>
         </view>
-        <view  class="identify-mask">
+        <view  class="identify-mask" wx:if="{{userInfo}}">
           <block wx:if="{{userInfo}}">
             <view class="iconfont" style="color: #39b54a;margin-right:8px;">&#xe937;</view>
-            <text>红人</text>
+            <text style="color:#39b54a">红人</text>
           </block> 
         </view>
       </view>
@@ -194,21 +200,19 @@
     <view wx:if="{{!verify}}" class="container">
     <view  class="container-info">
       <view class="header-info" style="margin-bottom:8px;">
-        <image class="avatar-image" src="{{userInfo?userInfo.avatarUrl:'/images/default.png'}}"/>
-        <view style="display:flex;flex-direction:column;margin-left:25px;">
+        <view><image class="avatar-image" src="{{userInfo?userInfo.avatarUrl:'/images/default.png'}}"/></view>
+        <view class="userlogin">
           <text class="user-name">{{userInfo?userInfo.nickName:'未登录用户'}}</text>
           <!-- <view class="box" wx:if="{{promise}}">{{userPhone}}</view> -->
-           <view class="box" wx:if="{{!promise}}">
+           <view wx:if="{{!promise}}">
                <button class='loginbutton' @tap="tologin">
                  立即登录
                 </button>
            </view>
         </view>
-        <view  class="identify-mask">
-          <block wx:if="{{userInfo}}">
+        <view  class="identify-mask" wx:if="{{userInfo}}">
             <view class="iconfont" style="color: #39b54a;margin-right:8px;">&#xe937;</view>
-            <text>金主</text>
-          </block>
+            <text style="color:#39b54a">金主</text>
         </view>
       </view>
     <!-- 通告维护 -->

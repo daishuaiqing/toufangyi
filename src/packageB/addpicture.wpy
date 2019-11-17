@@ -10,7 +10,7 @@
 // 发布按钮
 .submit_pic{
     margin-right: 10px;
-    background: purple;
+    background: #39b54a;
     border-radius: 8px;
     height: 15px;
     margin-top: 5px;
@@ -152,8 +152,7 @@ export default class PicturePage extends wepy.page {
       this.editStatus = true
     },
     delImage(e) {
-      console.log('删除了图片')
-      var index = e.currentTarget.index
+      var index = e.currentTarget.dataset.index
       this.tempFilePaths.splice(index, 1)
     },
     previewImage(e) {
@@ -166,9 +165,10 @@ export default class PicturePage extends wepy.page {
     },
   }
   onLoad(options) {
-    var images = JSON.parse(options.Images)
-    images = images.images
-    this.tempFilePaths = images
+    // var editimages = JSON.parse(options.Images)
+    // var images = editimages.images
+    // console.log(images, '2222222222')
+    // this.tempFilePaths = images
   }
 }
 </script>

@@ -115,6 +115,18 @@ input{
       }
     }
     onLoad(options) {
+      const token = wx.getStorageSync('token')
+      if (token && token.length) {
+        console.log('token存在')
+      } else {
+        wepy.showToast({
+          title: '您还未登录',
+          icon: 'none',
+        })
+        setTimeout(function() {
+          wx.redirectTo({ url: '/packageA/nologin' })
+        }, 1000)
+      }
     }
   }
 </script>

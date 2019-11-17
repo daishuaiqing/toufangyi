@@ -1,59 +1,4 @@
 <style lang="less">
-
-  #bottom-loader-wrapper {
-    align-self: center;
-    padding: 10px;
-  }
-
-  #operation_wrapper {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    align-self: stretch;
-    margin: 8px 12px 0px 12px;
-  }
-
-  #clear_button {
-    display: flex;
-    background-color: #f2f2f2;
-    color: #333;
-    height: 36px;
-    text-align: center;
-    align-items: center;
-    margin-right: 8px;
-    padding-left: 16px;
-    padding-right: 16px;
-    border-radius: 2px;
-    justify-content: center;
-  }
-
-  #clear_button:active {
-    opacity: 0.7;
-  }
-
-  #confirm_button {
-    display: flex;
-    text-align: center;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    border-radius: 2px;
-    height: 36px;
-    flex: 1;
-    background-color: #0872b0;
-  }
-
-  #confirm_button:active {
-    opacity: 0.7;
-  }
-  #contact_service_button {
-    color: #333;
-    text-decoration: underline;
-  }
-  .nocontenttip{
-    font-size: 12px;
-    background: white;
-  }
 </style>
 <template>
     <view class="container" style="min-height: 100vh;">
@@ -64,7 +9,6 @@
           </view>
         </repeat>
       </view>
-      <button class="nocontenttip">{{msg}}</button>
     </view>
 </template>
 <script>
@@ -92,9 +36,6 @@
     }
     // 获取我的所有通告列表
     async getmyAllAnnounce() {
-      wx.showLoading({
-        title: '正在加载',
-      })
       var pageNum = 1
       var that = this
       that.pageNum = pageNum
@@ -103,10 +44,8 @@
           var myAllAnnounce = res.data.data.content
           that.myAllAnnounce = myAllAnnounce
           console.log(myAllAnnounce, '金主的所有通告')
-          wx.hideLoading()
         } else {
           console.log('当前还没有通告')
-          wx.hideLoading()
         }
       })
       that.$apply()
@@ -133,7 +72,6 @@
     async onPullDownRefresh(e) {
       this.getmyAllAnnounce()
       wepy.stopPullDownRefresh()
-      this.$apply()
     }
     async onLoad(option) {
       const token = wx.getStorageSync('token')

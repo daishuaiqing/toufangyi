@@ -4,8 +4,8 @@
   margin:0 auto;
   min-height: 100vh;
   font-size: 14px;
-  padding-bottom: 20px;
   padding:0 20px;
+  padding-bottom: 60px;
   box-sizing: border-box;
   background: white;
 }
@@ -40,6 +40,7 @@
 }
 .button_all{
   margin-top: 30px;
+  // margin-bottom:50px;
   display: flex;
   justify-content: space-around;
 }
@@ -49,7 +50,7 @@
   border:none;
   color:white;
   border-radius: 5px;
-  background: rgb(187, 180, 180);
+  background: rgb(204, 202, 202);
   box-shadow: 2px 2px 2px #dedede;
 }
 .radio-group{
@@ -139,7 +140,7 @@
   import { FILTER_CONDITION } from '../data/filter'
   import AreaPicker from "../components/common/wepy-area-picker"
   import jump from "../components/common/jump"
-  import { postRequest } from "../utils/request"
+  import { getRequest, postRequest } from "../utils/request"
   export default class AddPlatformPage extends wepy.page {
     config = {
       enablePullDownRefresh: false
@@ -149,6 +150,7 @@
       jump
     }
     data = {
+      employerInfo: '',
       issalary: false,
       contentType_data: FILTER_CONDITION.contentType_data, // 类别
       platform_data: FILTER_CONDITION.platform_data, // 平台
@@ -297,17 +299,29 @@
       })
       this.fansArray = fans_data
     }
+    async getmyInfo() {
+      await getRequest({ url: '/ums/financier/find/my' }).then(res => {
+        console.log(res)
+        if (res.data.code === 200) {
+          this.employerInfo = res.data.data
+          if (this.employerInfo) {
+            console.log('金主已经完善过信息')
+          } else {
+            wepy.showToast({
+              title: '请先完善您的个人信息!',
+              icon: 'none',
+            })
+            setTimeout(function() {
+              wepy.navigateTo({ url: '/packageB/jinzhupage' })
+            }, 2000)
+          }
+          console.log(this.employerInfo, '获取到的金主的信息')
+        }
+      })
+      this.$apply()
+    }
     onShow() {
-      var employerInfo = wx.getStorageSync('employerInfo')
-      if (!employerInfo) {
-        wepy.showToast({
-          title: '请先完善您的个人信息!',
-          icon: 'none',
-        })
-        setTimeout(function() {
-          wepy.navigateTo({ url: '/packageB/jinzhupage' })
-        }, 2000)
-      }
+      this.getmyInfo()
       var verify = wx.getStorageSync('verify')
       if (verify === 1) {
         console.log('这是红人界面')

@@ -148,7 +148,9 @@ export default class NamePage extends wepy.page {
     if (token && token.length) {
       console.log('token存在')
     } else {
-      wx.redirectTo({ url: '/packageA/nologin' })
+      setTimeout(function() {
+        wx.redirectTo({ url: '/packageA/nologin' })
+      }, 2000)
     }
   }
   async getmyInfo() {
@@ -158,7 +160,6 @@ export default class NamePage extends wepy.page {
         var data = res.data.data
         this.myInfo = res.data.data
         console.log(this.myInfo, '金主获取到的自己的信息')
-        wx.setStorageSync('employerInfo', data)
       }
     })
     this.$apply()

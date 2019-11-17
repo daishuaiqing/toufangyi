@@ -207,7 +207,6 @@ export default class extends wepy.app {
           }
           postRequest({url: '/ums/user/login'}, data).then(res => {
             if (res.data.data) {
-              wepy.setStorageSync('logged', true)
               wx.setStorageSync('token', res.data.data.token)
             } else {
               console.log("用户信息校验失败")

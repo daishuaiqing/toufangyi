@@ -63,13 +63,17 @@
   border-radius: 8px;
 }
 .Imgview{
-  width: 100%;
+  // margin-top: 10px;
+  width: 90%;
   height: 160px;
   display: flex;
+  margin:10px auto;
   background: white;
   justify-content: center;
   align-items: center;
   border-radius: 8px;
+  border: 2px solid #dedede;
+  box-shadow: 1px 2px 2px #dedede;
 }
 .toupimg{
     width:120px;
@@ -170,6 +174,7 @@
               </view>
           </view>
           <view  wx:if="{{!isFromMine&&!showImg}}" class="Imgview">
+            <!-- <view class="iconfont" style="font-size:20px;">&#xe664;</view> -->
             <view style="margin-top:15px;">红人当前还没有图片集</view>
           </view>
           <!-- 用户上传了照片 -->
@@ -325,8 +330,6 @@
             that.$apply()
           }
           this.KolDetail = KolDetail
-          console.log(this.KolDetail, '红人的详细信息')
-          // wx.setStorageSync('card', this.KolDetail)
           that.$apply()
         }
       })
@@ -357,7 +360,29 @@
         }
       })
     }
+    async getmyInfo() {
+      await getRequest({ url: '/ums/financier/find/my' }).then(res => {
+        console.log(res)
+        if (res.data.code === 200) {
+          this.employerInfo = res.data.data
+          if (this.employerInfo) {
+            console.log('金主已经完善过信息')
+          } else {
+            wepy.showToast({
+              title: '请先完善您的个人信息!',
+              icon: 'none',
+            })
+            setTimeout(function() {
+              wepy.navigateTo({ url: '/packageB/jinzhupage' })
+            }, 2000)
+          }
+          console.log(this.employerInfo, '获取到的金主的信息')
+        }
+      })
+      this.$apply()
+    }
     onShow() {
+      this.getmyInfo()
       if (this.isFromMine === true) {
         this.getKOLdetil()
       } else {
@@ -369,7 +394,9 @@
       if (token && token.length) {
         console.log('token存在')
       } else {
-        wx.redirectTo({ url: '/packageA/nologin' })
+        setTimeout(() => {
+          wx.redirectTo({ url: '/packageA/nologin' })
+        }, 1000)
       }
       var kolId = options.kolId
       this.kolId = kolId

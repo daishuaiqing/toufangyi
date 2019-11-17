@@ -63,15 +63,13 @@
         <view class="react-item">我申请过的</view>
       </view>
       <!-- 我关注的界面 -->
-    <block>
+    <view style="padding-bottom:70px;">
       <repeat for="{{applyedArray}}">
-        <!-- <swipeout  i-class="i-swipeout-demo-item" style="height:100%;"  @change="delItem"> -->
         <view slot="content"  @tap="clickItem" id="{{item.bmsAnnounce.id}}">
          <express :item_data="item"/>
         </view>
-        <!-- </swipeout> -->
       </repeat>
-    </block>
+    </view>
     </view>
   </block>
   <mp-tabbar current="{{1}}" style="position:fixed;bottom:0;width:100%;left:0;right:0;" list="{{list}}" bindchange="tabChange"></mp-tabbar>
@@ -90,24 +88,23 @@
         <view class="react-item">对我感兴趣</view>
       </view>
       <!-- 申请过工作界面 -->
-        <view class="content-item" wx:if="{{false}}">
+        <view class="content-item" wx:if="{{kolArray}}" style="padding-bottom:70px;">
         <repeat for="{{kolArray}}" key="{{index}}">
-            <view class="interest">
-                <image style="width:50px;height:50px;border-radius:50%;margin-right:10px;" src="{{item.avatar}}"/>
+            <view class="interest" @tap="clickItem">
+                <image style="width:50px;height:50px;border-radius:50%;margin-right:10px;" src="{{item.umsUser.avatar}}"/>
                 <view style="flex:1;border-bottom:1px solid #cccccc;height:100%;">     
-                    <view style="font-size:14px;margin-top:8px;">{{item.nick}}</view>
+                    <view style="font-size:14px;margin-top:8px;">{{item.umsUser.nick}}</view>
                      <view style="display:flex;font-size:13px;align-items:center;">
-                        <view style="flex:1;">类别：美妆</view>
-                        <view style="border:1px solid orange;color:orange;padding:5px;border-radius:5px;">去看看</view>
+                        <view style="flex:1;">类别: {{item.umsCelebrityCard.category}}</view>
+                        <!-- <view style="border:1px solid orange;color:orange;padding:5px;border-radius:5px;">去看看</view> -->
                     </view>
-                    <view style="font-size:13px;">小红书、抖音1k粉左右</view>
+                    <view style="font-size:13px;">{{item.umsCelebrityCard.appName}} {{item.umsCelebrityCard.fansNumb}} 粉</view>
                 </view>
             </view>
         </repeat>
       </view>
        <view class="nokolList " wx:else>
         <view class="iconfont" style="font-size:100px;margin-bottom:10px;">&#xe600;</view>
-        <!-- <view><image class="homelogo" src="/images/logo.jpg"/></view> -->
         <view>当前没有列表</view>
       </view>
   </view>
@@ -162,10 +159,7 @@
             url: '../packageA/kol_detail'
           })
         }
-      },
-      // todetail() {
-      //   wepy.navigateTo({ url: '/packageA/express_detail' })
-      // }
+      }
     }
     onReachBottom(e) {
       var that = this
@@ -180,7 +174,7 @@
     }
     // 对我感兴趣的红人的列表
     async getKolList(pageNum) {
-      await getRequest({ url: '/bms/celebrity/financier/log/list?pageNum=' + pageNum }).then(res => {
+      await getRequest({ url: '/bms/celebrity/announce/find?pageNum=1' }).then(res => {
         console.log(res, '申请过工作的红人的列表')
         if (res.data.code === 200) {
           var kolArray = []

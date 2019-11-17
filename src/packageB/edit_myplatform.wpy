@@ -1,9 +1,16 @@
 <style lang="less">
+.editList{
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+}
 .edit_content{
-    width: 90vw;
-    margin:10px auto;
-    padding: 10px;
+    width: 100vw;
+    height: 100%;
+    flex:1;
+    padding: 20px;
     background: white;
+    box-sizing: border-box;
 }
 .edit_content .edit_title{
   font-size: 18px;
@@ -49,13 +56,13 @@
   border:none;
   color:white;
   border-radius: 10px;
-  background: rgb(143, 123, 123);
+  background: #00a982;
   box-shadow: 2px 2px 2px #dedede;
 }
 
 </style>
 <template>
-  <view class="container">
+  <view class="container editList">
     <form bindsubmit="formSubmit" bindreset="formReset">
        <view class="edit_content">
         <view class="edit_title">{{isaddplatform === true?'添加我的平台信息': '编辑平台信息'}}</view>
@@ -260,13 +267,12 @@
         this.isaddplatform = true
         wepy.setNavigationBarTitle({ title: '添加平台' })
       } else {
+        this.isaddplatform = false
         this.editDetail = JSON.parse(options.platformDetail)
-  
         wepy.setNavigationBarTitle({ title: '编辑我的平台' })
       }
     }
     editplat() {
-      console.log(this.editDetail.platform)
       var editDetail = this.editDetail.platform
       this.appLink = editDetail.appLink
       this.platformUserId = editDetail.appNickname
@@ -293,7 +299,7 @@
       }
     }
     onShow() {
-      if (this.isaddplatform !== "true") {
+      if (this.isaddplatform !== true) {
         this.editplat()
       }
     }

@@ -23,14 +23,14 @@
   .express-item-wrapper {
     display: flex;
     flex-direction: column;
-    padding: 8px 12px;
+    padding: 15px;
     background-color: white;
-    margin-top: 8px;
     box-shadow: 0 1px 1px #dedede;
+    border-bottom: 1px solid #dedede;
   }
-  .avatar-image {
-    width: 26px;
-    height: 26px;
+  .employerImg {
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
   }
   .user-name {
@@ -142,52 +142,59 @@
   background: #00a982;
   margin-top: 15px;
 }
+.announceExa{
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex:1;
+  justify-content: space-between;
+  align-items: center;
+}
+.ExampleName{
+  font-weight: 550;
+  font-size: 18px;
+
+}
 </style>
 <template>
   <view class="container">
     <view class="express-item-wrapper">
-      <view class="item_row_container">
-         <view class="item_row_container" style="font-weight:550;font-size:16px;flex:1 1 auto; width: 80vw; align-items: flex-end;">
-        <text class="item_title_text;">{{ announce_detail.announceName}}</text>
-        <block wx:if="{{ announce_detail.appName }}">
-          <text class="item_sub_title_text">(</text>
-          <text class="item_sub_title_text">{{announce_detail.appName  }}</text>
-          <text class="item_sub_title_text">)</text>
-        </block>
-      </view>
-        <view class="item_row_container" style="flex:0 0 auto;font-size:13px; margin-top: 8px;display:flex;">
-        <view wx:if="{{announce_detail.salary!==0}}">
-          <text class="item_right_corner_text">报酬： </text>
+       <view class="announceExa">
+         <!-- 平台等 -->
+         <view>
+           <view class="ExampleName">{{ announce_detail.announceName}}</view>
+           <view style="margin-top:5px;">平台:  {{announce_detail.appName}} ( {{announce_detail.announceCategory}} )</view>
+           <view wx:if="{{ announce_detail.fansStr }}" style="margin-top:5px;">
+             <text class="item_main_atrr_text">粉丝: </text>
+             <text class="item_main_atrr_text">{{ announce_detail.fansStr}}</text>  
+          </view>
+          <view style="margin-top:5px;">
+            <text class="item_foot_text">需求人数: </text>
+            <text class="item_foot_text" style="margin-left: 6px;color: #eea932">{{announce_detail.needNumb}}</text>
+          </view>
+         </view>
+         <!-- 报酬 -->
+        <view>
+          <view wx:if="{{announce_detail.salary!==0}}">
+          <text class="item_right_corner_text">报酬: </text>
            <text class="item_right_corner_text">{{ announce_detail.salary }}</text>
         </view>
          <view wx:if="{{announce_detail.salary==0}}">
           <text class="item_right_corner_text">无费置换 </text>
         </view>
-        <view style="margin-left:10px;">
-           <block wx:if="{{ announce_detail.fansNumb }}">
-        <text class="item_main_atrr_text">{{ announce_detail.fansNumb}}</text>
-        <text style="margin-left: 6px;"></text>
-      </block>
-      <text class="item_main_atrr_text">{{ announce_detail.fansStr}}粉</text>
         </view>
-      </view>
-    </view>
-      <view class="item_row_container" style="font-size:12px;flex-wrap: wrap; width: 90vw; margin-top: 8px;">
-      <text class="item_foot_text">需求人数: </text>
-      <text class="item_foot_text" style="margin-left: 6px;color: #eea932">{{announce_detail.needNumb}}</text>
-    </view>
+       </view>
     </view>
     <view class="express-item-wrapper">
       <view class="item_row_container">
           <view style="display: flex; flex-direction: column; width: 50vw; flex:1 1 auto; padding-left: 6px;">
             <view class="item_row_container">
-              <image class="avatar-image" src="{{announceUser.avatar}}"/>
-           <text class="user-name" style="margin-left: 6px;font-size:12px">{{announceUser.nick}}</text>
-           <text class="user-name" style="margin-left: 6px;font-size:12px">{{announceUser.position}}</text>
+              <image class="employerImg" src="{{announceUser.avatar}}"/>
+              <text class="user-name" style="margin-left: 20px;font-size:15px">{{announceUser.nick}}</text>
             </view>
-            <view class="item_row_container" style="margin-top: 8px;">
-              <text class="item_foot_text">公司: </text>
-              <text class="item_foot_text" style="margin-left: 6px;">{{announceUser.company}}</text>
+            <view class="item_row_container" style="margin-top: 10px;">
+              <text class="item_foot_text">{{announceUser.company}}</text>
+              <text class="user-name" style="margin-left: 6px;font-size:15px">{{announceUser.position}}</text>
             </view>
           </view>
       </view>
@@ -195,12 +202,12 @@
 
     <view class="express-item-wrapper">
       <text class="user-name">通告详情</text>
-      <text class="item_foot_text" style="margin-top: 8px;">{{announce_detail.detail}}</text>
+      <text class="item_foot_text" style="margin-top: 8px;font-size:16px;">{{announce_detail.detail}}</text>
     </view>
-      <view class="express-item-wrapper">
-          <view class="item_row_container">
+      <view class="express-item-wrapper" style="margin-top:0;">
+          <view class="item_row_container" style="padding:10px 0;">
             <text class="item_foot_text">报名截至时间: </text>
-            <text class="item_foot_text" style="margin-left: 6px;">{{announce_detail.endTime}}</text>
+            <text class="item_foot_text" style="margin-left: 6px;">{{endTime}}</text>
           </view>
       </view>
     <!-- 微信号显示 -->
@@ -251,6 +258,8 @@
     components = {
     }
     data = {
+      endTime: '',
+      KolDetail: [],
       visible: null,
       announce_detail: {},
       announceUser: {},
@@ -342,6 +351,9 @@
           that.announceUser = res.data.data.umsUser
           that.wechatNum = that.announceUser.wechatNumb
           console.log(that.announceUser, '金主信息')
+          var endTime = that.announce_detail.endTime
+          endTime = endTime.split(' ')[0]
+          this.endTime = endTime
           this.getshareImage()
           that.$apply()
         }
@@ -420,15 +432,43 @@
         })
       }, 2000)
     }
+    async getKOLdetil() {
+      await getRequest({url: '/ums/celebrity/card/find/all'}).then(res => {
+        console.log(res)
+        var that = this
+        if (res.data.code === 200) {
+          var KolDetail = res.data.data.umsCelebrityCards
+          this.KolDetail = KolDetail
+          if (this.KolDetail.length) {
+            console.log('红人已经有名片')
+          } else {
+            wx.showModal({
+              title: '持有名片才可报名通告',
+              content: '去添加名片？',
+              showCancel: true,
+              cancelText: '取消',
+              cancelColor: '#000000',
+              confirmText: '确定',
+              confirmColor: '#39b54a',
+              success: res => {
+                if (res.cancel) {
+                  setTimeout(() => {
+                    wx.switchTab({ url: '/pages/express_area' })
+                  }, 1000)
+                } else {
+                  setTimeout(() => {
+                    wx.navigateTo({ url: '/packageB/edit_myplatform?addplatform=true' })
+                  }, 1000)
+                }
+              }
+            })
+          }
+          that.$apply()
+        }
+      })
+    }
     onShow() {
-      var card = wx.getStorageSync('mycard')
-      if (card) {
-        wepy.showToast({
-          title: '您还没有添加名片!',
-          icon: 'none'
-        })
-        wepy.navigateTo({ url: '/packageA/kol_detail' })
-      }
+      this.getKOLdetil()
       const token = wx.getStorageSync('token')
       if (token && token.length) {
         console.log('token存在')
@@ -437,6 +477,7 @@
       }
     }
     onLoad(option) {
+  
       var announceID = option.announceId
       this.announceID = announceID
       this.getannounceDetail()
